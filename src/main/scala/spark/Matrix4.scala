@@ -1,6 +1,6 @@
-package spark.activator
+package spark
 
-import spark.activator.util.{Matrix, Timestamp}
+import spark.util.{Matrix, Timestamp}
 import org.apache.spark.SparkContext
 
 /**

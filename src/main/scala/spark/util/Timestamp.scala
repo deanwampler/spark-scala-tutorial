@@ -1,4 +1,4 @@
-package spark.activator.util
+package spark.util
 
 import java.util.Date
 import java.text.SimpleDateFormat

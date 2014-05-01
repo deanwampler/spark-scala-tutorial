@@ -63,9 +63,15 @@ I recommend that you open the [Documentation link](http://people.apache.org/~pwe
 
 ## Building and Running
 
-The *de facto* standard build tool for Scala is [sbt](http://www.scala-sbt.org/). Build files included with this project (see the `project` directory) download the required Spark jar files and other dependencies.
+If you're using [Activator](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically. 
 
-Invoke <a class="shortcut" href="#run">run</a> to try it out. The default `main` class `RunAll` runs all of the scripts with default arguments. Each script also has its own `main` routine that you can select in the drop-down menu on the Run panel. The examples provided are these:
+If you checked this tutorial out of [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
+
+Open the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class" and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations. 
+
+If you are using `sbt` from the command line, start `sbt`, then type `run`. It will present the same list of main classes. Enter one of the numbers to select the example you want to run.
+
+Here are examples. Subsequent sections will dive into the details for each one:
 
 * **WordCount2:** find all N-word ("N-gram") occurrences matching a pattern. In this case, the 4-word phrases in the King James Version of the Bible of the form "% love % %", where the "%" are wild cards. In other words, all 4-grams are found with "love" as the second word. There are 5 such NGrams.
 * **WordCount:** find all the words in a corpus of documents and count them, again using the KJV.
@@ -593,3 +599,4 @@ This template is not a complete Apache Spark tutorial. To learn more, see the fo
 * See [Typesafe](http://typesafe.com) for more information about our products and services. 
 * See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
 * [Snowplow's Spark Example Project](https://github.com/snowplow/spark-example-project).
+

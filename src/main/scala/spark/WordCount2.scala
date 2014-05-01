@@ -1,6 +1,6 @@
-package spark.activator
+package spark
 
-import spark.activator.util.Timestamp   // Simple date-time utility
+import spark.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in 
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)

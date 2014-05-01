@@ -1,6 +1,6 @@
-package spark.activator.other
+package spark.other
 
-import spark.activator.util.{CommandLineOptions, Timestamp}
+import spark.util.{CommandLineOptions, Timestamp}
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 

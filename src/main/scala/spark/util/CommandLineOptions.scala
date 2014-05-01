@@ -1,4 +1,4 @@
-package spark.activator.util
+package spark.util
 
 /** 
  * Handles command-line argument processing for scripts that take

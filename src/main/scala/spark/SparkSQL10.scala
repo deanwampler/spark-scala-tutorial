@@ -1,6 +1,6 @@
-package spark.activator
+package spark
 
-import spark.activator.util.{Timestamp, CommandLineOptions}
+import spark.util.{Timestamp, CommandLineOptions}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
 

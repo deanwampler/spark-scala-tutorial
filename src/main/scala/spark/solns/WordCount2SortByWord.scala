@@ -1,6 +1,6 @@
-package spark.activator.solutions
+package spark.solns
 
-import spark.activator.util.Timestamp
+import spark.util.Timestamp
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in 
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
@@ -8,9 +8,9 @@ import org.apache.spark.SparkContext._
 
 /**
  * First implementation of Word Count.
- * Also implements the sort-by-count exercise.
+ * Also implements the sort-by-word exercise.
  */
-object WordCount2SortByCount {
+object WordCount2SortByWord {
   def main(args: Array[String]) = {
 
     val sc = new SparkContext("local", "Word Count (2)")
@@ -38,17 +38,14 @@ object WordCount2SortByCount {
         .flatMap(line => line.split("""\W+"""))
         .map(word => (word, 1))
         .reduceByKey((count1, count2) => count1 + count2)
-        .keyBy(tuple => tuple._2)  // Create a new RDD with the count as the key!
         // Add this line to sort: pass true for ascending, false for descending.
         .sortByKey(false)
-        // Exercise: Note that the output will have the count listed redundantly,
-        // can you reformat the records to just have (word, count), but ordered?
 
       // Save, but it actually writes Hadoop-style output; to a directory, 
       // with a _SUCCESS marker (empty) file, the data as a "part" file, 
       // and checksum files.
       val now = Timestamp.now()
-      val out = s"output/kjv-wc-sort-by-count-$now"
+      val out = s"output/kjv-wc-sort-by-word-$now"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

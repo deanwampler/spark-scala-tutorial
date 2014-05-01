@@ -1,6 +1,6 @@
-package spark.activator
+package spark
 
-import spark.activator.util.Timestamp
+import spark.util.Timestamp
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.streaming._
@@ -11,7 +11,7 @@ import org.apache.spark.streaming._
  * arguments. In another terminal use NetCat (http://netcat.sourceforge.net/) or
  * NCat that comes with NMap (http://nmap.org/download.html), which is available
  * for more platforms, to send data to this process:
- * Terminal one: sbt run-main spark.activator.SparkStreaming7 [localhost [9999]]
+ * Terminal one: sbt run-main spark.SparkStreaming7 [localhost [9999]]
  * Terminal two (NetCat): nc -c -l -p 9999
  * Unfortunately, Spark Streaming does not yet provide a way to detect end of
  * input from the socket! (A feature request has been posted.) So, we have to ^C

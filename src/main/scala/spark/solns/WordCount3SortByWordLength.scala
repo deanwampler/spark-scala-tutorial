@@ -1,6 +1,6 @@
-package spark.activator.solutions
+package spark.solns
 
-import spark.activator.util.{CommandLineOptions, Timestamp}
+import spark.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
