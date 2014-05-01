@@ -1,0 +1,22 @@
+Subject: vince and vasant :
+here is a brief summary of my meeting with chris germany , capacity trader at
+the east desk , related to gas transmission :
+typically , pipelines lease capacity billed on a monthly basis . an example
+might be the pipeline between south texas and brooklyn , where you might pay
+$ 12 . 00 per month per 10 , 000 decatherms of capacity ( $ 0 . 40 per day ) , a fixed
+payment . variable charges are 6 % for fuel costs ( " shrinkage " ) and 6 . 5 % for
+overhead expenses . a gas trader might call south texas and be quoted a
+delivery price tomorrow of nymex - $ 0 . 10 ( " basis " ) , and might call brooklyn
+and be quoted a delivered price of nymex + $ 0 . 25 . the trader ' s spread is
+$ 0 . 35 , and variable costs of transmission are $ 0 . 125 , so the trader would
+offer the leaseholder of capacity up to $ 0 . 225 for firm capacity tomorrow .
+as for the distinction betweem firm and interruptible , the leaseholders have
+an excellent knowledge of the firm - equivalent of interruptible capacity .
+also , many pipelines don ' t discount firm capacity from the tariff maximum
+( " it ' s not worth their time to haggle " ) ( there is a further issue of
+" secondary markets " not important to the model yet ) . for south texas and
+brooklyn , there are several different routes the gas can physically take
+( pipelines of enron , texas eastern , etc ) . and , once the trade is in the
+system traders can cover the ( enron ) positions on each end of the pipeline ,
+in so doing freeing up the capacity for other contracts .
+clayton

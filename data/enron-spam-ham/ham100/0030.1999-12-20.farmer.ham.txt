@@ -1,0 +1,38 @@
+Subject: re : purge of old contract _ event _ status
+fyi - what do you all think ?
+- - - - - - - - - - - - - - - - - - - - - - forwarded by brenda f herod / hou / ect on 12 / 20 / 99 08 : 19
+am - - - - - - - - - - - - - - - - - - - - - - - - - - -
+from : dave nommensen on 12 / 17 / 99 05 : 29 pm
+to : scotty gilbert / hou / ect @ ect
+cc : george smith / hou / ect @ ect , edward terry / hou / ect @ ect , katherine l
+kelly / hou / ect @ ect , bryce baxter / hou / ect @ ect , randall l gay / hou / ect @ ect ,
+brenda f herod / hou / ect @ ect , richard pinion / hou / ect @ ect
+subject : re : purge of old contract _ event _ status
+just to clarify , its not the relative age of the production date , but the age
+of the event itself .
+d . n .
+to : george smith , edward terry / hou / ect @ ect , katherine l kelly / hou / ect @ ect ,
+bryce baxter / hou / ect @ ect , randall l gay / hou / ect @ ect , brenda f
+herod / hou / ect @ ect
+cc : richard pinion / hou / ect @ ect , dave nommensen / hou / ect @ ect
+subject : re : purge of old contract _ event _ status
+do any of you see a problem with limiting this to the current month or
+current month + 1
+need to know soon
+scotty
+from : dave nommensen 12 / 17 / 99 03 : 25 pm
+to : scotty gilbert / hou / ect @ ect , richard pinion / hou / ect @ ect
+cc : trisha luong / hou / ect @ ect , benedicta tung / hou / ect @ ect , diane e
+niestrath / hou / ect @ ect , dave mcmullan / hou / ect @ ect
+subject : purge of old contract _ event _ status
+scotty / richard ,
+our dbas would like to see what we can do to reduce the qty of rows in
+contract _ event _ status . we have over 1 gig of data in that table . i would
+like to suggest we have a nightly or weekly or monthly process to delete any
+row with a last _ mod _ date over a month ( or two ) old . so if someone balances
+february 1999 this month , we will keep it around for a month ( or two ) .
+does any one else have a desire to keep this data for a shorter / longer period
+of time ?
+this is not an audit table . this is just a " log " every nom / track / balance / edi
+send / fax send / sched qty / quick response since the beginning of time .
+d . n .

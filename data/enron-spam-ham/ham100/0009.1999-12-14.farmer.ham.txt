@@ -1,0 +1,13 @@
+Subject: meter 1517 - jan 1999
+george ,
+i need the following done :
+jan 13
+zero out 012 - 27049 - 02 - 001 receipt package id 2666
+allocate flow of 149 to 012 - 64610 - 02 - 055 deliv package id 392
+jan 26
+zero out 012 - 27049 - 02 - 001 receipt package id 3011
+zero out 012 - 64610 - 02 - 055 deliv package id 392
+these were buybacks that were incorrectly nominated to transport contracts
+( ect 201 receipt )
+let me know when this is done
+hc

@@ -1,0 +1,25 @@
+Subject: king ranch
+there are two fields of gas that i am having difficulty with in the unify
+system .
+1 . cage ranch - since there is no processing agreement that accomodates this
+gas on king ranch , it is my understanding hpl is selling the liquids and
+king ranch is re - delivering to stratton . it is also my understanding that
+there is a . 05 cent fee
+to deliver this gas . we need a method to accomodate the volume flow on hpl
+at meter 415 and 9643 . this gas
+will not be reflected on trans . usage ticket # 123395 and # 95394 since it is
+not being nominated from a processing agreement . we either , need to input
+a point nom ( on hpl or krgp ) at these meters to match the nom at meter 9610 ,
+or a deal for purchase and sale ( if king ranch is taking title to the gas )
+needs to be input into sitara at these meters with the appropriate rate . i
+have currently input a point nom on krgp to accomodate this flow , so we can
+divert some of this gas to the current interstate sales that are being made .
+2 . forest oil - there is a processing agreement that will accomodate flow
+from the meter ( 6396 ) into king ranch . it is my
+understanding that this agreement was originally setup until texaco had
+their own processing agreement . i need confirmation that the gas from this
+meter should be nominated on contract # ( 96006681 ) and that this agreement
+should have been reassigned to hplc . ( it is currently still under hplr ) .
+if this gas is not nominated on the above transport agreement , then once
+again we need to accomodate the flow volume on the hpl pipe with either a
+point nom or a sitara deal at meters 415 and 9643 .
