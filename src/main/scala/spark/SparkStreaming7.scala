@@ -18,7 +18,7 @@ import org.apache.spark.streaming._
  * the application (and sbt with it). The "-c" option to nc will cause it to 
  * terminate too; it DOES detect dropped sockets.
  */
-object SparkStreaming6 {
+object SparkStreaming7 {
   def main(args: Array[String]) = {
 
     // Use a configuration object this time, in part because Streaming requires
