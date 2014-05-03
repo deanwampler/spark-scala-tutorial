@@ -152,45 +152,178 @@ sup {
 	}
 }
 </style>
-<title>Activator Scalding Template</title>
+<title>Apache Spark: A Tutorial</title>
 <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax:{inlineMath:[['$$$','$$$']]}});</script><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </head>
 <body>
-<h1>Activator Scalding Template</h1>
-
-<div>
-
-<h2>Explore Scalding</h2>
-
-<p>This template demonstrates how to build and run <a href="https://github.com/twitter/scalding">Scalding</a>-based <em>Big Data</em> applications for <a href="http://hadoop.apache.org">Hadoop</a>. You can also run them "locally" on your personal machine, which we will do here, for convenient development and testing. Actually, these "applications" are more like "scripts" than traditional, multi-file applications.</p>
-
-<p><a href="https://github.com/twitter/scalding">Scalding</a> is a Scala API developed at Twitter for distributed data programming that sits on top of the <a href="http://www.cascading.org/">Cascading</a> Java API, which in turn sits on top of Hadoop's Java API. However, through Cascading, Scalding also offers a <em>local</em> mode that makes it easy to run jobs without Hadoop. This greatly simplifies and accelerates learning and testing of applications. It's even "good enough" for small data sets that fit easily on a single machine.</p>
+<h1>Apache Spark: A Tutorial</h1>
 
 </div>
-
 <div>
+<h2>Introduction</h2>
 
-<h2>Building and Running</h2>
+<p>This tutorial demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications.</p>
 
-<p>Invoke <a class="shortcut" href="#run">run</a> to try it out. The default <code>main</code> class <code>RunAll</code> runs all of the scripts with default arguments. Each script also has its own <code>main</code> routine that you can select in the drop-down menu on the Run panel. The four examples provided are these:</p>
+<p><a href="http://spark.apache.org">Apache Spark</a> is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level <a href="http://spark.apache.org">Apache project</a>.</p>
+
+<p>We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a <em>Spark Shell</em>, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.</p>
+
+</div>
+<div>
+<h2>Why Spark?</h2>
+
+<p>By 2013, it became increasingly clear that a successor was needed for the venerable <a href="http://wiki.apache.org/hadoop/MapReduce">Hadoop MapReduce</a> compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.</p>
+
+<p>Spark was seen as the best, general-purpose alternative, so <a href="http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html">Cloudera led the way</a> in embracing Spark as a replacement for MapReduce.</p>
+
+<p>Spark is now officially supported in <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">Cloudera CDH5</a> and <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">MapR's distribution</a>. Hortonworks has not yet announced whether or not they will support Spark natively, but <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">this page</a> in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.</p>
+
+</div>
+<div>
+<h2>Spark Clusters</h2>
+
+<p>Let's briefly discuss the anatomy of a Spark standalone cluster, adapting <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">this discussion (and diagram) from the Spark documentation</a>. Consider the following diagram:</p>
+
+<p><img src="http://spark.apache.org/docs/0.9.1/img/cluster-overview.png" alt="Spark Cluster" /></p>
+
+<p>Each program we'll write is a <em>Driver Program</em>. It uses a <em>SparkContext</em> to communicate with the <em>Cluster Manager</em>, either Spark's own manager or the corresponding management services provided by <a href="http://mesos.apache.org/">Mesos</a> or <a href="http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html">Hadoop's YARN</a>. The <em>Cluster Manager</em> allocates resources. An <em>Executor</em> JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.</p>
+
+<p>Because each application has its own executor process per node, applications can't share data through the <em>Spark Context</em>. External storage has to be used (e.g., the file system, a database, a message queue, etc.)</p>
+
+<p>When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.</p>
+
+</div>
+<div>
+<h2>Spark Deployment Options</h2>
+
+<p>Spark currently supports <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">three cluster managers</a>:</p>
 
 <ul>
-<li><strong>NGrams:</strong> find all N-word ("N-gram") occurrences matching a pattern. In this case, the 4-word phrases in the King James Version of the Bible of the form "% love % %", where the "%" are wild cards. In other words, all 4-grams are found with "love" as the second word. There are 5 such NGrams.</li>
-<li><strong>WordCount:</strong> find all the words in a corpus of documents and count them, again using the KJV.</li>
-<li><strong>FilterUniqueCountLimit:</strong> demonstrate how to filter records (we'll create a "skeptics Bible" that removes all verses with the word "miracle"; like SQL's <code>WHERE</code> clause), how to find unique values (we'll find the names of the books of the KJV; like SQL's <code>DISTINCT</code> keyword), how to count all records (we'll count the total number of verses in the KJV; like SQL's <code>COUNT (*)</code> clause), and how to limit the number of records (we'll return the first 10 verses; like SQL's <code>LIMIT N</code> clause).</li>
-<li><strong>TfIdf:</strong> compute the <em>term frequency-inverse document frequency</em> of the KJV, an algorithm used in part to create search indices for the web or document corpi.</li>
+<li><a href="http://spark.apache.org/docs/0.9.1/spark-standalone.html">Standalone</a> – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.</li>
+<li><a href="http://spark.apache.org/docs/0.9.1/running-on-mesos.html">Apache Mesos</a> – <a href="http://mesos.apache.org/">Mesos</a> is a general-purpose cluster management system that can also run <a href="http://hadoop.apache.org">Hadoop</a> and other services.</li>
+<li><a href="http://spark.apache.org/docs/0.9.1/running-on-yarn.html">Hadoop YARN</a> – <a href="http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html">YARN</a> is the <a href="http://hadoop.apache.org">Hadoop</a> v2 resource manager.</li>
 </ul>
 
 
-<p>Each of these scripts writes output to the <code>output</code> directory, but for convenience, we echo some of output to the Activator window.</p>
+<p>Note that you can run Spark on a Hadoop cluster using any of these three approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Standalone and Mesos deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.</p>
 
-<p>Let's examine these scripts in more detail...</p>
+<p>Spark also includes <a href="http://spark.apache.org/docs/0.9.1/ec2-scripts.html">EC2 launch scripts</a> for running clusters on Amazon EC2.</p>
 
 </div>
-
 <div>
+<h2>Resilient, Distributed Datasets</h2>
 
-<h2>NGrams</h2>
+<p>The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in <em>Resilient, Distributed Datasets</em> (RDDs), where a logical data set is virtualized over the cluster.</p>
+
+<p>The user can specify that data in an RDD should be cached in memory for subsequent reuse. In contrast, MapReduce has no such mechanism, so a complex job requiring a sequence of MapReduce jobs will be penalized by a complete flush to disk of intermediate data, followed by a subsequent reloading into memory by the next job.</p>
+
+<p>RDDs support common data operations, such as <em>map</em>, <em>flatmap</em>, <em>filter</em>, <em>fold/reduce</em>, and <em>groupby</em>. RDDs are resilient in the sense that if a "partition" of data is lost on one node, it can be reconstructed from the original source without having to start the whole job over again.</p>
+
+<p>The architecture of RDDs is described in the research paper <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a>.</p>
+
+</div>
+<div>
+<h2>Spark 1.0.0</h2>
+
+<p>We will use Spark 1.0.0-RC3 so we can use some new features, like Spark SQL, that will be generally available (GA) soon. I'll update the tutorial to final artifacts when they are available.</p>
+
+<p>For now, we will use the following temporary locations for documentation and jar files:</p>
+
+<ul>
+<li><a href="http://people.apache.org/~pwendell/spark-1.0.0-rc3-docs/">Documentation</a>.</li>
+<li><a href="https://repository.apache.org/content/repositories/orgapachespark-1012/">Maven Repo</a>.</li>
+</ul>
+
+
+<p>I recommend that you open the <a href="http://people.apache.org/~pwendell/spark-1.0.0-rc3-docs/">Documentation link</a>, as the getting-started guides, overviews, and reference pages (<em>Scaladocs</em>) will be useful. The Maven repo is used automatically by the build process.</p>
+
+</div>
+<div>
+<h2>Building and Running</h2>
+
+<p>If you're using the <a href="http://typesafe.com/activator">Activator UI</a>, search for <code>activator-spark</code> and install it in the UI. The code is built automatically.</p>
+
+<p>If you grabbed this tutorial from <a href="https://github.com/deanwampler/activator-spark">Github</a>, you'll need to install <code>sbt</code> and use a command line to build and run the applications. In that case, see the <a href="http://www.scala-sbt.org/">sbt website</a> for instructions on installing <code>sbt</code>.</p>
+
+<p>If you're using the Activator UI the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class", for example <code>WordCount2</code>, and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations.</p>
+
+<p>If you are using <code>sbt</code> from the command line, start <code>sbt</code>, then type <code>run</code>. It will present the same list of main classes. Enter one of the numbers to select the example you want to run. Try <strong>WordCount2</strong> to verify everything works.</p>
+
+<p>Note that the examples with package names that contain <code>solns</code> are solutions to exercises. The <code>other</code> examples show alternative implementations.</p>
+
+<p>Here is a list of the examples. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:</p>
+
+<ul>
+<li><strong>Intro1:</strong> Actually, this <em>isn't</em> listed by the <code>run</code> command, because it is a script we'll use with the interactive <em>Spark Shell</em>.</li>
+<li><strong>WordCount2:</strong> The <em>Word Count</em> algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The <code>data</code> directory has a <a href="data/README.html">REAMDE</a> that discusses the sources of the data files.)</li>
+<li><strong>WordCount3:</strong> An alternative implementation of <em>Word Count</em> that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</li>
+<li><strong>Matrix4:</strong> Demonstrates Spark's Matrix API, useful for many machine learning algorithms.</li>
+<li><strong>Crawl5a:</strong> Simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.</li>
+<li><strong>InvertedIndex5b:</strong> Using the crawl data, compute the index of words to documents (emails).</li>
+<li><strong>NGrams6:</strong> Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
+<li><strong>SparkStreaming7:</strong> The streaming capability is relatively new and this example shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
+<li><strong>SparkSQL8:</strong> An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.</li>
+<li><strong>Shark9:</strong> We'll briefly look at Shark, a port of the MapReduce-based <a href="http://hive.apache.org">Hive</a> SQL query tool to Spark.</li>
+<li><strong>MLlib10:</strong> One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the <a href="http://mahout.apache.org">Mahout</a> project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.</li>
+<li><strong>GraphX11:</strong> Our last example explores the Spark graph library GraphX.</li>
+</ul>
+
+
+<p>Let's examine these examples in more detail...</p>
+
+</div>
+<div>
+<h2>Intro1:</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a></p>
+
+<p>Our first exercise demonstrates the useful <em>Spark Shell</em>, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>.</p>
+
+<p>The comments in this and the subsequent files try to explain the API calls being made.</p>
+
+<p>You'll note that the extension is <code>.sc</code>, not <code>.scala</code>. This is my convention to prevent the build from compiling this file, which won't compile because it's missing some definitions that the Spark Shell will define automatically.</p>
+
+<p>TODO</p>
+
+</div>
+<div>
+<h2>WordCount2:</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a></p>
+
+<p>The classic, simple <em>Word Count</em> algorithm is easy to understand and a suitable for parallel computation, so it's a good choice when learning a Big Data API.</p>
+
+<p>In <em>Word Count</em>, you read a corpus of documents (you can do this in parallel), tokenize each one into words, and count the occurrences of all the words globally. By default, <a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> uses a file containing the King James Version (KJV) of the Bible, but this can be overridden.</p>
+
+<p>The <code>data</code> directory has a <a href="data/README.html">REAMDE</a> that discusses the files present and where they came from.</p>
+
+<p>If using the <a class="shortcut" href="#run">run</a> panel, select <code>scala.WordCount2</code> and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.</p>
+
+<p>If using <code>sbt</code>, enter <code>run</code> and then the number corresponding to <code>scala.WordCount2</code>.</p>
+
+<p>The reason the output directories have a timestamp in their name is so you can easily rerun the examples repeatedly. Starting with v1.0.0, Spark follows the Hadoop convention of refusing to overwrite an existing directory. The timestamps keep them unique.</p>
+
+<p>There are comments at the end of each source file with suggested exercises to learn the API. Try some, then look at the solutions such as <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a></p>
+
+<p>I don't provide solutions for all the suggested exercises, but I do accept pull requests ;)</p>
+
+<ul>
+<li><strong>WordCount3:</strong> An alternative implementation of <em>Word Count</em> that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</li>
+<li><strong>Matrix4:</strong> Demonstrates Spark's Matrix API, useful for many machine learning algorithms.</li>
+<li><strong>Crawl5a:</strong> Simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.</li>
+<li><strong>InvertedIndex5b:</strong> Using the crawl data, compute the index of words to documents (emails).</li>
+<li><strong>NGrams6:</strong> Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
+<li><strong>SparkStreaming7:</strong> The streaming capability is relatively new and this example shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
+<li><strong>SparkSQL8:</strong> An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.</li>
+<li><strong>Shark9:</strong> We'll briefly look at Shark, a port of the MapReduce-based <a href="http://hive.apache.org">Hive</a> SQL query tool to Spark.</li>
+<li><strong>MLlib10:</strong> One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the <a href="http://mahout.apache.org">Mahout</a> project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.</li>
+<li><strong>GraphX11:</strong> Our last example explores the Spark graph library GraphX.</li>
+</ul>
+
+
+</div>
+<div>
+<h2>NGrams6</h2>
 
 <p>Let's see how the <em>NGrams</em> Script works. Open <a class="shortcut" href="#code/src/main/scala/scalding/NGrams.scala">NGrams.scala</a>.</p>
 
@@ -235,7 +368,7 @@ class NGrams(args : Args) extends Job(args) {
   ...
 </code></pre>
 
-<p>We start with the Scalding imports we need, then declare a class <code>NGrams</code> that subclasses a <code>Job</code> class, which provides a <code>main</code> routine and other runtime context support (such as Hadoop integration). Our class must take a list of command-line arguments, which are processed for us by Scalding's <code>Args</code> class. We'll use these to specify where to find input, where to write output, and handle other configuration options.</p>
+<p>We start with the Apache Spark imports we need, then declare a class <code>NGrams</code> that subclasses a <code>Job</code> class, which provides a <code>main</code> routine and other runtime context support (such as Hadoop integration). Our class must take a list of command-line arguments, which are processed for us by Apache Spark's <code>Args</code> class. We'll use these to specify where to find input, where to write output, and handle other configuration options.</p>
 
 <pre><code>  ...
   val ngramsArg = args.list("ngrams").mkString(" ").toLowerCase
@@ -298,7 +431,7 @@ class NGrams(args : Args) extends Job(args) {
 }
 </code></pre>
 
-<p>If we want to rank the found NGrams by their frequencies, we need to get all occurrences of a given NGram together. Hence, we use a <code>groupBy</code> operation to group over the <code>'ngram</code> fields. To sort and output the tope <code>numberOfNGrams</code>, we group <em>all</em> together, then use a special Scalding function that combines sorting with "taking", i.e., just keeping the top N values after sorting.</p>
+<p>If we want to rank the found NGrams by their frequencies, we need to get all occurrences of a given NGram together. Hence, we use a <code>groupBy</code> operation to group over the <code>'ngram</code> fields. To sort and output the tope <code>numberOfNGrams</code>, we group <em>all</em> together, then use a special Apache Spark function that combines sorting with "taking", i.e., just keeping the top N values after sorting.</p>
 
 <pre><code>    ...
     .debug
@@ -315,9 +448,7 @@ class NGrams(args : Args) extends Job(args) {
 <p><em>WordCount</em> is next...</p>
 
 </div>
-
 <div>
-
 <h2>WordCount</h2>
 
 <p>Open <a class="shortcut" href="#code/src/main/scala/scalding/WordCount.scala">WordCount.scala</a>, which implements the well-known <em>Word Count</em> algorithm, which is popular as an easy-to-implement, "hello world!" program for developers learning Hadoop.</p>
@@ -355,9 +486,7 @@ class WordCount(args : Args) extends Job(args) {
 <p><em>FilterUniqueCountLimit</em> is next...</p>
 
 </div>
-
 <div>
-
 <h2>FilterUniqueCountLimit</h2>
 
 <p>Open <a class="shortcut" href="#code/src/main/scala/scalding/FilterUniqueCountLimit.scala">FilterUniqueCountLimit.scala</a>, which shows a few useful techniques:</p>
@@ -419,9 +548,7 @@ class FilterUniqueCountLimit(args : Args) extends Job(args) {
 <p><em>TfIdf</em> is our last example script...</p>
 
 </div>
-
 <div>
-
 <h2>TfIdf</h2>
 
 <p>Open <a class="shortcut" href="#code/src/main/scala/scalding/TfIdf.scala">TfIdf.scala</a>, our most complex example script. It implements the <em>term frequency-inverse document frequency</em> algorithm used as part of  the indexing process for document or Internet search engines. (See <a href="http://en.wikipedia.org/wiki/Tf*idf">this Wikipedia page</a> for more information on this algorithm.)</p>
@@ -501,7 +628,7 @@ class TfIdf(args : Args) extends Job(args) {
 }
 </code></pre>
 
-<p>This example uses Scalding's Matrix API, which simplifies working with "sparse" matrices.</p>
+<p>This example uses Apache Spark's Matrix API, which simplifies working with "sparse" matrices.</p>
 
 <p>Here, the <code>--n</code> argument is used to specify how many of the most frequently-occurring terms to keep for each book of the Bible. It defaults to 100.</p>
 
@@ -511,7 +638,7 @@ class TfIdf(args : Args) extends Job(args) {
 
 <p>The <code>byBookWordCount</code> pipeline is very similar to <em>WordCount</em>, but we don't forget which book the word came from, so our key for grouping is now the <code>'booked</code> and the <code>'word</code>.</p>
 
-<p>Next, we convert <code>byBookWordCount</code> to a term frequency, two-dimensional matrix, using Scalding Matrix API, where the "x" coordinate is the book id, the "y" coordinate is the word, and the value is the count, converted to <code>Double</code>.</p>
+<p>Next, we convert <code>byBookWordCount</code> to a term frequency, two-dimensional matrix, using Apache Spark Matrix API, where the "x" coordinate is the book id, the "y" coordinate is the word, and the value is the count, converted to <code>Double</code>.</p>
 
 <p>Now we compute the overall document frequency of each word. The value of <code>docFreq(i)</code> will be the total count for word <code>i</code> over all documents. Then we need the inverse document frequency vector, which is used to suppress the significance of really common words, like "the", "and", "I", etc. The <em>L1 norm</em> is just <code>1/(|a| + |b| + ...)</code>, rather then the square root of the sum of squares, which would be more accurate, but also more expensive to compute. Actually, we use <code>1/log(x)</code>, rather than <code>1/x</code>, for better numerical stability.</p>
 
@@ -530,17 +657,13 @@ class TfIdf(args : Args) extends Job(args) {
 <p>After joining, we do a final projection and then write the output as before.</p>
 
 </div>
-
 <div>
-
 <h2>Next Steps</h2>
 
 <p>There are additional capabilities built into this Activator template that you can access from a command line using the <code>activator</code> command or <a href="http://www.scala-sbt.org/">sbt</a>, the standard Scala build tool. Let's explore those features.</p>
 
 </div>
-
 <div>
-
 <h2>Running Locally with the Command Line</h2>
 
 <p>In a command window, run <code>activator</code> (or <code>sbt</code>). At the prompt, invoke the <code>test</code> and <code>run</code> tasks, which are the same tasks we ran in Activator, to ensure they complete successfully.</p>
@@ -562,16 +685,14 @@ class TfIdf(args : Args) extends Job(args) {
 
 <p>Each command should run without error and the output will be written to the file indicated by the <code>--output</code> option. You can change the output location to be anything you want.</p>
 
-<p>Also, if you want to understand how Cascading converts each script into a MapReduce dataflow, Cascading has a feature that generates graphs of the dataflow in the <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language)">dot</a> graph format. You can view these files with many tools, including the free <a href="http://www.graphviz.org/">Graphviz</a>.</p>
+<p>Also, if you want to understand how Cascading converts each script into a MapReduce dataflow, Cascading has a feature that generates graphs of the dataflow in the <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language">dot</a>) graph format. You can view these files with many tools, including the free <a href="http://www.graphviz.org/">Graphviz</a>.</p>
 
 <p>To generate these files, you can add the argument <code>--tool.graph</code> to the end of any script command we discuss in subsequent sections. Instead of running the job, the Cascading runtime will write one or more "dot" files to the project root directory.</p>
 
 <p>Now let's look at each example. Recall that all the scripts are in <code>src/main/scala/scalding</code>. You should look at the files for detailed comments on how they are implemented.</p>
 
 </div>
-
 <div>
-
 <h2>NGrams</h2>
 
 <p>You invoke the <em>NGrams</em> script inside <code>activator</code> like this:</p>
@@ -594,9 +715,7 @@ class TfIdf(args : Args) extends Job(args) {
 <p>This example also uses the <code>debug</code> pipe to dump output to the console. In this case, you'll see the same output that gets written to the output file, which is the list of the NGrams and their frequencies, sorted by frequency descending.</p>
 
 </div>
-
 <div>
-
 <h2>WordCount</h2>
 
 <p>You invoke the script inside <code>activator</code> like this:</p>
@@ -619,9 +738,7 @@ class TfIdf(args : Args) extends Job(args) {
 <p>The <code>--output</code> argument specifies where the results are written. You just see a few log messages written to the <code>activator</code> console. You can use any path you want for this output.</p>
 
 </div>
-
 <div>
-
 <h2>FilterUniqueCountLimit</h2>
 
 <p>You invoke the script inside <code>activator</code> like this:</p>
@@ -632,9 +749,7 @@ class TfIdf(args : Args) extends Job(args) {
 <p>In this case, the <code>--output</code> is actually used as a prefix for the four output files discussed previously.</p>
 
 </div>
-
 <div>
-
 <h2>TfIDf</h2>
 
 <p>You invoke the script inside <code>activator</code> like this:</p>
@@ -645,9 +760,7 @@ class TfIdf(args : Args) extends Job(args) {
 <p>The <code>--n</code> argument is optional; it defaults to 100. It specifies how many words to keep for each document.</p>
 
 </div>
-
 <div>
-
 <h2>Running on Hadoop</h2>
 
 <p>After testing your scripts, you can run them on a Hadoop cluster. You'll first need to build an all-inclusive jar file that contains all the dependencies, including the Scala standard library, that aren't already on the cluster.</p>
@@ -671,23 +784,71 @@ class TfIdf(args : Args) extends Job(args) {
 
 <p>Note that when using HDFS, Hadoop treats all paths as <em>directories</em>. So, all the files in an <code>--input</code> directory will be read. In <code>--local</code> mode, the paths are interpreted as <em>files</em>.</p>
 
-<p>An alternative to running the <code>hadoop</code> command directly is to use the <code>scald.rb</code> script that comes with Scalding distributions. See the <a href="https://github.com/twitter/scalding">Scalding</a> website for more information.</p>
+<p>An alternative to running the <code>hadoop</code> command directly is to use the <code>scald.rb</code> script that comes with Apache Spark distributions. See the <a href="http://spark.apache.org">Apache Spark</a> website for more information.</p>
 
 </div>
-
 <div>
+<h2>Best Practices, Tips, and Tricks</h2>
 
+<h3>Safe Closures</h3>
+
+<p>When you use a closure (anonymous function), Spark will serialize it and send it around the cluster. This means that any captured variables must be serializable.</p>
+
+<p>A common mistake is to capture a field in an object, which forces the whole object to be serialized. Sometimes it can't be. Consider this example adapted from <a href="http://spark-summit.org/wp-content/uploads/2013/10/McDonough-spark-tutorial_spark-summit-2013.pdf">this presentation</a>.</p>
+
+<p>```scala
+class RDDApp {
+  val factor = 3.14159
+  val log = new Log(...)</p>
+
+<p>  def multiply(rdd: RDD[Int]) = {
+    rdd.map(x => x * factor).reduce(...)
+  }
+}
+```</p>
+
+<p>The closure passed to <code>map</code> captures the field <code>factor</code> in the instance of <code>RDDApp</code>. However, the JVM must serialize the whole object, and a <code>NotSerializableException</code> will result when it attempts to serialize <code>log</code>.</p>
+
+<p>Here is the work around; assign <code>factor</code> to a local field:</p>
+
+<p>```scala
+class RDDApp {
+  val factor = 3.14159
+  val log = new Log(...)</p>
+
+<p>  def multiply(rdd: RDD[Int]) = {
+    val factor2 = factor
+    rdd.map(x => x * factor2).reduce(...)
+  }
+}
+```</p>
+
+<p>Now, only <code>factor2</code> must be serialized.</p>
+
+<h3>Arguments for Spark Context</h3>
+
+</div>
+<div>
 <h2>Going Forward from Here</h2>
 
-<p>This template is not a complete Scalding tutorial. To learn more, see the following:</p>
+<p>This template is not a complete Apache Spark tutorial. To learn more, see the following:</p>
 
 <ul>
-<li>The Scalding <a href="https://github.com/twitter/scalding/wiki">Wiki</a>.</li>
-<li>The Scalding <a href="https://github.com/twitter/scalding/tree/develop/tutorial">tutorial</a> distributed with the <a href="https://github.com/twitter/scalding">Scalding</a> distribution.</li>
-<li>Dean Wampler's <a href="https://github.com/deanwampler/scalding-workshop">Scalding Workshop</a>, from which some of this material was adapted.</li>
-<li>See <a href="http://typesafe.com">Typesafe</a> for more information about our products and services.</li>
-<li>See <a href="http://typesafe.com/activator">Typesafe Activator</a> to find other Activator templates.</li>
+<li>The Apache Spark <a href="http://spark.apache.org/">website</a>.</li>
+<li>The Apache Spark <a href="http://spark.apache.org/tree/develop/tutorial">tutorial</a> distributed with the <a href="http://spark.apache.org">Apache Spark</a> distribution.</li>
+<li><a href="http://spark-summit.org/2013">Talks from Spark Summit 2013</a>.</li>
+<li><a href="http://aws.amazon.com/articles/4926593393724923">Running Spark in EC2</a>.</li>
+<li><a href="https://github.com/snowplow/spark-example-project">Snowplow's Spark Example Project</a>.</li>
+<li><a href="https://github.com/freeman-lab/thunder">Thunder - Large-scale neural data analysis with Spark</a>.</li>
 </ul>
-</div>
+
+
+<p>For more about Typesafe:</p>
+
+<ul>
+<li>See <a href="http://typesafe.com/activator">Typesafe Activator</a> to find other Activator templates.</li>
+<li>See <a href="http://typesafe.com">Typesafe</a> for more information about our products and services.</li>
+</ul>
+
 </body>
 </html>
