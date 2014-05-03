@@ -82,7 +82,7 @@ object NGrams6 {
 
     // Exercise: Try different ngrams and input texts. Note that you can specify
     // a regular expression, e.g., 
-    //   run-main spark.NGrams6 --ngrams '% (lov|hat)ed? % %'
+    //   run-main spark.NGrams6 --ngrams "% (lov|hat)ed? % %"
 
     // Exercise (Hard): Read in many documents and retain the file, so you find
     // ngrams per document.
