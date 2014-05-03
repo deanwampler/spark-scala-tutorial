@@ -11,24 +11,20 @@ object WordCount3 {
     // I extracted command-line processing code into a separate utility class,
     // an illustration of how it's convenient that we can mix "normal" code
     // with "big data" processing code. 
-    // Here, I'm passing "named arguments" for clarity, but this is not
-    // required. Note that the left-hand side of each = is the name of the
-    // argument in the CommandLineOptions constructor, while the right-hand
-    // side is the value.
     val options = CommandLineOptions(
-      defaultInputPath  = "data/kjvdat.txt",
-      defaultOutputPath = "output/kjv-wc2.txt",
-      defaultMaster     = "local",
-      programName       = this.getClass.getSimpleName)
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/kjvdat.txt"),
+      CommandLineOptions.outputPath("output/kjv-wc2.txt"),
+      CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
 
-    val sc = new SparkContext(argz.master, "Word Count (3)")
+    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
 
     try {
       // Load the King James Version of the Bible, then convert 
       // each line to lower case, creating an RDD.
-      val input = sc.textFile(argz.inpath).map(line => line.toLowerCase)
+      val input = sc.textFile(argz("input-path").toString).map(line => line.toLowerCase)
 
       // Cache the RDD in memory for fast, repeated access.
       // You don't have to do this and you shouldn't unless the data IS reused.
@@ -47,7 +43,7 @@ object WordCount3 {
       // not a directory as before, the format of each line will be diffierent,
       // and the order of the output will not be the same, either. 
       val now = Timestamp.now()
-      val outpath = s"${argz.outpath}-$now"
+      val outpath = s"${argz("output-path")}-$now"
       println(s"Writing output (${wc2.size} records) to: $outpath")
       import java.io._
       val out = new PrintWriter(outpath)

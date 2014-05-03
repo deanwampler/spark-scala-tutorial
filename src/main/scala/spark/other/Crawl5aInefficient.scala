@@ -19,14 +19,14 @@ object Crawl5aInefficient {
   def main(args: Array[String]) = {
 
     val options = CommandLineOptions(
-      defaultInputPath  = "data/enron-spam-ham",
-      defaultOutputPath = "output/crawl-inefficient",
-      defaultMaster     = "local",
-      programName       = this.getClass.getSimpleName)
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/enron-spam-ham"),
+      CommandLineOptions.outputPath("output/crawl-inefficient"),
+      CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
 
-    val sc = new SparkContext(argz.master, "Crawl (5a - inefficient)")
+    val sc = new SparkContext(argz("master").toString, "Crawl (5a - inefficient)")
 
     try {
       // Because we want to read this output with the InvertedIndex script, we
@@ -35,11 +35,11 @@ object Crawl5aInefficient {
       // HOWEVER, if you run the InvertedIndex script on this output, you will
       // have to specify the different output directory used here:
       // val now = Timestamp.now()
-      // val out = s"${argz.outpath}-$now"
-      val out = s"${argz.outpath}"
+      // val out = s"${argz("output-path").toString}-$now"
+      val out = s"${argz("output-path")}"
       println(s"Writing output to: $out")
 
-      ingestFiles(argz.inpath, sc).saveAsTextFile(out)
+      ingestFiles(argz("input-path").toString, sc).saveAsTextFile(out)
     } finally {
       sc.stop()
     }

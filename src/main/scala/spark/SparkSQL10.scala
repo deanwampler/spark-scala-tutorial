@@ -18,20 +18,21 @@ object SparkSQL10 {
   def main(args: Array[String]) = {
 
     val options = CommandLineOptions(
-      defaultInputPath  = "data/kjvdat.txt",
-      defaultOutputPath = "output/kjv-queries",
-      defaultMaster     = "local",
-      programName       = this.getClass.getSimpleName)
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/kjvdat.txt"),
+      CommandLineOptions.outputPath("output/kjv-queries"),
+      CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
-    val sc = new SparkContext(argz.master, "Spark SQL (6)")
+
+    val sc = new SparkContext(argz("master").toString, "Spark SQL (6)")
     val sqlContext = new SQLContext(sc)
     import sqlContext._    // Make its methods accessible.
 
     try {
       val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
       // Use flatMap to effectively remove bad lines.
-      val verses = sc.textFile(argz.inpath) flatMap {
+      val verses = sc.textFile(argz("input-path").toString) flatMap {
         case lineRE(book, chapter, verse, text) => 
           List(Verse(book, chapter.toInt, verse.toInt, text))
         case line => 
@@ -47,7 +48,7 @@ object SparkSQL10 {
       val godVerses = sql("SELECT * FROM bible WHERE text LIKE '%God%';")    
       
       val now = Timestamp.now()
-      val out = s"${argz.outpath}/$now/gods"
+      val out = s"${argz("output-path")}/$now/gods"
       println(s"Writing verses that reference 'god' to: $out")
       godVerses.saveAsTextFile(out)
       println("Number of verses that mention God: "+godVerses.count())
@@ -61,7 +62,7 @@ object SparkSQL10 {
       // output from the last query!
       .coalesce(1)
 
-      val out2 = s"${argz.outpath}/$now/book-counts"
+      val out2 = s"${argz("output-path")}/$now/book-counts"
       println(s"Writing book counts output to: $out2")
       counts.saveAsTextFile(out2)
     } finally {

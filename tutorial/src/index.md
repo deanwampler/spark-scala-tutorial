@@ -67,16 +67,22 @@ If you're using [Activator](http://typesafe.com/activator), search for `activato
 
 If you checked this tutorial out of [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
 
-Open the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class" and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations. 
+Open the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class" and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations. Try **WordCount2** to verify everything works.
 
-If you are using `sbt` from the command line, start `sbt`, then type `run`. It will present the same list of main classes. Enter one of the numbers to select the example you want to run.
+If you are using `sbt` from the command line, start `sbt`, then type `run`. It will present the same list of main classes. Enter one of the numbers to select the example you want to run. Try **WordCount2** to verify everything works.
 
-Here are examples. Subsequent sections will dive into the details for each one:
+Note that the examples with package names that contain `solns` are solutions to exercises. The `other` examples show alternative implementations.
 
+Here are the examples. Subsequent sections will dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
+
+* **Intro1:** Actually, this *isn't* listed, because it is a script we'll use with the interactive *Spark Shell*.
+* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. Uses a file containing the King James Version (KJV) of the Bible.
+* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic Scala code.
+* **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
+* **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
+* **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
+* 
 * **WordCount2:** find all N-word ("N-gram") occurrences matching a pattern. In this case, the 4-word phrases in the King James Version of the Bible of the form "% love % %", where the "%" are wild cards. In other words, all 4-grams are found with "love" as the second word. There are 5 such NGrams.
-* **WordCount:** find all the words in a corpus of documents and count them, again using the KJV.
-* **FilterUniqueCountLimit:** demonstrate how to filter records (we'll create a "skeptics Bible" that removes all verses with the word "miracle"; like SQL's `WHERE` clause), how to find unique values (we'll find the names of the books of the KJV; like SQL's `DISTINCT` keyword), how to count all records (we'll count the total number of verses in the KJV; like SQL's `COUNT (*)` clause), and how to limit the number of records (we'll return the first 10 verses; like SQL's `LIMIT N` clause).
-* **TfIdf:** compute the *term frequency-inverse document frequency* of the KJV, an algorithm used in part to create search indices for the web or document corpi.
 
 Each of these scripts writes output to the `output` directory, but for convenience, we echo some of output to the Activator window.
 
@@ -595,8 +601,13 @@ This template is not a complete Apache Spark tutorial. To learn more, see the fo
 
 * The Apache Spark [website](http://spark.apache.org/). 
 * The Apache Spark [tutorial](http://spark.apache.org/tree/develop/tutorial) distributed with the [Apache Spark](http://spark.apache.org) distribution. 
-* Dean Wampler's [Apache Spark Workshop](https://github.com/deanwampler/scalding-workshop), from which some of this material was adapted.
-* See [Typesafe](http://typesafe.com) for more information about our products and services. 
-* See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
+* [Talks from Spark Summit 2013](http://spark-summit.org/2013).
+* [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).
 * [Snowplow's Spark Example Project](https://github.com/snowplow/spark-example-project).
+* [Thunder - Large-scale neural data analysis with Spark](https://github.com/freeman-lab/thunder).
+
+For more about Typesafe:
+
+* See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
+* See [Typesafe](http://typesafe.com) for more information about our products and services. 
 

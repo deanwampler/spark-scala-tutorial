@@ -9,14 +9,14 @@ object InvertedIndex5b {
   def main(args: Array[String]) = {
 
     val options = CommandLineOptions(
-      defaultInputPath  = "output/crawl",
-      defaultOutputPath = "output/inverted-index",
-      defaultMaster     = "local",
-      programName       = this.getClass.getSimpleName)
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("output/crawl"),
+      CommandLineOptions.outputPath("output/inverted-index"),
+      CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
 
-    val sc = new SparkContext(argz.master, "Inverted Index (5b)")
+    val sc = new SparkContext(argz("master").toString, "Inverted Index (5b)")
 
     try {
       // Load the input "crawl" data, where each line has the format:
@@ -24,10 +24,10 @@ object InvertedIndex5b {
       // First remove the outer parentheses, split on the first comma, 
       // trim whitespace from the name (we'll do it later for the text)
       // and convert the text to lower case.
-      // NOTE: The argz.inpath is a directory; Spark finds the correct
+      // NOTE: The args("input-path").toString is a directory; Spark finds the correct
       // data files, part-NNNNN.
       val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-      val input = sc.textFile(argz.inpath) map {
+      val input = sc.textFile(argz("input-path").toString) map {
         case lineRE(name, text) => (name.trim, text.toLowerCase)
         case line => 
           Console.err.println("Unexpected line: $line")
@@ -36,7 +36,7 @@ object InvertedIndex5b {
       }
 
       val now = Timestamp.now()
-      val out = s"${argz.outpath}-$now"
+      val out = s"${argz("output-path")}-$now"
       println(s"Writing output to: $out")
 
       // Split on non-alphanumeric sequences of character as before. 

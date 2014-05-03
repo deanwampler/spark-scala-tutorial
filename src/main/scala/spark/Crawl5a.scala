@@ -18,17 +18,17 @@ object Crawl5a {
     // a separate utility class. Here, I'm using named arguments for clarity,
     // but this is not required:
     val options = CommandLineOptions(
-      defaultInputPath  = "data/enron-spam-ham/",
-      defaultOutputPath = "output/crawl",
-      defaultMaster     = "local",
-      programName       = this.getClass.getSimpleName)
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/enron-spam-ham"),
+      CommandLineOptions.outputPath("output/crawl"),
+      CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
 
-    val sc = new SparkContext(argz.master, "Crawl (5a)")
+    val sc = new SparkContext(argz("master").toString, "Crawl (5a)")
 
     try {
-      val files_rdds = ingestFiles(argz.inpath, sc)
+      val files_rdds = ingestFiles(argz("input-path").toString, sc)
       val names_contents = files_rdds map {
         // fold to convert lines into a long, space-separated string.
         // keyBy to generate a new RDD with schema (file_name, file_contents)
@@ -38,8 +38,8 @@ object Crawl5a {
       // don't append a timestamp. That means if you run this script repeatedly,
       // you'll need to delete the output directory from the previous run first.
       // val now = Timestamp.now()
-      // val out = s"${argz.outpath}-$now"
-      val out = argz.outpath
+      // val out = s"${args("output-path").toString}-$now"
+      val out = argz("output-path").toString
       println(s"Writing output to: $out")
       sc.makeRDD(names_contents).saveAsTextFile(out)
     } finally {

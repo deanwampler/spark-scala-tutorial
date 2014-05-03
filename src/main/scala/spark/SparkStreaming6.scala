@@ -46,7 +46,7 @@ object SparkStreaming6 {
     val sc  = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-    // (A different argument list than CommandLineOptions handles.)
+    // (A simpler handle for the command-line argument list than CommandLineOptions.)
     // Create a DStream (Discretized Stream) that will connect to server:port
     // and periodically generate an RDD from a discrete chunk of data.
     val (server, port) = args.toList match {
