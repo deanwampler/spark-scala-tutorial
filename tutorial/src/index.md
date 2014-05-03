@@ -81,8 +81,7 @@ Here are the examples. Subsequent sections will dive into the details for each o
 * **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
 * **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
-* 
-* **WordCount2:** find all N-word ("N-gram") occurrences matching a pattern. In this case, the 4-word phrases in the King James Version of the Bible of the form "% love % %", where the "%" are wild cards. In other words, all 4-grams are found with "love" as the second word. There are 5 such NGrams.
+* **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`. 
 
 Each of these scripts writes output to the `output` directory, but for convenience, we echo some of output to the Activator window.
 
