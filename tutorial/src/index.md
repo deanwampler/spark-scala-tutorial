@@ -63,31 +63,77 @@ I recommend that you open the [Documentation link](http://people.apache.org/~pwe
 
 ## Building and Running
 
-If you're using [Activator](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically. 
+If you're using the [Activator UI](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically. 
 
-If you checked this tutorial out of [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
+If you grabbed this tutorial from [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
 
-Open the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class" and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations. Try **WordCount2** to verify everything works.
+If you're using the Activator UI the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class", for example `WordCount2`, and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations.
 
 If you are using `sbt` from the command line, start `sbt`, then type `run`. It will present the same list of main classes. Enter one of the numbers to select the example you want to run. Try **WordCount2** to verify everything works.
 
 Note that the examples with package names that contain `solns` are solutions to exercises. The `other` examples show alternative implementations.
 
-Here are the examples. Subsequent sections will dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
+Here is a list of the examples. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
-* **Intro1:** Actually, this *isn't* listed, because it is a script we'll use with the interactive *Spark Shell*.
-* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. Uses a file containing the King James Version (KJV) of the Bible.
-* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic Scala code.
+* **Intro1:** Actually, this *isn't* listed by the `run` command, because it is a script we'll use with the interactive *Spark Shell*.
+* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [REAMDE](data/README.html) that discusses the sources of the data files.)
+* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 * **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
 * **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`. 
+* **SparkStreaming7:** The streaming capability is relatively new and this example shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
+* **SparkSQL8:** An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.
+* **Shark9:** We'll briefly look at Shark, a port of the MapReduce-based [Hive](http://hive.apache.org) SQL query tool to Spark.
+* **MLlib10:** One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the [Mahout](http://mahout.apache.org) project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.
+* **GraphX11:** Our last example explores the Spark graph library GraphX.
 
-Each of these scripts writes output to the `output` directory, but for convenience, we echo some of output to the Activator window.
+Let's examine these examples in more detail...
 
-Let's examine these scripts in more detail...
+## Intro1:
 
-## NGrams
+<a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>
+
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. 
+
+The comments in this and the subsequent files try to explain the API calls being made.  
+
+You'll note that the extension is `.sc`, not `.scala`. This is my convention to prevent the build from compiling this file, which won't compile because it's missing some definitions that the Spark Shell will define automatically.
+
+TODO
+
+## WordCount2:
+
+<a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> 
+
+The classic, simple *Word Count* algorithm is easy to understand and a suitable for parallel computation, so it's a good choice when learning a Big Data API.
+
+In *Word Count*, you read a corpus of documents (you can do this in parallel), tokenize each one into words, and count the occurrences of all the words globally. By default, <a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> uses a file containing the King James Version (KJV) of the Bible, but this can be overridden.
+
+The `data` directory has a [REAMDE](data/README.html) that discusses the files present and where they came from.
+
+If using the <a class="shortcut" href="#run">run</a> panel, select `scala.WordCount2` and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.
+
+If using `sbt`, enter `run` and then the number corresponding to `scala.WordCount2`.
+
+The reason the output directories have a timestamp in their name is so you can easily rerun the examples repeatedly. Starting with v1.0.0, Spark follows the Hadoop convention of refusing to overwrite an existing directory. The timestamps keep them unique.
+
+There are comments at the end of each source file with suggested exercises to learn the API. Try some, then look at the solutions such as <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> 
+
+I don't provide solutions for all the suggested exercises, but I do accept pull requests ;)
+
+* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
+* **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
+* **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
+* **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
+* **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`. 
+* **SparkStreaming7:** The streaming capability is relatively new and this example shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
+* **SparkSQL8:** An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.
+* **Shark9:** We'll briefly look at Shark, a port of the MapReduce-based [Hive](http://hive.apache.org) SQL query tool to Spark.
+* **MLlib10:** One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the [Mahout](http://mahout.apache.org) project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.
+* **GraphX11:** Our last example explores the Spark graph library GraphX.
+
+## NGrams6
 
 Let's see how the *NGrams* Script works. Open <a class="shortcut" href="#code/src/main/scala/scalding/NGrams.scala">NGrams.scala</a>. 
 

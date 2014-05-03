@@ -79,5 +79,12 @@ object InvertedIndex5b {
 
     // Exercise (hard): Try combining some of the processing steps or reordering
     // steps to make it more efficient.
+
+    // Exercise (hard): As written the output data has an important limitation 
+    // for use in a search engine. Really common words, like "a", "an", "the", 
+    // etc. are pervasive. There are two tools to improve this. One is to filter
+    // out so-called "stop" words that aren't useful for the index. The second
+    // is to use a variation of this algorithm called "term frequency-inverse 
+    // document frequency" (TF-IDF). Look up this algorithm and implement it.
   }
 }
