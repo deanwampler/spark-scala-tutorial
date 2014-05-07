@@ -6,7 +6,7 @@ import org.apache.spark.SparkContext._
 /** 
  * A special-purpose matrix case class. Each cell is given the value
  * i*N + j for indices (i,j), counting from 0.
- * @note: Must be serializable, which is automatic for case classes.
+ * Note: Must be serializable, which is automatic for case classes.
  */
 case class Matrix(m: Int, n: Int) {
   private def makeRow(start: Long): Array[Long] = 

@@ -372,10 +372,17 @@ This template is not a complete Apache Spark tutorial. To learn more, see the fo
 * The Apache Spark [tutorial](http://spark.apache.org/tree/develop/tutorial) distributed with the [Apache Spark](http://spark.apache.org) distribution. 
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
 * [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).
+
+## Experience Reports
+
+* [Spark at Twitter](http://www.slideshare.net/krishflix/seattle-spark-meetup-spark-at-twitter)
+
+## Spark Based Libraries
+
 * [Snowplow's Spark Example Project](https://github.com/snowplow/spark-example-project).
 * [Thunder - Large-scale neural data analysis with Spark](https://github.com/freeman-lab/thunder).
 
-For more about Typesafe:
+## For more about Typesafe:
 
 * See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
 * See [Typesafe](http://typesafe.com) for more information about our products and services. 
