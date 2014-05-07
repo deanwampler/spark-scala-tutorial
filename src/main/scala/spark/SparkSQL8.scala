@@ -14,7 +14,7 @@ import org.apache.spark.sql.SQLContext
 case class Verse(book: String, chapter: Int, verse: Int, text: String)
 
 /** Example of Spark SQL, using the KJV Bible text. */
-object SparkSQL8 {
+object SparkSQL9 {
   def main(args: Array[String]) = {
 
     val options = CommandLineOptions(
