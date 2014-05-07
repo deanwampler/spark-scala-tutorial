@@ -71,20 +71,16 @@ object InvertedIndex5b {
     }
 
     // Exercise: Sort the output by the words. How much overhead does this add?
-
     // Exercise: For each output record, sort the list of (path, n) tuples by n.
-
     // Exercise: Try you own set of text files. First run Crawl5a to generate
-    // the "web crawl" data.
-
+    //   the "web crawl" data.
     // Exercise (hard): Try combining some of the processing steps or reordering
-    // steps to make it more efficient.
-
+    //   steps to make it more efficient.
     // Exercise (hard): As written the output data has an important limitation 
-    // for use in a search engine. Really common words, like "a", "an", "the", 
-    // etc. are pervasive. There are two tools to improve this. One is to filter
-    // out so-called "stop" words that aren't useful for the index. The second
-    // is to use a variation of this algorithm called "term frequency-inverse 
-    // document frequency" (TF-IDF). Look up this algorithm and implement it.
+    //   for use in a search engine. Really common words, like "a", "an", "the", 
+    //   etc. are pervasive. There are two tools to improve this. One is to filter
+    //   out so-called "stop" words that aren't useful for the index. The second
+    //   is to use a variation of this algorithm called "term frequency-inverse 
+    //   document frequency" (TF-IDF). Look up this algorithm and implement it.
   }
 }

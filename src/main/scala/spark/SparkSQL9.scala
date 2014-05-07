@@ -70,10 +70,8 @@ object SparkSQL9 {
     }
 
     // Exercise: Sort the output by the words. How much overhead does this add?
-
     // Exercise: For each output record, sort the list of (path, n) tuples by n.
-
     // Exercise: Try you own set of text files. First run Crawl5a to generate
-    // the "web crawl" data.
+    //   the "web crawl" data.
   }
 }

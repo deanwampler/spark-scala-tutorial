@@ -72,6 +72,6 @@ object Crawl5a {
   }
 
   // EXERCISE: Try passing the input path argument in a different format:
-  // sbt run-main spark.Crawl5a -i 'data/enron-spam-ham/ham100/*,data/enron-spam-ham/spam100/*' -o output/crawl2
-  // How is the output different in output/crawl2?
+  //   sbt run-main spark.Crawl5a -i 'data/enron-spam-ham/ham100/*,data/enron-spam-ham/spam100/*' -o output/crawl2
+  //   How is the output different in output/crawl2?
 }

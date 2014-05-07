@@ -1,4 +1,4 @@
-package spark
+package spark    // Put the code in a package named "spark"
 
 import spark.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
@@ -19,7 +19,7 @@ object WordCount2 {
 
     // The first argument specifies the "master" (see the tutorial notes).
     // The second argument is a name for the job. Additional arguments
-    // are optinoal.
+    // are optional.
     val sc = new SparkContext("local", "Word Count (2)")
 
     // Put the "stop" inside a finally clause, so it's invoked even when 
@@ -54,12 +54,11 @@ object WordCount2 {
       // We append a timestamp, because Spark, like Hadoop, won't let us 
       // overwrite an existing directory, e.g., from a prior run.
       val now = Timestamp.now()
-      val out = s"output/kjv-wc-$now"
+      val out = s"output/kjv-wc2-$now"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {
-      // Stop (shut down) the context.
-      sc.stop()
+      sc.stop()      // Stop (shut down) the context.
     }
 
     // Exercise: Use other versions of the Bible:

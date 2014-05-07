@@ -5,11 +5,13 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
 /**
-* Second implementation of Word Count that makes the following changes:
-* * A simpler approach is used for the algorithm.
-* * A CommandLineOptions library is used.
-* * The handling of the per-line data format is refined.
-*/
+ * Second implementation of Word Count that makes the following changes:
+ * <ol>
+ * <li>A simpler approach is used for the algorithm.</li>
+ * <li>A CommandLineOptions library is used.</li>
+ * <li>The handling of the per-line data format is refined.</li>
+ * </ol>
+ */
 object WordCount3 {
   def main(args: Array[String]) = {
 
@@ -19,7 +21,7 @@ object WordCount3 {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.outputPath("output/kjv-wc2.txt"),
+      CommandLineOptions.outputPath("output/kjv-wc3"),
       CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
@@ -27,8 +29,8 @@ object WordCount3 {
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
 
     try {
-      // Load the King James Version of the Bible, convert 
-      // each line to lower case, then split into fields:
+      // Load the input text, convert each line to lower case, then split
+      // into fields:
       //   book|chapter|verse|text
       // Keep only the text. The output is an RDD.
       // Note that calling "last" on the split array is robust against lines
@@ -50,7 +52,7 @@ object WordCount3 {
 
       // Save to a file, but because we no longer have an RDD, we have to use
       // good 'ol Java File IO. Note that the output specifier is now a file, 
-      // not a directory as before, the format of each line will be diffierent,
+      // not a directory as before, the format of each line will be different,
       // and the order of the output will not be the same, either. 
       val now = Timestamp.now()
       val outpath = s"${argz("output-path")}-$now"
@@ -69,5 +71,6 @@ object WordCount3 {
 
     // Exercise: Try different arguments for the input and output. 
     //   NOTE: I've observed 0 output for some small input files!
+    // Exercise: Don't discard the book names. 
   }
 }

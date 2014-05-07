@@ -6,7 +6,7 @@
 // by the shell. In this tutorial, we don't download a full Spark distribution
 // with the $SPARK_HOME/bin/spark-shell, so we'll use SBT's "console" task:
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext_
+import org.apache.spark.SparkContext._
 // The val keyword declares a read-only variable: "value".
 val sc = new SparkContext("local", "Intro (1)")
 
@@ -26,7 +26,8 @@ val array = sins.collect()       // Convert the RDD into a collection (array)
 array.take(20) foreach println   // Take the first 20, and print them 1/line.
 
 // Create a separate filter function instead and pass it as an argument to the 
-// filter method. "filterFunc" is a value that's a function of String to Boolean
+// filter method. "filterFunc" is a value that's a function of type
+// String to Boolean.
 val filterFunc: String => Boolean = 
     (s:String) => s.contains("god") || s.contains("christ") 
 // Equivalent, due to type inference:
@@ -34,17 +35,18 @@ val filterFunc: String => Boolean =
 
 // Filter the sins for the verses that mention God or Christ (lowercase)
 val sinsPlusGodOrChrist  = sins filter filterFunc
-// Count how many we found.
+// Count how many we found. (Note we dropped the parentheses after "count")
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
-// Convert the RDD to an in-memory collection. What's its type?
-val arrayPlusGodOrChrist = sinsPlusGodOrChrist.collect
+
+// Not needed if you're using the actual Spark Shell
+sc.stop()
 
 // Prep for subsequent exercises; create an "output" directory
 val output = new java.io.File("output")
 if (output.exists == false) output.mkdir
 
 // Exercise: Try different filters. The filter function could match on a 
-// regular expression, for example. Note also the line format in the input text
-// files. It would be easy to filter on book of the bible, etc.
+//   regular expression, for example. Note also the line format in the input 
+//   text files. It would be easy to filter on book of the bible, etc.
 // Exercise: Try different sacred texts in the "data" directory, download other
-// texts from http://www.sacred-texts.com/, or just use any other texts you have.
+//   texts from http://www.sacred-texts.com/, or just use any other texts you have.

@@ -28,7 +28,7 @@ object Matrix4 {
       // Set up a mxn matrix of numbers.
       val matrix = Matrix(dims.m, dims.n)
 
-      // Average rows of a matrix in parallel:
+      // Average rows of the matrix in parallel:
       val sums_avgs = sc.parallelize(1 to dims.m).map { i =>
         // Matrix indices count from 0. 
         // "_ + _" is the same as "(count1, count2) => count1 + count2".
