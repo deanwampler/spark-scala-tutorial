@@ -4,7 +4,12 @@ import spark.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
-/** Second, simpler implementation of Word Count */
+/**
+* Second implementation of Word Count that makes the following changes:
+* * A simpler approach is used for the algorithm.
+* * A CommandLineOptions library is used.
+* * The handling of the per-line data format is refined.
+*/
 object WordCount3 {
   def main(args: Array[String]) = {
 
@@ -22,9 +27,14 @@ object WordCount3 {
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
 
     try {
-      // Load the King James Version of the Bible, then convert 
-      // each line to lower case, creating an RDD.
-      val input = sc.textFile(argz("input-path").toString).map(line => line.toLowerCase)
+      // Load the King James Version of the Bible, convert 
+      // each line to lower case, then split into fields:
+      //   book|chapter|verse|text
+      // Keep only the text. The output is an RDD.
+      // Note that calling "last" on the split array is robust against lines
+      // that don't have the delimiter, if any.
+      val input = sc.textFile(argz("input-path").toString)
+        .map(line => line.toLowerCase.split("\\s*\\|\\s*").last)
 
       // Cache the RDD in memory for fast, repeated access.
       // You don't have to do this and you shouldn't unless the data IS reused.
