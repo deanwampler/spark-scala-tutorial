@@ -3,15 +3,23 @@ package spark
 import spark.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in 
-// [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
+// org.apache.spark.rdd.PairRDDFunctions
+// (http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
 import org.apache.spark.SparkContext._
 
 /**
  * First implementation of Word Count.
+ * Scala makes the Singleton Design Pattern "first class". The "object" keyword
+ * declares an class with a single instance that the runtime will create itself.
+ * You put definitions in objects that would be declared static in Java, like
+ * "main".
  */
 object WordCount2 {
   def main(args: Array[String]) = {
 
+    // The first argument specifies the "master" (see the tutorial notes).
+    // The second argument is a name for the job. Additional arguments
+    // are optinoal.
     val sc = new SparkContext("local", "Word Count (2)")
 
     // Put the "stop" inside a finally clause, so it's invoked even when 
