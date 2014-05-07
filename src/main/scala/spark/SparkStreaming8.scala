@@ -38,7 +38,7 @@ object SparkStreaming8 {
     // setMaster("local[2]").
     val conf = new SparkConf()
              .setMaster("local[2]")
-             .setAppName("Spark Streaming (7)")
+             .setAppName("Spark Streaming (8)")
              .set("spark.cleaner.ttl", "60")
              .set("spark.files.overwrite", "true")
              // If you need more memory:

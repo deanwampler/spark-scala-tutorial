@@ -12,7 +12,7 @@ object NGrams6 {
     def count(value: String): Opt = Opt(
       name   = "count",
       value  = value,
-      help   = "-c | --count  N     The number of NGrams to compute (default: $value)",
+      help   = s"-c | --count  N     The number of NGrams to compute (default: $value)",
       parser = {
         case ("-c" | "--count") +: n +: tail => (("count", n), tail)
       })
@@ -27,7 +27,7 @@ object NGrams6 {
     def ngrams(value: String): Opt = Opt(
       name   = "ngrams",
       value  = value,
-      help   = "-n | --ngrams  S     The NGrams match string (default: $value)",
+      help   = s"-n | --ngrams  S     The NGrams match string (default: $value)",
       parser = {
         case ("-n" | "--ngrams") +: s +: tail => (("ngrams", s), tail)
       })

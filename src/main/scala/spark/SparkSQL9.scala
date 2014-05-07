@@ -25,7 +25,7 @@ object SparkSQL9 {
 
     val argz = options(args.toList)
 
-    val sc = new SparkContext(argz("master").toString, "Spark SQL (6)")
+    val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
     val sqlContext = new SQLContext(sc)
     import sqlContext._    // Make its methods accessible.
 

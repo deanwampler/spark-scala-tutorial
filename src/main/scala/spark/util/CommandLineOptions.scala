@@ -82,7 +82,7 @@ object CommandLineOptions {
   def inputPath(value: String): Opt = Opt(
     name   = "input-path",
     value  = value,
-    help   = "-i | --in  | --input  path   The input root directory of files to crawl (default: $value)",
+    help   = s"-i | --in  | --input  path   The input root directory of files to crawl (default: $value)",
     parser = {
       case ("-i" | "--in" | "--inpath") +: path +: tail => (("input-path", path), tail)
     })
@@ -91,7 +91,7 @@ object CommandLineOptions {
   def outputPath(value: String): Opt = Opt(
     name   = "output-path",
     value  = value,
-    help   = "-o | --out | --output path   The output location (default: $value)",
+    help   = s"-o | --out | --output path   The output location (default: $value)",
     parser = {
       case ("-o" | "--out" | "--outpath") +: path +: tail => (("output-path", path), tail)
     })
@@ -100,10 +100,10 @@ object CommandLineOptions {
   def master(value: String): Opt = Opt(
     name   = "master",
     value  = value,
-    help   = """
+    help   = s"""
        |-m | --master M      The "master" argument passed to SparkContext, "M" is one of:
        |                    "local", local[N]", "mesos://host:port", or "spark://host:port"
-       |                    (default: $defaultMaster).""".stripMargin,
+       |                    (default: $value).""".stripMargin,
     parser = {
       case ("-m" | "--master") +: master +: tail => (("master", master), tail)
     })
