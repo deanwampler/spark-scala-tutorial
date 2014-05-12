@@ -64,9 +64,12 @@ object Crawl5a {
     // A more scalable approach is to use an org.apache.spark.Accumulable 
     // shared variable. The implementation here is synchronous.
     def toRDDs(file: File, accum: Seq[(File,RDD[String])]): Seq[(File,RDD[String])] = 
-      if (file.isDirectory) 
+      if (file.isDirectory) {
+        // Process the directory (recursively) and fold its results in...
         file.listFiles(filter).foldLeft(accum) ( (acc, f) => toRDDs(f, acc) )
-      else (file, sc.textFile(file.getPath)) +: accum
+      } else {
+        (file, sc.textFile(file.getPath)) +: accum
+      }
 
     toRDDs(new File(inpath), Seq.empty[(File,RDD[String])])
   }

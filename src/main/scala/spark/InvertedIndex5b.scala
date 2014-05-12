@@ -29,8 +29,8 @@ object InvertedIndex5b {
       val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
       val input = sc.textFile(argz("input-path").toString) map {
         case lineRE(name, text) => (name.trim, text.toLowerCase)
-        case line => 
-          Console.err.println("Unexpected line: $line")
+        case badLine => 
+          Console.err.println("Unexpected line: $badLine")
           // If any of these were returned, you could filter them out below.
           ("", "")  
       }

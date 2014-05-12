@@ -158,18 +158,14 @@ sup {
 <body>
 <h1>Apache Spark: A Tutorial</h1>
 
-</div>
-<div>
 <h2>Introduction</h2>
 
-<p>This tutorial demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications.</p>
+<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications.</p>
 
 <p><a href="http://spark.apache.org">Apache Spark</a> is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level <a href="http://spark.apache.org">Apache project</a>.</p>
 
 <p>We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a <em>Spark Shell</em>, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.</p>
 
-</div>
-<div>
 <h2>Why Spark?</h2>
 
 <p>By 2013, it became increasingly clear that a successor was needed for the venerable <a href="http://wiki.apache.org/hadoop/MapReduce">Hadoop MapReduce</a> compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.</p>
@@ -178,8 +174,6 @@ sup {
 
 <p>Spark is now officially supported in <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">Cloudera CDH5</a> and <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">MapR's distribution</a>. Hortonworks has not yet announced whether or not they will support Spark natively, but <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">this page</a> in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.</p>
 
-</div>
-<div>
 <h2>Spark Clusters</h2>
 
 <p>Let's briefly discuss the anatomy of a Spark standalone cluster, adapting <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">this discussion (and diagram) from the Spark documentation</a>. Consider the following diagram:</p>
@@ -192,8 +186,6 @@ sup {
 
 <p>When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.</p>
 
-</div>
-<div>
 <h2>Spark Deployment Options</h2>
 
 <p>Spark currently supports <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">three cluster managers</a>:</p>
@@ -209,8 +201,6 @@ sup {
 
 <p>Spark also includes <a href="http://spark.apache.org/docs/0.9.1/ec2-scripts.html">EC2 launch scripts</a> for running clusters on Amazon EC2.</p>
 
-</div>
-<div>
 <h2>Resilient, Distributed Datasets</h2>
 
 <p>The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in <em>Resilient, Distributed Datasets</em> (RDDs), where a logical data set is virtualized over the cluster.</p>
@@ -221,11 +211,9 @@ sup {
 
 <p>The architecture of RDDs is described in the research paper <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a>.</p>
 
-</div>
-<div>
 <h2>Spark 1.0.0</h2>
 
-<p>We will use Spark 1.0.0-RC3 so we can use some new features, like Spark SQL, that will be generally available (GA) soon. I'll update the tutorial to final artifacts when they are available.</p>
+<p>We will use Spark 1.0.0-RC3 so we can use some new features, like Spark SQL, that will be generally available (GA) soon. I'll update the workshop to final artifacts when they are available.</p>
 
 <p>For now, we will use the following temporary locations for documentation and jar files:</p>
 
@@ -237,21 +225,19 @@ sup {
 
 <p>I recommend that you open the <a href="http://people.apache.org/~pwendell/spark-1.0.0-rc3-docs/">Documentation link</a>, as the getting-started guides, overviews, and reference pages (<em>Scaladocs</em>) will be useful. The Maven repo is used automatically by the build process.</p>
 
-</div>
-<div>
 <h2>Building and Running</h2>
 
 <p>If you're using the <a href="http://typesafe.com/activator">Activator UI</a>, search for <code>activator-spark</code> and install it in the UI. The code is built automatically.</p>
 
-<p>If you grabbed this tutorial from <a href="https://github.com/deanwampler/activator-spark">Github</a>, you'll need to install <code>sbt</code> and use a command line to build and run the applications. In that case, see the <a href="http://www.scala-sbt.org/">sbt website</a> for instructions on installing <code>sbt</code>.</p>
+<p>If you grabbed this workshop from <a href="https://github.com/deanwampler/activator-spark">Github</a>, you'll need to install <code>sbt</code> and use a command line to build and run the applications. In that case, see the <a href="http://www.scala-sbt.org/">sbt website</a> for instructions on installing <code>sbt</code>.</p>
 
 <p>If you're using the Activator UI the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class", for example <code>WordCount2</code>, and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories to view the output written in those locations.</p>
 
-<p>If you are using <code>sbt</code> from the command line, start <code>sbt</code>, then type <code>run</code>. It will present the same list of main classes. Enter one of the numbers to select the example you want to run. Try <strong>WordCount2</strong> to verify everything works.</p>
+<p>If you are using <code>sbt</code> from the command line, start <code>sbt</code>, then type <code>run</code>. It will present the same list of main classes. Enter one of the numbers to select the executable you want to run. Try <strong>WordCount2</strong> to verify everything works.</p>
 
-<p>Note that the examples with package names that contain <code>solns</code> are solutions to exercises. The <code>other</code> examples show alternative implementations.</p>
+<p>Note that the exercises with package names that contain <code>solns</code> are solutions to exercises. The <code>other</code> exercises show alternative implementations.</p>
 
-<p>Here is a list of the examples. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:</p>
+<p>Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:</p>
 
 <ul>
 <li><strong>Intro1:</strong> Actually, this <em>isn't</em> listed by the <code>run</code> command, because it is a script we'll use with the interactive <em>Spark Shell</em>.</li>
@@ -261,18 +247,17 @@ sup {
 <li><strong>Crawl5a:</strong> Simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.</li>
 <li><strong>InvertedIndex5b:</strong> Using the crawl data, compute the index of words to documents (emails).</li>
 <li><strong>NGrams6:</strong> Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
-<li><strong>SparkStreaming7:</strong> The streaming capability is relatively new and this example shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
-<li><strong>SparkSQL8:</strong> An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.</li>
-<li><strong>Shark9:</strong> We'll briefly look at Shark, a port of the MapReduce-based <a href="http://hive.apache.org">Hive</a> SQL query tool to Spark.</li>
-<li><strong>MLlib10:</strong> One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the <a href="http://mahout.apache.org">Mahout</a> project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.</li>
-<li><strong>GraphX11:</strong> Our last example explores the Spark graph library GraphX.</li>
+<li><strong>Joins7:</strong> Spark supports SQL-style joins and this exercise provides a simple example.</li>
+<li><strong>SparkStreaming8:</strong> The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
+<li><strong>SparkSQL9:</strong> An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.</li>
+<li><strong>Shark10:</strong> We'll briefly look at Shark, a port of the MapReduce-based <a href="http://hive.apache.org">Hive</a> SQL query tool to Spark.</li>
+<li><strong>MLlib11:</strong> One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the <a href="http://mahout.apache.org">Mahout</a> project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.</li>
+<li><strong>GraphX12:</strong> Our last exercise explores the Spark graph library GraphX.</li>
 </ul>
 
 
-<p>Let's examine these examples in more detail...</p>
+<p>Let's examine these exercises in more detail...</p>
 
-</div>
-<div>
 <h2>Intro1:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a></p>
@@ -283,501 +268,938 @@ sup {
 
 <p>You'll note that the extension is <code>.sc</code>, not <code>.scala</code>. This is my convention to prevent the build from compiling this file, which won't compile because it's missing some definitions that the Spark Shell will define automatically.</p>
 
-<p>TODO</p>
+<p>Actually, we're <em>not</em> going to use the <em>actual</em> Spark Shell, because just pull down the Spark jar file as a dependency, not a full distribution. Instead, we'll just use the Scala REPL via the <code>sbt console</code> task. We'll discuss the differences of this approach.</p>
 
-</div>
-<div>
+<p>You'll have to use a command window for this part of the workshop. Change your working directory to where you installed this workshop and type <code>sbt</code>:</p>
+
+<pre><code>cd where_you_installed_the_workshop
+sbt
+</code></pre>
+
+<p>At the <code>sbt</code> prompt, type <code>console</code>. You'll see a welcome message and a <code>scala&gt;</code> prompt.</p>
+
+<p>We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. Here is the content of the script without the comments, but broken into sections with discussions:</p>
+
+<p><code>scala
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+val sc = new SparkContext("local", "Intro (1)")
+</code>
+Import the <code>SparkContext</code> that drives everything.</p>
+
+<p>Why are there two, very similar <code>import</code> statements? The first one imports the <code>SparkContext</code> type so we don't have to use a fully-qualified name in the <code>new SparkContext</code> statement. The second is analogous to a <code>static import</code> in Java, where we make some methods and values visible in the current scope, again without requiring qualification.</p>
+
+<p>When you construct a <code>SparkContext</code>, there are several constructors you can use. This one takes a string for the "master" and a job name. The master must be one of the following:</p>
+
+<ul>
+<li><code>local</code>: Start the Spark job standalone and use a single thread to run the job.</li>
+<li><code>local[k]</code>: Use <code>k</code> threads instead. Should be less than the number of cores.</li>
+<li><code>mesos://host:port</code>: Connect to a running, Mesos-managed Spark cluster.</li>
+<li><code>spark://host:port</code>: Connect to a running, standalone Spark cluster.</li>
+</ul>
+
+
+<p>You can also run Spark under Hadoop YARN, which we'll discuss at the end of the workshop.</p>
+
+<p><code>scala
+val input = sc.textFile("data/kjvdat.txt").map(line =&gt; line.toLowerCase)
+input.cache
+</code></p>
+
+<p>Define a read-only variable <code>input</code> of type RDD (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case.</p>
+
+<blockquote><p>The <code>data</code> directory has a <a href="data/README.html">README</a> that discusses the files present and where they came from.</p></blockquote>
+
+<p>Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides dramatic performance improvements.</p>
+
+<p><code>scala
+val sins = input.filter(line =&gt; line.contains("sin"))
+val count = sins.count()         // How many sins?
+val array = sins.collect()       // Convert the RDD into a collection (array)
+array.take(20) foreach println   // Take the first 20, and print them 1/line.
+</code></p>
+
+<p>Filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many found, convert the RDD to a collection. (What is the actual type??) and finally print the first twenty lines.</p>
+
+<p>Note: in Scala, the <code>()</code> in method calls are actually optional for no-argument methods.</p>
+
+<p><code>scala
+val filterFunc: String =&gt; Boolean =
+    (s:String) =&gt; s.contains("god") || s.contains("christ")
+</code></p>
+
+<p>An alternative approach; create a separate filter <em>function value</em> instead and pass it as an argument to the filter method. Specifically, <code>filterFunc</code> is a value that's a function of type <code>String</code> to <code>Boolean</code>.</p>
+
+<p>Actually, the following more concise form is equivalent, due to type inference:</p>
+
+<p><code>scala
+val filterFunc: String =&gt; Boolean =
+    s =&gt; s.contains("god") || s.contains("christ")
+</code></p>
+
+<p><code>scala
+val sinsPlusGodOrChrist  = sins filter filterFunc
+val countPlusGodOrChrist = sinsPlusGodOrChrist.count
+</code></p>
+
+<p>Now use <code>filterFunc</code> with filter to find all the <code>sins</code> verses that mention God or Christ.
+Then, count how many were found. Note that we dropped the parentheses after "count" in this case.</p>
+
+<p><code>scala
+sc.stop()
+</code></p>
+
+<p>Stop the session. If you exit the REPL immediately, this will happen implicitly, but as we'll see, it's a good practice to always do this in your scripts. You'll also don't typically do this when running the actual Spark Shell, as you'll usually want the context alive until you're finished completely.</p>
+
+<p>Lastly, we need to run some unrelated code to setup the rest of the exercises. Namely, we need to create an <code>output</code> directory we'll use:</p>
+
+<p><code>scala
+val output = new java.io.File("output")
+if (output.exists == false) output.mkdir
+</code></p>
+
+<p>Now, if we actually used the Spark Shell for this exercise, we would have omitted the two <code>import</code> statements and the statement where we created the <code>ScalaContext</code> value <code>sc</code>.
+The shell automatically does these steps for us.</p>
+
+<p>There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the <code>src/main/scala/spark/solns</code> directory. Solutions are provided for all the suggested exercises, but we do accept pull requests ;) All the solutions provided for the rest of the exercises are also built with the rest of the code, so you'll be able to run them the same way.</p>
+
+<blockquote><p>Note: If you don't want to modify the original code when working on an exercise, just copy the file and give the exercise type a new name.</p></blockquote>
+
+<p>Before moving on, let's discuss how you would actually run the Spark Shell. When you <a href="TODO">download a full Spark distribution</a>, it includes a <code>bin</code> directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command <code>bin/spark-shell</code> (assuming your working directory is the root of the distribution).</p>
+
 <h2>WordCount2:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a></p>
 
-<p>The classic, simple <em>Word Count</em> algorithm is easy to understand and a suitable for parallel computation, so it's a good choice when learning a Big Data API.</p>
+<p>The classic, simple <em>Word Count</em> algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.</p>
 
-<p>In <em>Word Count</em>, you read a corpus of documents (you can do this in parallel), tokenize each one into words, and count the occurrences of all the words globally. By default, <a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> uses a file containing the King James Version (KJV) of the Bible, but this can be overridden.</p>
+<p>In <em>Word Count</em>, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "local" counts can be done in parallel.</p>
 
-<p>The <code>data</code> directory has a <a href="data/README.html">REAMDE</a> that discusses the files present and where they came from.</p>
+<p><a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)</p>
 
 <p>If using the <a class="shortcut" href="#run">run</a> panel, select <code>scala.WordCount2</code> and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.</p>
 
-<p>If using <code>sbt</code>, enter <code>run</code> and then the number corresponding to <code>scala.WordCount2</code>.</p>
+<p>If using <code>sbt</code>, enter <code>run</code> and then the number shown to the left to <code>scala.WordCount2</code>.</p>
 
-<p>The reason the output directories have a timestamp in their name is so you can easily rerun the examples repeatedly. Starting with v1.0.0, Spark follows the Hadoop convention of refusing to overwrite an existing directory. The timestamps keep them unique.</p>
+<p>The reason the output directories have a timestamp in their name is so you can easily rerun the exercises repeatedly. Starting with v1.0.0, Spark follows the Hadoop convention of refusing to overwrite an existing directory. The timestamps keep them unique.</p>
 
-<p>There are comments at the end of each source file with suggested exercises to learn the API. Try some, then look at the solutions such as <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a></p>
+<p>As before, here is the text of the script in sections, with code comments removed:</p>
 
-<p>I don't provide solutions for all the suggested exercises, but I do accept pull requests ;)</p>
+<p><code>scala
+package spark    // Put the code in a package named "spark"
+import spark.util.Timestamp   // Simple date-time utility
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+</code></p>
+
+<p>We use a <code>spark</code> package for the compiled exercises. The <code>Timestamp</code> class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.</p>
+
+<blockquote><p>Even though our exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!</p></blockquote>
+
+<p>First, here is the outline of the script, demonstrating a pattern we'll use throughout.</p>
+
+<p>```scala
+object WordCount2 {
+  def main(args: Array[String]) = {</p>
+
+<pre><code>val sc = new SparkContext("local", "Word Count (2)")
+
+try {
+  ...
+} finally {
+  sc.stop()      // Stop (shut down) the context.
+}
+</code></pre>
+
+<p>  }
+}</p>
+
+<p>In case the script fails with an exception, putting the <code>SparkContext.stop</code> inside a <code>finally</code> clause ensures that will get invoked no matter what. This is most useful when you're running scripts inside the Scala REPL.</p>
+
+<p>The content of the <code>try</code> clause is the following:</p>
+
+<p>```scala
+val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
+input.cache</p>
+
+<p>val wc = input
+  .flatMap(line => line.split("""\W+"""))
+  .map(word => (word, 1))
+  .reduceByKey((count1, count2) => count1 + count2)</p>
+
+<p>val now = Timestamp.now()
+val out = s"output/kjv-wc2-$now"
+println(s"Writing output to: $out")
+wc.saveAsTextFile(out)
+```</p>
+
+<p>After the same loading and cache of the data we saw previously, we setup a pipeline of operations to perform the word count.</p>
+
+<p>First the line is split into words using as the separator any run of characters that isn't alphanumeric (e.g., whitespace and punctuation). This also conveniently removes the trailing <code>~</code> characters at the end of each line (for some reason). <code>input.flatMap(line =&gt; line.split(...))</code> maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The <code>flat</code> part flattens those nested collections into a single, "flat" collection of words.</p>
+
+<p>The next two lines convert the single word "records" into tuples with the word and a count of <code>1</code>. In Shark, the first field in a tuple will be used as the default key for joins, group-bys, and the <code>reduceByKey</code> we use next. It effectively groups all the tuples together with the same word (the key) and then "reduces" the values using the passed in function. In this case, the two counts are added together.</p>
+
+<p>The last sequence of statements creates a timestamp that can be used in a file or directory name, constructs the output path, and finally uses the <code>saveAsTextFile</code> method to write the final RDD to that location.</p>
+
+<p>Spark follows Hadoop conventions. The <code>out</code> path is actually interpreted as a directory name. Here is its contents (for a run at a particular time...):</p>
+
+<pre><code>$ ls -Al output/kjv-wc2-2014.05.02-06.40.55
+total 328
+-rw-r--r--  1 deanwampler  staff       8 May  3 09:40 ._SUCCESS.crc
+-rw-r--r--  1 deanwampler  staff    1248 May  3 09:40 .part-00000.crc
+-rwxrwxrwx  1 deanwampler  staff       0 May  3 09:40 _SUCCESS
+-rwxrwxrwx  1 deanwampler  staff  158620 May  3 09:40 part-00000
+</code></pre>
+
+<p>In a real cluster with lots of data and lots of concurrent processing, there would be many <code>part-NNNNN</code> files. They contain the actual data. The <code>_SUCCESS</code> file is a useful convention that signals the end of processing. It's useful because tools that are watching for the data to be written so they can perform subsequent processing will know the files are complete when they see this marker file. Finally, there are "hidden" CRC files for these other two files.</p>
+
+<p>There are exercises in the file and solutions for some of them, for example <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.</p>
+
+<h2>WordCount3:</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/WordCount3.scala">WordCount3.scala</a></p>
+
+<p>This exercise also implements <em>Word Count</em>, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</p>
+
+<p>Finally, it does some data cleansing to improve the results. The sacred text files included in the <code>data</code> directory, such as <code>kjvdat.txt</code> are actually formatted records of the form:</p>
+
+<pre><code>book|chapter|verse|text
+</code></pre>
+
+<p>That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but abbreviated "Gen"), the chapter and verse numbers, and then the verse text. We just want to word count the verses, although including the book names would be fine.</p>
+
+<p>Command line options can be used to override the defaults. You'll have to use <code>sbt</code> from a command window to use this feature. Note the use of the <code>run-main</code> task that lets us specify a particular "main" to run and optional arguments. The "\" are used to wrap long lines, <code>[...]</code> indicate optional arguments, and <code>|</code> indicate alternative flags:</p>
+
+<pre><code>run-main spark.WordCount3 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-o | --out | --outpath output] \ 
+  [-m | --master master]
+</code></pre>
+
+<p>Where the options have the following meanings:</p>
+
+<pre><code>-h | --help     Show help and exit.
+-i ... input    Read this input source (default: data/kjvdat.txt).
+-o ... output   Write to this output location (default: output/kjvdat-wc3).
+-m ... master   local, local[k], etc. as discussed previously.
+</code></pre>
+
+<p>You can try different variants of <code>local[k]</code>, but keep k less than the number of cores in your machine. The <code>input</code> and <code>master</code> arguments are basically the same things we discussed for <code>WordCount2</code>, but the <code>output</code> argument is used slightly differently. As we'll see, we'll output the results using a different mechanism than before, so the <code>output/kjvdat-wc3</code> (or your override) will be converted to file (not a Hadoop-style directory) <code>output/kjvdat-wc3-${now}.txt</code>, where <code>now</code> will be the current timestamp.</p>
+
+<p>When you specify an input path for Spark, you can specify <code>bash</code>-style "globs" and even a list of them.</p>
 
 <ul>
-<li><strong>WordCount3:</strong> An alternative implementation of <em>Word Count</em> that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</li>
-<li><strong>Matrix4:</strong> Demonstrates Spark's Matrix API, useful for many machine learning algorithms.</li>
-<li><strong>Crawl5a:</strong> Simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.</li>
-<li><strong>InvertedIndex5b:</strong> Using the crawl data, compute the index of words to documents (emails).</li>
-<li><strong>NGrams6:</strong> Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
-<li><strong>SparkStreaming7:</strong> The streaming capability is relatively new and this example shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
-<li><strong>SparkSQL8:</strong> An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.</li>
-<li><strong>Shark9:</strong> We'll briefly look at Shark, a port of the MapReduce-based <a href="http://hive.apache.org">Hive</a> SQL query tool to Spark.</li>
-<li><strong>MLlib10:</strong> One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the <a href="http://mahout.apache.org">Mahout</a> project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.</li>
-<li><strong>GraphX11:</strong> Our last example explores the Spark graph library GraphX.</li>
+<li><code>data/foo</code>: Just the file <code>foo</code> or if it's a directory, all its files, one level deep (unless the program does some extra handling itself).</li>
+<li><code>data/foo*.txt</code>: All files in <code>data</code> whose names start with <code>foo</code> and end with the <code>.txt</code> extension.</li>
+<li><code>data/foo*.txt,data2/bar*.dat</code>: A comma-separated list of globs.</li>
 </ul>
 
 
-</div>
-<div>
+<p>Here is the implementation of <code>WordCount3</code>, in sections:</p>
+
+<p><code>scala
+package spark
+import spark.util.{CommandLineOptions, Timestamp}
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+</code></p>
+
+<p>As before, but with our new <code>CommandLineOptions</code> and <code>Timestamp</code> utilities.</p>
+
+<p>```scala
+object WordCount3 {
+  def main(args: Array[String]) = {</p>
+
+<pre><code>val options = CommandLineOptions(
+  this.getClass.getSimpleName,
+  CommandLineOptions.inputPath("data/kjvdat.txt"),
+  CommandLineOptions.outputPath("output/kjv-wc3"),
+  CommandLineOptions.master("local"))
+
+val argz = options(args.toList)
+</code></pre>
+
+<pre><code>
+I won't discuss the implementation of &lt;a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala"&gt;CommandLineOptions.scala&lt;/a&gt; except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument to this method is the default value. 
+
+```scala
+    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
+
+    try {
+      val input = sc.textFile(argz("input-path").toString)
+        .map(line =&gt; line.toLowerCase.split("\\s*\\|\\s*").last)
+      input.cache
+</code></pre>
+
+<p>It starts out much like <code>WordCount2</code>, but it splits each line into fields, where the lines are of the form: <code>book|chapter|verse|text</code>. Only the text is kept. The output is an RDD that we then cache as before. Note that calling <code>last</code> on the split array is robust against lines that don't have the delimiter, if there are any; it simply returns the whole original string.</p>
+
+<p><code>scala
+      val wc2 = input
+        .flatMap(line =&gt; line.split("""\W+"""))
+        .countByValue()  // Returns a Map[T, Long]
+</code></p>
+
+<p>Split on non-alphanumeric sequences of character as before, but rather than map to <code>(word, 1)</code> tuples and use <code>reduceByKey</code>, as we did in <code>WordCount2</code>, we simply treat the words as values and call <code>countByValue</code> to count the unique occurrences.</p>
+
+<p><code>scala
+      val now = Timestamp.now()
+      val outpath = s"${argz("output-path")}-$now"
+      println(s"Writing output (${wc2.size} records) to: $outpath")
+      import java.io._
+      val out = new PrintWriter(outpath)
+      wc2 foreach {
+        case (word, count) =&gt; out.println("%20s\t%d".format(word, count))
+      }
+      // WARNING: Without this close statement, it appears the output stream is
+      // not completely flushed to disk!
+      out.close()
+    } finally {
+      sc.stop()
+    }
+  }
+}
+</code></p>
+
+<p>The result of <code>countByValue</code> is a Scala array, not an RDD, so we use conventional Java I/O to write the output. Note the warning; failure to close the stream explicit appears to cause data truncation when the <code>SparkContext</code> is stopped before the stream is flushed.</p>
+
+<p>Don't forget the try the exercises at the end of the source file.</p>
+
+<h2>Matrix4</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/Matrix4.scala">Matrix4.scala</a></p>
+
+<p>Spark was originally used for Machine Learning algorithms. It has a built-in Matrix API that is useful for many machine learning algorithms. This exercise explores it briefly.</p>
+
+<p>The sample data is generated internally; there is no input that is read. The output is written to the console.</p>
+
+<p>Here is the <code>run-main</code> command with options:</p>
+
+<pre><code>run-main spark.Matrix4 [m [n]]
+</code></pre>
+
+<p>Where the smaller set of supported options are:</p>
+
+<pre><code>m   Number of rows (default: 5)
+n   Number of columns (default: 10)
+</code></pre>
+
+<p>Here is the code:</p>
+
+<p>```scala
+package spark
+import spark.util.{Matrix, Timestamp}
+import org.apache.spark.SparkContext</p>
+
+<p>object Matrix4 {</p>
+
+<p>  def main(args: Array[String]) = {</p>
+
+<pre><code>case class Dimensions(m: Int, n: Int)
+
+val dims = args match {
+  case Array(m, n) =&gt; Dimensions(m.toInt, n.toInt)
+  case Array(m)    =&gt; Dimensions(m.toInt, 10)
+  case Array()     =&gt; Dimensions(5,       10)
+  case _ =&gt; 
+    println("""Expected optional matrix dimensions, got this: ${args.mkString(" ")}""")
+    sys.exit(1)
+}
+</code></pre>
+
+<pre><code>
+`Dimensions` is a convenience class for capturing the default or user-specified matrix dimensions.
+
+```scala
+    val sc = new SparkContext("local", "Matrix (4)")
+
+    try { 
+      // Set up a mxn matrix of numbers.
+      val matrix = Matrix(dims.m, dims.n)
+
+      // Average rows of the matrix in parallel:
+      val sums_avgs = sc.parallelize(1 to dims.m).map { i =&gt;
+        // Matrix indices count from 0. 
+        // "_ + _" is the same as "(count1, count2) =&gt; count1 + count2".
+        val sum = matrix(i-1) reduce (_ + _) 
+        (sum, sum/dims.n)
+      }.collect
+
+      println(s"${dims.m}x${dims.n} Matrix:")
+      sums_avgs.zipWithIndex foreach {
+        case ((sum, avg), index) =&gt; 
+          println(f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d")
+      }
+    } finally {
+      sc.stop()
+    }
+  }
+}
+</code></pre>
+
+<p>The comments explain most of the steps. The crucial part is the call to <code>parallelize</code> that creates N parallel operations. If you have less than N cores, some of the operations will have to run sequentially. The argument to <code>parallelize</code> is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to <code>i</code>. We then grab the <code>i-1</code> row (because of zero indexing) and use the <code>reduce</code> method to sum the column elements. A final tuple with the sum and the average is returned.</p>
+
+<p>The <code>collect</code> method is called to convert the RDD to an array, because we're just going to print results to the console. The expression <code>sums_avgs.zipWithIndex</code> creates a tuple with each <code>sumb_avgs</code> value and it's index into the collection. We use that to print the row index.</p>
+
+<h2>Crawl5a</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/Crawl5a.scala">Crawl5a.scala</a></p>
+
+<p>This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.</p>
+
+<p><code>Crawl5a</code> supports the same command-line options as <code>WordCount3</code>:</p>
+
+<pre><code>run-main spark.Crawl5a [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-o | --out | --outpath output] \ 
+  [-m | --master master]
+</code></pre>
+
+<p>In this case, no timestamp is appended to the output path, since it will be read by the next exercise <code>InvertedIndex5b</code>. So, if you rerun <code>Crawl5a</code>, you'll have to delete or rename the previous output manually.</p>
+
+<p>Most of this code is straightforward. It's comments explain any complicated constructs used.</p>
+
+<h2>InvertedIndex5b</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/InvertedIndex5b.scala">InvertedIndex5b.scala</a></p>
+
+<p>Using the crawl data just generated, compute the index of words to documents (emails).</p>
+
+<p><code>InvertedIndex5b</code> supports the same command-line options as <code>WordCount3</code>:</p>
+
+<pre><code>run-main spark.InvertedIndex5b [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-o | --out | --outpath output] \ 
+  [-m | --master master]
+</code></pre>
+
+<p>Here is the code:</p>
+
+<p>```scala
+package spark</p>
+
+<p>import spark.util.{CommandLineOptions, Timestamp}
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._</p>
+
+<p>object InvertedIndex5b {
+  def main(args: Array[String]) = {</p>
+
+<pre><code>val options = CommandLineOptions(
+  this.getClass.getSimpleName,
+  CommandLineOptions.inputPath("output/crawl"),
+  CommandLineOptions.outputPath("output/inverted-index"),
+  CommandLineOptions.master("local"))
+
+val argz = options(args.toList)
+
+val sc = new SparkContext(argz("master").toString, "Inverted Index (5b)")
+
+try {
+  val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
+  val input = sc.textFile(argz("input-path").toString) map {
+    case lineRE(name, text) =&gt; (name.trim, text.toLowerCase)
+    case badLine =&gt; 
+      Console.err.println("Unexpected line: $badLine")
+      ("", "")  
+  }
+</code></pre>
+
+<pre><code>
+Inside the `try` expression, we load the "crawl" data, where each line was written by `Crawl5a` with the following format: `(document_id, text)` (including the parentheses). Hence, we use a regular expression with "capture groups" for the document and text.
+
+Note the function passed to `map`. It has the form:
+
+```scala
+{
+  case lineRE(name, text) =&gt; ...
+  case line =&gt; ...
+}
+
+There is now explicit argument list like we've used before. This syntax is the literal syntax for a *partial function*, a mathematical concept for a function that is not defined at all of its inputs. We have two `case` match clauses, one for when the regular expression successfully matches and returns the capture groups into variables `name` and `text` and the second which will match everything else, assigning the line to the variable `badLine`. (In fact, this catch-all clause makes the function *total*, not *partial*.) The function must return a two-element tuple, so the catch clause simply returns `("","")`.
+
+Note that the specified or default `input-path` is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.
+
+```scala
+      val now = Timestamp.now()
+      val out = s"${argz("output-path")}-$now"
+      println(s"Writing output to: $out")
+
+      // Split on non-alphanumeric sequences of character as before. 
+      // Rather than map to "(word, 1)" tuples, we treat the words by values
+      // and count the unique occurrences.
+      input
+        .flatMap { 
+          case (path, text) =&gt; text.split("""\W+""") map (word =&gt; (word, path))
+        }
+        .map { 
+          case (word, path) =&gt; ((word, path), 1) 
+        }
+        .reduceByKey{
+          case (count1, count2) =&gt; count1 + count2
+        }
+        .map {
+          case ((word, path), n) =&gt; (word, (path, n)) 
+        }
+        .groupBy {
+          case (word, (path, n)) =&gt; word
+        }
+        .map {
+          case (word, seq) =&gt; 
+            val seq2 = seq map {
+              case (redundantWord, (path, n)) =&gt; (path, n)
+            }
+            (word, seq2.mkString(", "))
+        }
+        .saveAsTextFile(out)
+    } finally {
+      sc.stop()
+    }
+  }
+}
+</code></pre>
+
+<p>See if you can understand what this sequence of transformations is doing. The end goal is to output each record string in the following form: <code>(word, (doc1, n1), (doc2, n2), ...)</code>:</p>
+
 <h2>NGrams6</h2>
 
-<p>Let's see how the <em>NGrams</em> Script works. Open <a class="shortcut" href="#code/src/main/scala/scalding/NGrams.scala">NGrams.scala</a>.</p>
+<p><a class="shortcut" href="#code/src/main/scala/spark/NGrams6.scala">NGrams6.scala</a></p>
 
-<p>In the Run panel, select <em>NGrams</em> from the drop-down menu to invoke this script by itself.</p>
+<p>In <em>Natural Language Processing</em>, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or <em>NGrams</em>. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N=3-5 appears to provide the optimal balance.</p>
 
-<p>Here is the entire script, with the comments removed:</p>
+<p>This exercise finds all NGrams matching a user-specified pattern. The default is the 4-word phrases the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the user can also specify an NGram Phrase that is a regular expression or a mixture, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, or <code>hated</code> as the second word.</p>
 
-<pre><code>import com.twitter.scalding._
+<p><code>NGrams6</code> supports the same command-line options as <code>WordCount3</code>, except for the output path (it just writes to the console), plus two new options:</p>
 
-class NGrams(args : Args) extends Job(args) {
+<pre><code>run-main spark.NGrams6 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-m | --master master] \ 
+  [-c | --count N] \ 
+  [-n | --ngrams string] 
+</code></pre>
 
-  val ngramsArg = args.list("ngrams").mkString(" ").toLowerCase
-  val ngramsRE = ngramsArg.trim
-    .replaceAll("%", """ (\\p{Alnum}+) """)
-    .replaceAll("""\s+""", """\\p{Space}+""").r
-  val numberOfNGrams = args.getOrElse("count", "20").toInt
+<p>Where</p>
 
-  val countReverseComparator = 
-    (tuple1:(String,Int), tuple2:(String,Int)) =&gt; tuple1._2 &gt; tuple2._2
+<pre><code>-c | --count N        List the N most frequently occurring NGrams (default: 100)
+-n | --ngrams string  Match string (default "% love % %"). Quote the string!
+</code></pre>
 
-  val lines = TextLine(args("input"))
-    .read
-    .flatMap('line -&gt; 'ngram) { 
-      text: String =&gt; ngramsRE.findAllIn(text.trim.toLowerCase).toIterable 
+<p>The <code>%</code> are wildcards for words and the whitespace is replaced with a more general regular expression. You can specify regular expressions if you want. What would the following match?</p>
+
+<pre><code>-n "% (lov|hat)ed? % %"
+</code></pre>
+
+<p>Here r yur codez:</p>
+
+<p>```scala
+package spark</p>
+
+<p>import spark.util.{CommandLineOptions, Timestamp}
+import spark.util.CommandLineOptions.Opt
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._</p>
+
+<p>object NGrams6 {
+  def main(args: Array[String]) = {</p>
+
+<pre><code>/** A function to generate an Opt for handling the count argument. */
+def count(value: String): Opt = Opt(
+  name   = "count",
+  value  = value,
+  help   = s"-c | --count  N  The number of NGrams to compute (default: $value)",
+  parser = {
+    case ("-c" | "--count") +: n +: tail =&gt; (("count", n), tail)
+  })
+
+/** A function to generate an Opt for handling the ngram expression. */
+def ngrams(value: String): Opt = Opt(
+  name   = "ngrams",
+  value  = value,
+  help   = s"-n | --ngrams  S     The NGrams match string (default: $value)",
+  parser = {
+    case ("-n" | "--ngrams") +: s +: tail =&gt; (("ngrams", s), tail)
+  })
+
+val options = CommandLineOptions(
+  this.getClass.getSimpleName,
+  CommandLineOptions.inputPath("data/kjvdat.txt"),
+  CommandLineOptions.master("local"),
+  count("100"),
+  ngrams("% love % %"))
+
+val argz = options(args.toList)
+
+val sc = new SparkContext(argz("master").toString, "NGrams (6)")
+val ngramsStr = argz("ngrams").toString.toLowerCase
+// Note that the replacement strings use Scala's triple quotes; necessary
+// to ensure that the final string is "\w+" and "\s+" for the reges.
+val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
+val n = argz("count").toInt
+</code></pre>
+
+<pre><code>
+Without discussing the details, this exercise defines two new `Opt` instances for handling the NGram phrase and count options. Because we allow the user to mix `%` characters for word wildcards and regular expressions, we convert the `%` to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.
+
+```scala 
+    try {
+      object CountOrdering extends Ordering[(String,Int)] {
+        def compare(a:(String,Int), b:(String,Int)) = 
+          -(a._2 compare b._2)  // - so that it sorts descending
+      }
+
+      val ngramz = sc.textFile(argz("input-path").toString)
+        .flatMap { line =&gt; 
+            val text = line.toLowerCase.split("\\s*\\|\\s*").last
+            ngramsRE.findAllMatchIn(text).map(_.toString)
+        }
+        .map(ngram =&gt; (ngram, 1))
+        .reduceByKey((count1, count2) =&gt; count1 + count2)
+        .takeOrdered(n)(CountOrdering)
+
+      println(s"Found ${ngramz.size} ngrams:")
+      ngramz foreach {
+        case (ngram, count) =&gt; println("%30s\t%d".format(ngram, count))
+      }
+    } finally {
+      sc.stop()
     }
-    .discard('offset, 'line)
-    .groupBy('ngram) { _.size('count) }
-    .groupAll { 
-      _.sortWithTake[(String,Int)](
-        ('ngram,'count) -&gt; 'sorted_ngrams, numberOfNGrams)(countReverseComparator)
-    }
-    .debug
-    .write(Tsv(args("output")))
+  }
 }
 </code></pre>
 
-<p>Let's walk through this code.</p>
+<p>We need an implementation of <code>Ordering</code> to sort our found NGrams descending by count.
+We read the data as before, but note that because of our line orientation, we <em>won't</em> find NGrams that cross line boundaries! This doesn't matter for our sacred text files, since it wouldn't make sense to find NGrams across verse boundaries, but a more flexible implementation should account for this. Note that we also look at just the verse text, as in <code>WordCount3</code>.</p>
 
-<pre><code>import com.twitter.scalding._
+<p>The <code>map</code> and <code>reduceByKey</code> calls are just like we used previously for <code>WordCount2</code>, but now we're counting found NGrams. The final <code>takeOrdered</code> call combines sorting with taking the top <code>n</code> found. This is more efficient than separate sort, then take operations. As a rule, when you see a method that does two things like this, it's usually there for efficiency reasons!</p>
 
-class NGrams(args : Args) extends Job(args) {
-  ...
+<h2>SparkStreaming8</h2>
+
+<p><a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a></p>
+
+<p>The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved, because we need two console windows, or at least one in addition to <code>sbt run</code>.</p>
+
+<p>You'll need <a href="http://netcat.sourceforge.net/">NetCat</a> or NCat that comes with <a href="http://nmap.org/download.html">NMap</a>, which is available for more platforms, like Windows. If you're on a Mac or Linux machine, you may already have the <code>nc</code> (NetCat) shell command available.</p>
+
+<p>We'll use it to send data to the spark streaming process. Open a second console window to use <code>nc</code> or <code>ncat</code>.</p>
+
+<p>In Activator or your <code>sbt</code> console window, run this command in <code>SparkStreaming8</code> as before. Note that it has default arguments for the host (<code>localhost</code>) and the port (<code>9999</code>), e.g., you could use this <code>sbt</code> command to override them:</p>
+
+<pre><code>run-main spark.SparkStreaming8 some_host some_port
 </code></pre>
 
-<p>We start with the Apache Spark imports we need, then declare a class <code>NGrams</code> that subclasses a <code>Job</code> class, which provides a <code>main</code> routine and other runtime context support (such as Hadoop integration). Our class must take a list of command-line arguments, which are processed for us by Apache Spark's <code>Args</code> class. We'll use these to specify where to find input, where to write output, and handle other configuration options.</p>
+<p>However you start it, it will wait for traffic on the socket.</p>
 
-<pre><code>  ...
-  val ngramsArg = args.list("ngrams").mkString(" ").toLowerCase
-  val ngramsRE = ngramsArg.trim
-    .replaceAll("%", """ (\\p{Alnum}+) """)
-    .replaceAll("""\s+""", """\\p{Space}+""").r
-  val numberOfNGrams = args.getOrElse("count", "20").toInt
-  ...
+<p>In the second console, run this command or the equivalent for <code>ncat</code>:</p>
+
+<pre><code>nc -c -l -p 9999
 </code></pre>
 
-<p>Before we create our <em>dataflow</em>, a series of <em>pipes</em> that provide data processing, we define a values that we'll need. The user specifies the NGram pattern they want, such as the "% love % %" used in our <em>run</em> example. The <code>ngramsRE</code> takes that NGram specification and turns it into a regular expression that we need. The "%" are converted into patterns to find any word and any runs of whitespace are generalized for all whitespace. Finally, we get the command line argument for the number of most frequently occurring NGrams to find, which defaults to 20 if not specified.</p>
+<p>The <code>-c</code> option tells it to terminate if the socket drops, the <code>-l</code> option puts <code>nc</code> in listen mode, and the <code>-p</code> option is used to specify the port.</p>
 
-<pre><code>  ...
-  val countReverseComparator = 
-    (tuple1:(String,Int), tuple2:(String,Int)) =&gt; tuple1._2 &gt; tuple2._2
-  ...
-</code></pre>
+<p>Now, type (or copy and paste) text into the console running <code>nc</code>. After each carriage return, the text is sent to the <code>SparkStreaming8</code> app, where word count is performed on it.</p>
 
-<p>The <code>countReverseComparator</code> function will be used to rank our found NGrams by frequency of occurrence, descending. The count of occurrences will be the second field in each tuple.</p>
+<p>Unfortunately, Spark Streaming does not yet provide a way to detect the end of
+input from the socket! (A feature request has been posted.) So, we can't just end the <code>nc</code> process and have the <code>SparkStreaming8</code> app exit gracefully. Instead, we have to ^C to kill <code>SparkStreaming8</code> (and <code>sbt</code> with it). Because we invoked <code>nc</code> with <code>-c</code> it will terminate automatically when we do this; <code>nc</code> <strong>does</strong> detect dropped sockets.</p>
 
-<pre><code>  ...
-  val lines = TextLine(args("input"))
-    .read
-    .flatMap('line -&gt; 'ngram) { 
-      text: String =&gt; ngramsRE.findAllIn(text.trim.toLowerCase).toIterable 
+<p>Spark Streaming uses a clever hack; it runs more or less the same Spark code (or code that at least looks conceptually the same) on deltas of data, say all the events received within 1-second intervals. Those deltas are <code>RDDs</code> encapsulated in a <code>DStream</code> (Discretized Stream).</p>
+
+<p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a>:</p>
+
+<p><code>scala
+object SparkStreaming8 {
+  def main(args: Array[String]) = {
+    val conf = new SparkConf()
+             .setMaster("local[2]")
+             .setAppName("Spark Streaming (8)")
+             .set("spark.cleaner.ttl", "60")
+             .set("spark.files.overwrite", "true")
+             // If you need more memory:
+             // .set("spark.executor.memory", "1g")
+    val sc  = new SparkContext(conf)
+    val ssc = new StreamingContext(sc, Seconds(1))
+</code></p>
+
+<p>Here we construct the <code>SparkContext</code> a different way, by first defining a <code>SparkConf</code> (configuration) object. First, it is necessary to use 2 cores, which is specified using <code>setMaster("local[2]")</code> to avoid a <a href="http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html">problem discussed here</a>.</p>
+
+<p>Spark Streaming requires the TTL to be set, <code>spark.cleaner.ttl</code>, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic cleanups is necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See <a href="http://spark.apache.org/docs/0.9.0/configuration.html">Configuration</a> for more details.</p>
+
+<p>With the <code>SparkContext</code>, we create a <code>StreamingContext</code>, where we also specify the time interval.</p>
+
+<p><code>scala
+    val (server, port) = args.toList match {
+      case server :: port :: _ =&gt; (server, port.toInt)
+      case port :: Nil =&gt; ("localhost", port.toInt)
+      case Nil =&gt; ("localhost", 9999)
     }
-    .discard('offset, 'line)
-    ...
+    println(s"Connecting to $server:$port...")
+</code></p>
+
+<p>Use a simple handler for the command-line argument list to extract the optional hostname and port.</p>
+
+<p><code>scala
+    val lines = ssc.socketTextStream(server, port)
+</code></p>
+
+<p>Create a <code>DStream</code> (Discretized Stream) named <code>lines</code> that will connect to the specified server and port. It will periodically generate an RDD from a discrete chunk of the data.</p>
+
+<p>Now we implement an incremental word count:</p>
+
+<p>```scala
+    val words = lines.flatMap(line => line.split("""\W+"""))</p>
+
+<pre><code>val pairs = words.map(word =&gt; (word, 1))
+val wordCounts = pairs.transform(rdd =&gt; rdd.reduceByKey(_ + _))
+
+wordCounts.print()  // print a few counts...
+
+val now = Timestamp.now()
+val out = s"output/streaming/kjv-wc-$now"
+println(s"Writing output to: $out")
+
+wordCounts.saveAsTextFiles(out, "txt")
+
+ssc.start()
+ssc.awaitTermination()
 </code></pre>
 
-<p>Now our dataflow is created. A <code>TextLine</code> object is used to read each "record", a line of text as a single "field". Hence, the records are newline (<code>\n</code>) separated. It reads the file specified by the <code>--input</code> argument (processed by the <code>args</code> object).</p>
+<p>  }
+}
+```</p>
 
-<p>For input, we use a file containing the King James Version of the Bible. We have included that file; see the <code>data/README</code> file for more information.</p>
+<p>This works much like our previous word count logic, except for the use of <code>transform</code>, a <code>DStream</code> method for transforming the <code>RDDs</code> into new <code>RDDs</code>. In this case, we are performing "mini-word counts", within each RDD, but not across the whole <code>DStream</code>.</p>
 
-<p>Each line of the input actually has the following <em>schema</em>:</p>
+<h2>SparkSQL9</h2>
 
-<pre><code>Abbreviated name of the book of the Bible (e.g., Gen) | chapter | verse | text
+<p><a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a></p>
+
+<p>An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called <em>Catalyst</em>. The plan is to replace the Shark (Hive) query planner with Catalyst, because the later is much easier to maintain and extend.</p>
+
+<p>For now, SparkSQL provides an API for running SQL queries over RDDs with seamless inter-operation with Hive/Shark tables.</p>
+
+<p><code>SparkSQL9</code> supports the same command-line options as <code>WordCount3</code>:</p>
+
+<pre><code>run-main spark.SparkSQL9 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-o | --out | --outpath output] \ 
+  [-m | --master master]
 </code></pre>
 
-<p>For example, this the very first (famous) line:</p>
+<p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a>:</p>
 
-<pre><code>Gen|1|1| In the beginning God created the heaven and the earth.
+<p>```scala
+object SparkSQL9 {
+  def main(args: Array[String]) = {</p>
+
+<pre><code>val options = CommandLineOptions(
+  this.getClass.getSimpleName,
+  CommandLineOptions.inputPath("data/kjvdat.txt"),
+  CommandLineOptions.outputPath("output/kjv-queries"),
+  CommandLineOptions.master("local"))
+
+val argz = options(args.toList)
+
+val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
+val sqlContext = new SQLContext(sc)
+import sqlContext._    // Make its methods accessible.
 </code></pre>
 
-<p>Note that a flaw with our implementation is that NGrams across line boundaries won't be found, because we process each line separately. However, the text for the King James Version of Bible that we are using has each verse on its own line. It wouldn't make much sense to compute NGrams across verses, so this limitation is not an issue for this particular data set.</p>
+<pre><code>
+We declare a case class to hold the four fields in each "record" (Bible verse). In `main`, after the command-line argument handling, we construct a `SparkContext` and use it to construct a `SQLContext`. The last `import` statement makes its method visible without qualification required.
 
-<p>Next, we call <code>flatMap</code> on each line record, converting it to zero or more output records, one per NGram found. Of course, some lines won't have a matching NGram. We use our regular expression to tokenize each line, and also trim leading and trailing whitespace and convert to lower case.</p>
+```scala
+    try {
+      // Regex to match the fields separated by "|". 
+      // Also strips the trailing "~" in the KJV file.
+      val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
+      // Use flatMap to effectively remove bad lines.
+      val verses = sc.textFile(argz("input-path").toString) flatMap {
+        case lineRE(book, chapter, verse, text) =&gt; 
+          List(Verse(book, chapter.toInt, verse.toInt, text))
+        case line =&gt; 
+          Console.err.println("Unexpected line: $line")
+          Nil  // Will be eliminated by flattening.
+      }
+      verses.registerAsTable("bible")
+      verses.cache()
+</code></pre>
 
-<p>A scalding API convention is to use the first argument list to a function to specify the field names to input to the function and name the new fields output. In this case, we input just the line field, named <code>'line</code> (a Scala <em>symbol</em>) and name each found NGram <code>'ngram</code>. Note who these field names are specified using a tuple.</p>
+<p>The regular expression tokenizes each string into the four fields. (If you're uncomfortable with regular expressions, a simpler approach would use the <code>String.split("""\s*|\s*""")</code>, then associate the array elements with the correct fields.)</p>
 
-<p>Finally in this section, we discard the fields we no longer need. Operations like <code>flatMap</code> and <code>map</code> append the new fields to the existing fields. We no longer need the <code>'line</code> and <code>TextLine</code> also added a line number field to the input, named <code>'offset</code>.</p>
+<p>Because there could be malformed lines, we use a trick with <code>flatMap</code>. When the regular expression matches, we return construct a <code>Verse</code> wrapped in a <code>List</code>. Those <code>Lists</code> will be flattened into one long collection. If the line doesn't match the regex, we print an error and return Nil, which effectively disappears when the nested lists are flattened.</p>
 
-<pre><code>    ...
-    .groupBy('ngram) { _.size('count) }
-    .groupAll { 
-      _.sortWithTake[(String,Int)](
-        ('ngram,'count) -&gt; 'sorted_ngrams, numberOfNGrams)(countReverseComparator)
+<p>Each <code>util.Verse</code> instance encapsulates a Bible verse:</p>
+
+<p><code>scala
+case class Verse(book: String, chapter: Int, verse: Int, text: String)
+</code></p>
+
+<p>The <code>verses.registerAsTable("bible")</code> method is "enabled" through several "implicit" conversions and methods that we imported by <code>import sqlContext._</code>. It defines a temporary table in the Hive "metastore" for the RDD, with the table name "bible". For this method to work, the records must be defined with case classes.</p>
+
+<p> The actual method imported implicitly is defined in <code>org.apache.spark.sql.SchemaRDDLike</code>, which also has a method <code>saveAsParquetFile</code> to write a schema-preserving <a href="http://parquet.io/">Parquet</a> file, which is the emerging standard format for data sets stored as files in the Hadoop Distributed File System (HDFS). (We'll use it shortly.)</p>
+
+<p><code>scala
+      val godVerses = sql("SELECT * FROM bible WHERE text LIKE '%God%';")
+      println("Number of verses that mention God: "+godVerses.count())
+      godVerses
+        .collect()   // convert to a regular in-memory collection
+        .foreach(println) // print the query results.
+</code></p>
+
+<p>The <code>sql</code> method lets us run Hive Query Language (HQL) queries as strings. For this exercise, we emphasize a more typical interactive SQL workflow; we dump the query results to the console, but you could write text files as before.</p>
+
+<p>```scala
+      val counts = sql("""
+        |SELECT * FROM (
+        |  SELECT book, COUNT(*) AS count FROM bible GROUP BY book) bc
+        |WHERE bc.book &lt;> '';
+        """.stripMargin)
+        // Collect all partitions into 1 partition. Otherwise, there are 100s
+        // output from the last query!
+        .coalesce(1)</p>
+
+<pre><code>  counts
+    .collect()        // Convert to a regular in-memory collection.
+    .foreach(println) // Print the query results.
+</code></pre>
+
+<pre><code>
+Another query, written using Scala's convenient multi-line string format. It is followed by a call to `coalesce(n)` that is used here to collapse lots of small partitions (the output "chunks" from the individual, logical processing units) into `n` larger partitions, 1 in this case.
+
+Now let's actually use the Parquet support:
+
+```scala        
+      // Let's also see how to use the API to read and write Parquet files:
+      counts.saveAsParquetFile("output/sql.parquet")
+      // Now read it back and use it as a table:
+      val counts2 = sqlContext.parquetFile("output/sql.parquet")
+      counts2.registerAsTable("countS2")
+      // Run a SQL query against the table:
+      println("Using a SQL query:")
+      sql("SELECT c.book, c.count FROM counts2 c ORDER BY c.count DESC;")
+        .collect().foreach(println)
+
+      // ... or use the LINQ-inspired DSL that's provided by the class 
+      // org.apache.spark.sql.SchemaRDD that's used implicitly:
+      println("Using the LINQ-style query:")
+      counts2.orderBy('count.desc).select('book, 'count)
+        .collect().foreach(println)
+
+    } finally {
+      sc.stop()
     }
-    ...
+  }
 }
 </code></pre>
 
-<p>If we want to rank the found NGrams by their frequencies, we need to get all occurrences of a given NGram together. Hence, we use a <code>groupBy</code> operation to group over the <code>'ngram</code> fields. To sort and output the tope <code>numberOfNGrams</code>, we group <em>all</em> together, then use a special Apache Spark function that combines sorting with "taking", i.e., just keeping the top N values after sorting.</p>
+<p>These lines illustrate writing out Parquet-formatted output, which includes the schema, then reading it back in, like you might do in subsequent jobs, including other Hadoop applications that understand Parquet.</p>
 
-<pre><code>    ...
-    .debug
-    .write(Tsv(args("output")))
-}
+<p>Note that <code>counts2</code> is independent of <code>counts</code>, yet it retains the same schema information. When we register <code>counts2</code> as a table, we can run SQL queries against it. Or, we can write <a href="TODO">LINQ</a>-style queries against the RDD to achieve the same result, because it is actually of type <code>org.apache.spark.sql.SchemaRDD</code>, which provides these "combinators".</p>
+
+<p>For your convenience, much of the same logic is provided in a file <code>src/main/scala/spark/SparkSQL9b.sc</code>, which you can load into the REPL and use to play with queries. In <code>sbt</code> run these commands, where <code>&gt;</code> is the <code>sbt</code> prompt and <code>scala&gt;</code> is the REPL prompt:</p>
+
+<pre><code>&gt; console
+scala&gt; : load src/main/scala/spark/SparkSQL9b.sc
+scala&gt; // write your queries.
+scala&gt; sc.stop()  // when finished
+scala&gt; ^D         // leave the REPL
 </code></pre>
 
-<p>The <code>debug</code> function dumps the current stream of data to the console, which is useful for debugging. Don't do this for massive data sets!!</p>
+<h2>HiveSQL10</h2>
 
-<p>Finally, we write the results as tab-separated values to the location specified by the <code>--output</code> command-line argument.</p>
+<p><a class="shortcut" href="#code/src/main/scala/spark/HiveSQL10.scala">HiveSQL10.scala</a></p>
 
-<p>To recap, look again at the whole listing above. It's not very big! For what it does and compared to typical code bases you might work with, this is incredibly concise and powerful code.</p>
+<p><a href="http://hive.apache.org">Hive</a> is the SQL tool for Hadoop invented by Facebook. It became so popular that the Spark community ported Hive to Spark, calling it <em>Shark</em>, where they replaced the inefficient Hadoop MapReduce with Spark for 30+ times performance improvement! There are other SQL alternatives on Hadoop, as well.</p>
 
-<p><em>WordCount</em> is next...</p>
+<p>Instead of working directly with Shark, which requires a separate installation, etc., we'll use a handy feature of the SparkSQL API, the ability to work with Hive "metastores" (where table metadata is stored, etc.) and Hive queries directly in code. For more on using Shark itself, including its own REPL, see the <a href="http://shark.cs.berkeley.edu/">Shark website</a>.</p>
 
-</div>
-<div>
-<h2>WordCount</h2>
+<blockquote><p><strong>NOTE:</strong> Because of the third-party dependencies, the Spark SQL maven jars don't include support for Hive/Shark, by default.</p></blockquote>
 
-<p>Open <a class="shortcut" href="#code/src/main/scala/scalding/WordCount.scala">WordCount.scala</a>, which implements the well-known <em>Word Count</em> algorithm, which is popular as an easy-to-implement, "hello world!" program for developers learning Hadoop.</p>
+<p>So, to actually run this exercise, you'll need to clone the <a href="https://github.com/apache/spark">Spark Git</a> repo, build Spark yourself with Hive support enabled, then copy the "assembly" to the <code>lib</code> directory in this project. We don't include a prebuilt assembly because of its size, ~150MB.</p>
 
-<p>In <em>WordCount</em>, a corpus of documents is read, the contents are tokenized into words, and the total count for each word over the entire corpus is computed. The output is sorted by frequency descending.</p>
+<p>If you don't want to go to this trouble, just reading the exercise should give you enough details for now. Also for this reason, this exercise is provided as a script, rather than a compiled program that would fail to compiled without the custom assembly!</p>
 
-<p>In the Run panel, select <em>WordCount</em> from the drop-down menu to invoke this script by itself.</p>
+<p>If you want to build and run this exercise, execute the following Bash commands (or equivalent Windows commands) to build and install the Hive-enabled Spark assembly, where we assume that <code>$WORK</code> is a "work" directory where you'll build Spark, the root directory for this tutorial is <code>$ROOT</code>, and the <code># ...</code> are comments:</p>
 
-<p>Here is the script without comments:</p>
-
-<pre><code>import com.twitter.scalding._
-
-class WordCount(args : Args) extends Job(args) {
-
-  val tokenizerRegex = """\W+"""
-
-  TextLine(args("input"))
-    .read
-    .flatMap('line -&gt; 'word) {
-      line : String =&gt; line.trim.toLowerCase.split(tokenizerRegex) 
-    }
-    .groupBy('word){ group =&gt; group.size('count) }
-    .write(Tsv(args("output")))
-}
+<pre><code>cd $WORK
+git clone https://github.com/apache/spark      # Clone from GitHub
+cd spark                                       # Change to the new directory
+SPARK_HIVE=true sbt/sbt assembly/assembly      # Build an assembly with Hive enabled.
+cp assembly/target/scala-2.10/*.jar $ROOT/lib  # Copy to the tutorial's lib dir.
+cd $ROOT
 </code></pre>
 
-<p>Each line is read as plain text from the input location specified by the <code>--input</code> argument, just as we did for <em>NGrams</em>.</p>
+<p>Now restart <code>sbt</code> in this project's root directory (i.e., $ROOT) and you should be able to run this exercise. Then run <code>console</code> to start the REPL. You can load the script in with <code>:load src/main/scala/spark/HiveSQL10.sc</code>, but it's probably better to copy and paste to learn what it's doing.</p>
 
-<p>Next, <code>flatMap</code> is used to tokenize the line into words, similar to the first few steps in <em>NGrams</em>.</p>
+<p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/HiveSQL10.sc">HiveSQL10.sc</a>:</p>
 
-<p>Next, we group over the words, to get all occurrences of each word gathered together, and we compute the size of each group, naming this size field `'count'.</p>
+<p>```scala
+import org.apache.spark.SparkContext
+import org.apache.spark.sql._
+import org.apache.spark.sql.hive.LocalHiveContext</p>
 
-<p>Finally, we write the output <code>'word</code> and <code>'count</code> fields as tab-separated values to the location specified with the <code>--output</code> argument, as for <em>NGrams</em>.</p>
+<p>val sc = new SparkContext("local", "Hive SQL (10)")
+val hiveContext = new LocalHiveContext(sc, "warehouse")
+import hiveContext._   // Make methods local, as for SQLContext
+```</p>
 
-<p><em>FilterUniqueCountLimit</em> is next...</p>
+<p>The analog of <code>SQLContext</code> we used in the previous exercise is <code>LocalHiveContext</code> that creates an instance of Hive's Metastore in the same process, with data stored in the <code>./metadata</code> directory. Similarly, the table ("warehouse") data is stored in the <code>./warehouse</code> directory. If you have a Hive installation, you can use <code>HiveContext</code> instead to connect to your existing metastore.</p>
 
-</div>
-<div>
-<h2>FilterUniqueCountLimit</h2>
+<p>```scala
+hql("""
+  |CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+  |  book    STRING,
+  |  chapter INT,
+  |  verse   INT,
+  |  text    STRING)
+  |  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+  |  LOCATION 'data/kjvdat.txt'
+  |""".stripMargin)</p>
 
-<p>Open <a class="shortcut" href="#code/src/main/scala/scalding/FilterUniqueCountLimit.scala">FilterUniqueCountLimit.scala</a>, which shows a few useful techniques:</p>
+<p>println("Run the same GROUP BY we ran before:")
+hql("""
+  |SELECT * FROM (
+  |  SELECT book, COUNT(*) AS count FROM bible GROUP BY book) bc
+  |WHERE bc.book &lt;> '';
+  |""".stripMargin).collect.foreach(println)</p>
 
-<ol>
-<li>How to split a data stream into several flows, each for a specific calculation.</li>
-<li>How to filter records (like SQL's <code>WHERE</code> clause).</li>
-<li>How to find unique values (like SQL's <code>DISTINCT</code> keyword).</li>
-<li>How to count all records (like SQL's <code>COUNT(*)</code> clause).</li>
-<li>How to limit output (like SQL's <code>LIMIT n</code> clause).</li>
-</ol>
+<p>println("Run the 'God' query we ran before:")
+hql("SELECT * FROM bible WHERE text LIKE '%God%';").collect().foreach(println)</p>
 
+<p>// Don't forget this when you're done:
+// sc.stop()
+```</p>
 
-<p>In the Run panel, select <em>FilterUniqueCountLimit</em> from the drop-down menu to invoke this script by itself.</p>
+<p>The <code>hql</code> method is analogous to the <code>sql</code> method we used before. It let's us run the full set of Hive SQL statements. We use it create a table for our KJV data. Note that Hive's DDL statements let us specify the field separator for the data and we can make a table <em>external</em>,
+which means that Hive won't "own" the data, but instead just read it from the location we specify.</p>
 
-<p>Here is the full script without comments:</p>
+<p>After that, we run two queries we ran before and dump the results to the console.</p>
 
-<pre><code>import com.twitter.scalding._
+<h2>MLlib11</h2>
 
-class FilterUniqueCountLimit(args : Args) extends Job(args) {
+<p><a class="shortcut" href="#code/src/main/scala/spark/MLlib11.scala">MLlib11.scala</a></p>
 
-  val kjvSchema = ('book, 'chapter, 'verse, 'text)
-  val outputPrefix = args("output")
+<p>One of the early uses for Spark was machine learning (ML) applications. Spark is well suited for this purpose, because many ML algorithms are iterative and Spark can perform iterations efficiently, unlike MapReduce. The ML library, <em>MLlib</em>, isn't extensive, but it's growing fast. Also, the <a href="http://mahout.apache.org">Mahout</a> project recently announced plans to port its MapReduce algorithms to Spark.</p>
 
-  val bible = Csv(args("input"), separator = "|", fields = kjvSchema)
-      .read
+<p>This exercise looks at a representative ML problem.</p>
 
-  new RichPipe(bible)
-      .filter('text) { t:String       =&gt; t.contains("miracle") == false }
-      .write(Csv(s"$outputPrefix-skeptic.txt", separator = "|"))
+<h2>GraphX12</h2>
 
-  new RichPipe(bible)
-      .project('book)
-      .unique('book)
-      .write(Tsv(s"$outputPrefix-books.txt"))  
+<p><a class="shortcut" href="#code/src/main/scala/spark/GraphX12.scala">GraphX12.scala</a></p>
 
-  new RichPipe(bible)
-      .groupAll { _.size('countstar).reducers(2) }
-      .write(Tsv(s"$outputPrefix-count-star.txt"))  
+<p>Our last exercise explores the Spark graph library GraphX. TODO</p>
 
-  new RichPipe(bible)
-      .limit(args.getOrElse("n", "10").toInt)
-      .write(Csv(s"$outputPrefix-limit-N.txt", separator = "|"))
-}
-</code></pre>
-
-<p>This time, we read each line ("record") of text as a "|"-separated fields with the fields named by the <code>kjvSchema</code> value. Each input line is a verse in the Bible. We also treat the <code>--output</code> argument as a prefix, because four separate files will be output this time.</p>
-
-<p>We open the KJV file using a comma-separated values reader, but overriding the separator to be "|" and applying the <code>kjvSchema</code> specification to each record.</p>
-
-<p>Now we clone this input pipe four times to do four separated operations on the data. The first pipe filters each line, removing those with the word <em>miracle</em>, thus creating a "skeptics Bible". (Thomas Jefferson could have used this feature...) The output is written to file with the name suffix <code>-skeptic.txt</code>.</p>
-
-<p>The second pipe projects just the first column/field, the name of the book of the Bible and finds all the unique values for this field, thereby producing a list of books in the Bible.</p>
-
-<p>The third pipe uses the <code>groupAll</code> idiom to collect all records together and count them, yielding the total number of verses in the KJV Bible, 31102.</p>
-
-<p>The fourth and final pipe limits the number of records to the input value given for the <code>--n</code> argument or 10 if the argument isn't specified. Hence, it's output is just the first n lines of the KJV.</p>
-
-<p><em>TfIdf</em> is our last example script...</p>
-
-</div>
-<div>
-<h2>TfIdf</h2>
-
-<p>Open <a class="shortcut" href="#code/src/main/scala/scalding/TfIdf.scala">TfIdf.scala</a>, our most complex example script. It implements the <em>term frequency-inverse document frequency</em> algorithm used as part of  the indexing process for document or Internet search engines. (See <a href="http://en.wikipedia.org/wiki/Tf*idf">this Wikipedia page</a> for more information on this algorithm.)</p>
-
-<p>In the Run panel, select <em>TfIdf</em> from the drop-down menu to invoke this script by itself.</p>
-
-<p>In a conventional implementation of Tf-Idf, you might load a precomputed document to word matrix:</p>
-
-<pre><code>a[i,j] = frequency of the word j in the document with index i 
-</code></pre>
-
-<p>Then, you would compute the Tf-Idf score of each word with respect to each document.</p>
-
-<p>Instead, we'll compute this matrix by first performing a modified <em>Word Count</em> on our KJV Bible data, then convert that data to a matrix and proceed from there. The modified <em>Word Count</em> will track the source Bible book and <code>groupBy</code> the <code>('book, 'word)</code> instead of just the <code>'word</code>.</p>
-
-<p>Here is the entire script without comments:</p>
-
-<pre><code>import com.twitter.scalding._
-import com.twitter.scalding.mathematics.Matrix
-
-class TfIdf(args : Args) extends Job(args) {
-
-  val n = args.getOrElse("n", "100").toInt 
-  val kjvSchema = ('book, 'chapter, 'verse, 'text)
-  val tokenizerRegex = """\W+"""
-
-  val books = Vector(
-    "Act", "Amo", "Ch1", "Ch2", "Co1", "Co2", "Col", "Dan", "Deu", 
-    "Ecc", "Eph", "Est", "Exo", "Eze", "Ezr", "Gal", "Gen", "Hab", 
-    "Hag", "Heb", "Hos", "Isa", "Jam", "Jde", "Jdg", "Jer", "Jo1", 
-    "Jo2", "Jo3", "Job", "Joe", "Joh", "Jon", "Jos", "Kg1", "Kg2", 
-    "Lam", "Lev", "Luk", "Mal", "Mar", "Mat", "Mic", "Nah", "Neh", 
-    "Num", "Oba", "Pe1", "Pe2", "Phi", "Plm", "Pro", "Psa", "Rev", 
-    "Rom", "Rut", "Sa1", "Sa2", "Sol", "Th1", "Th2", "Ti1", "Ti2",
-    "Tit", "Zac", "Zep")
-
-  val booksToIndex = books.zipWithIndex.toMap
-
-  val byBookWordCount = Csv(args("input"), separator = "|", fields = kjvSchema)
-    .read
-    .flatMap('text -&gt; 'word) {
-      line : String =&gt; line.trim.toLowerCase.split(tokenizerRegex) 
-    }
-    .project('book, 'word)
-    .map('book -&gt; 'bookId)((book: String) =&gt; booksToIndex(book))
-    .groupBy(('bookId, 'word)){ group =&gt; group.size('count) }
-
-  import Matrix._
-
-  val docSchema = ('bookId, 'word, 'count)
-
-  val docWordMatrix = byBookWordCount
-    .toMatrix[Long,String,Double](docSchema)
-
-  val docFreq = docWordMatrix.sumRowVectors
-
-  val invDocFreqVct = 
-    docFreq.toMatrix(1).rowL1Normalize.mapValues( x =&gt; log2(1/x) )
-
-  val invDocFreqMat = 
-    docWordMatrix.zip(invDocFreqVct.getRow(1)).mapValues(_._2)
-
-  val out1 = docWordMatrix.hProd(invDocFreqMat).topRowElems(n)
-    .pipeAs(('bookId, 'word, 'frequency))
-    .mapTo(('bookId, 'word, 'frequency) -&gt; ('book, 'word, 'frequency)){
-      tri: (Int,String,Double) =&gt; (books(tri._1), tri._2, tri._3)
-    }
-
-  val abbrevToNameFile = args.getOrElse("abbrevs-to-names", "data/abbrevs-to-names.tsv")
-  val abbrevToName = Tsv(abbrevToNameFile, fields = ('abbrev, 'name)).read
-
-  out1.joinWithTiny('book -&gt; 'abbrev, abbrevToName)
-    .project('name, 'word, 'frequency)
-    .write(Tsv(args("output")))
-
-  def log2(x : Double) = scala.math.log(x)/scala.math.log(2.0)
-}
-</code></pre>
-
-<p>This example uses Apache Spark's Matrix API, which simplifies working with "sparse" matrices.</p>
-
-<p>Here, the <code>--n</code> argument is used to specify how many of the most frequently-occurring terms to keep for each book of the Bible. It defaults to 100.</p>
-
-<p>We use the same input schema and word-tokenization we used previously for <em>FilterUniqueCountLimit</em> and <em>WordCount</em>, respectively.</p>
-
-<p>We'll need to convert the Bible book names to numeric ids. We could actually compute the unique books and assign each an id (as discussed for <em>FilterUniqueCountLimit</em>), but to simplify things, we'll simply hard-code the abbreviated names used in the KJV text file and then zip this collection with the corresponding indices to create ids.</p>
-
-<p>The <code>byBookWordCount</code> pipeline is very similar to <em>WordCount</em>, but we don't forget which book the word came from, so our key for grouping is now the <code>'booked</code> and the <code>'word</code>.</p>
-
-<p>Next, we convert <code>byBookWordCount</code> to a term frequency, two-dimensional matrix, using Apache Spark Matrix API, where the "x" coordinate is the book id, the "y" coordinate is the word, and the value is the count, converted to <code>Double</code>.</p>
-
-<p>Now we compute the overall document frequency of each word. The value of <code>docFreq(i)</code> will be the total count for word <code>i</code> over all documents. Then we need the inverse document frequency vector, which is used to suppress the significance of really common words, like "the", "and", "I", etc. The <em>L1 norm</em> is just <code>1/(|a| + |b| + ...)</code>, rather then the square root of the sum of squares, which would be more accurate, but also more expensive to compute. Actually, we use <code>1/log(x)</code>, rather than <code>1/x</code>, for better numerical stability.</p>
-
-<p>Then we zip the row vector along the entire document-word matrix and multiply the term frequency with the inverse document frequency, keeping the top N words. The value <code>hProd</code> is the <em>Hadamard product</em>, which is nothing more than multiplying matrices element-wise, rather than the usual matrix multiplication of row vector x column vector.</p>
-
-<p>Before writing the output, we convert the matrix back to a Cascading pipe and replace the bookId with the abbreviated book name that we started with. Note that <code>mapTo</code> used here is like <code>map</code>, but the later keeps all the original input fields and adds the new fields created by the <code>map</code> function. In contrast, <code>mapTo</code> tosses all the original fields that aren't explicitly passed to the anonymous function. Hence, it's equivalent to the <code>map(...).project(...)</code> sequence, but more efficient by eliminating the extra intermediate step.</p>
-
-<p>Finally, before writing the output, we see how joins work, which we use to bring in a table of the book abbreviations and the corresponding full names. We would rather write the full names. Otherwise, this join isn't necessary.</p>
-
-<p>This mapping is in the file <code>data/abbrevs-to-names.tsv</code>. Almost a third of the books are actually aprocryphal and hence aren't in the KJV. We'll effectively ignore those.</p>
-
-<p>Note the word <code>Tiny</code> in the inner join, <code>joinWithTiny</code>. The "tiny" pipe is the abbreviations data set on the "right-hand side. Knowing which pipe has the smallest data set is important, because Cascading can use a optimization known as a <em>map-side join</em>. In short, if the small data set can fit in memory, that data can be cached in the underlying Hadoop "map" process' memory and the join can be performed as the larger pipe of data streams through. For more details on this optimization, see <a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+JoinOptimization#LanguageManualJoinOptimization-PriorSupportforMAPJOIN">this description for Hive's version of map-side joins</a>.</p>
-
-<p>The pair tuple passed to <code>joinWithTiny</code> lists one or more fields from the left-hand table and a corresponding number of fields from the right-hand table to join on. Here, we just join on a single field from each pipe. If it were two, we would pass an argument like <code>(('l1, l2') -&gt; ('r1, 'r2))</code>. Note the nested tuples within the outer pair tuple.</p>
-
-<p>After joining, we do a final projection and then write the output as before.</p>
-
-</div>
-<div>
-<h2>Next Steps</h2>
-
-<p>There are additional capabilities built into this Activator template that you can access from a command line using the <code>activator</code> command or <a href="http://www.scala-sbt.org/">sbt</a>, the standard Scala build tool. Let's explore those features.</p>
-
-</div>
-<div>
-<h2>Running Locally with the Command Line</h2>
-
-<p>In a command window, run <code>activator</code> (or <code>sbt</code>). At the prompt, invoke the <code>test</code> and <code>run</code> tasks, which are the same tasks we ran in Activator, to ensure they complete successfully.</p>
-
-<p>All four examples take command-line arguments to customize their behavior. The <em>NGrams</em> example is particular interesting to play with, where you search for different phrases in the Bible or some other text file of interest to you.</p>
-
-<p>At the <code>activator</code> prompt, type <code>scalding</code>. You'll see the following:</p>
-
-<pre><code>&gt; scalding
-[error] Please specify one of the following commands (example arguments shown):
-[error]   scalding FilterUniqueCountLimit --input data/kjvdat.txt --output output/kjv
-[error]   scalding NGrams --count 20 --ngrams "I love % %" --input data/kjvdat.txt --output output/kjv-ngrams.txt
-[error]   scalding TfIdf --n 100 --input data/kjvdat.txt --output output/kjv-tfidf.txt
-[error]   scalding WordCount --input data/kjvdat.txt --output output/kjv-wc.txt
-[error] scalding requires arguments.
-</code></pre>
-
-<p>Hence, without providing any arguments, the <code>scalding</code> command tells you which scripts are available and the arguments they support with examples that will run with supplied data in the <code>data</code> directory. Note that some of the options shown are optional (but which ones isn't indicated; see the comments in the script files). The scripts are listed alphabetically, not in the order we discussed them previously.</p>
-
-<p>Each command should run without error and the output will be written to the file indicated by the <code>--output</code> option. You can change the output location to be anything you want.</p>
-
-<p>Also, if you want to understand how Cascading converts each script into a MapReduce dataflow, Cascading has a feature that generates graphs of the dataflow in the <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language">dot</a>) graph format. You can view these files with many tools, including the free <a href="http://www.graphviz.org/">Graphviz</a>.</p>
-
-<p>To generate these files, you can add the argument <code>--tool.graph</code> to the end of any script command we discuss in subsequent sections. Instead of running the job, the Cascading runtime will write one or more "dot" files to the project root directory.</p>
-
-<p>Now let's look at each example. Recall that all the scripts are in <code>src/main/scala/scalding</code>. You should look at the files for detailed comments on how they are implemented.</p>
-
-</div>
-<div>
-<h2>NGrams</h2>
-
-<p>You invoke the <em>NGrams</em> script inside <code>activator</code> like this:</p>
-
-<pre><code>scalding NGrams --count 20 --ngrams "I love % %" --input data/kjvdat.txt --output output/kjv-ngrams.txt
-</code></pre>
-
-<p>The <code>--ngrams</code> phrase allows optional "context" words, like the "I love" prefix shown here, followed by two words, indicated by the two "%". Hence, you specify the desired <code>N</code> implicitly through the number of "%" placeholders and hard-coded words (4-grams, in this example).</p>
-
-<p>For example, the phrase "% love %" will find all 3-grams with the word "love" in the middle, and so forth, while the phrase "% % %" will find all 3-grams, period (i.e., without any "context").</p>
-
-<p>The NGram phrase is translated to a regular expression that also replaces the whitespace with a regular expression for arbitrary whitespace.</p>
-
-<p><strong>NOTE:</strong> In fact, additional regular expression constructs can be used in this string, e.g., <code>loves?</code> will match <code>love</code> and <code>loves</code>. This can be useful or confusing...</p>
-
-<p>The <code>--count n</code> flag means "show the top n most frequent matching NGrams". If not specified, it defaults to 20.</p>
-
-<p>Try different NGram phrases and values of count. Try different data sources.</p>
-
-<p>This example also uses the <code>debug</code> pipe to dump output to the console. In this case, you'll see the same output that gets written to the output file, which is the list of the NGrams and their frequencies, sorted by frequency descending.</p>
-
-</div>
-<div>
-<h2>WordCount</h2>
-
-<p>You invoke the script inside <code>activator</code> like this:</p>
-
-<pre><code>scalding WordCount --input data/kjvdat.txt --output output/kjv-wc.txt
-</code></pre>
-
-<p>Recall that each line of the input actually has the "schema":</p>
-
-<pre><code>Abbreviated name of the book of the Bible (e.g., Gen) | chapter | verse | text
-</code></pre>
-
-<p>For example,</p>
-
-<pre><code>Gen|1|1| In the beginning God created the heaven and the earth.~
-</code></pre>
-
-<p>We just treat the whole line as text. A nice exercise is to <em>project</em> out just the <code>text</code> field. See the other scripts for examples of how to do this.</p>
-
-<p>The <code>--output</code> argument specifies where the results are written. You just see a few log messages written to the <code>activator</code> console. You can use any path you want for this output.</p>
-
-</div>
-<div>
-<h2>FilterUniqueCountLimit</h2>
-
-<p>You invoke the script inside <code>activator</code> like this:</p>
-
-<pre><code>scalding FilterUniqueCountLimit --input data/kjvdat.txt --output output/kjv
-</code></pre>
-
-<p>In this case, the <code>--output</code> is actually used as a prefix for the four output files discussed previously.</p>
-
-</div>
-<div>
-<h2>TfIDf</h2>
-
-<p>You invoke the script inside <code>activator</code> like this:</p>
-
-<pre><code>scalding TfIdf --n 100 --input data/kjvdat.txt --output output/kjv-tfidf.txt
-</code></pre>
-
-<p>The <code>--n</code> argument is optional; it defaults to 100. It specifies how many words to keep for each document.</p>
-
-</div>
-<div>
 <h2>Running on Hadoop</h2>
 
-<p>After testing your scripts, you can run them on a Hadoop cluster. You'll first need to build an all-inclusive jar file that contains all the dependencies, including the Scala standard library, that aren't already on the cluster.</p>
+<p>TBD</p>
 
-<p>The <code>activator assembly</code> command first runs an <code>update</code> task, if missing dependencies need to be downloaded. Then the task builds the all-inclusive jar file, which is written to <code>target/scala-2.10/activator-scalding-X.Y.Z.jar</code>, where <code>X.Y.Z</code> will be the current version number for this project.</p>
-
-<p>One the jar is built and assuming you have the <code>hadoop</code> command installed on your system (or the server to which you copy the jar file...), the following command syntax will run one of the scripts</p>
-
-<pre><code>hadoop jar target/scala-2.10/activator-scalding-X.Y.Z.jar SCRIPT_NAME \ 
+<pre><code>hadoop jar target/scala-2.10/activator-spark-X.Y.Z.jar SCRIPT_NAME \ 
   [--hdfs | --local ] [--host JOBTRACKER_HOST] \ 
   --input INPUT_PATH --output OUTPUT_PATH \ 
   [other-args] 
 </code></pre>
 
-<p>Here is an example for <code>NGrams</code>, using HDFS, not the local file system, and assuming the JobTracker host is determined from the local configuration files, so we don't have to specify it:</p>
+<p>Here is an exercise for <code>NGrams</code>, using HDFS, not the local file system, and assuming the JobTracker host is determined from the local configuration files, so we don't have to specify it:</p>
 
-<pre><code>hadoop jar target/scala-2.10/activator-scalding-X.Y.Z.jar NGrams \ 
+<pre><code>hadoop jar target/scala-2.10/activator-spark-X.Y.Z.jar NGrams \ 
   --hdfs  --input /data/docs --output output/wordcount \ 
   --count 100 --ngrams "% loves? %"
 </code></pre>
@@ -786,8 +1208,6 @@ class TfIdf(args : Args) extends Job(args) {
 
 <p>An alternative to running the <code>hadoop</code> command directly is to use the <code>scald.rb</code> script that comes with Apache Spark distributions. See the <a href="http://spark.apache.org">Apache Spark</a> website for more information.</p>
 
-</div>
-<div>
 <h2>Best Practices, Tips, and Tricks</h2>
 
 <h3>Safe Closures</h3>
@@ -825,25 +1245,43 @@ class RDDApp {
 
 <p>Now, only <code>factor2</code> must be serialized.</p>
 
-<h3>Arguments for Spark Context</h3>
+<h2>Other Features of the API</h2>
 
-</div>
-<div>
+<p>TODO</p>
+
+<h2>YARN</h2>
+
+<p>TODO</p>
+
 <h2>Going Forward from Here</h2>
 
 <p>This template is not a complete Apache Spark tutorial. To learn more, see the following:</p>
 
 <ul>
 <li>The Apache Spark <a href="http://spark.apache.org/">website</a>.</li>
-<li>The Apache Spark <a href="http://spark.apache.org/tree/develop/tutorial">tutorial</a> distributed with the <a href="http://spark.apache.org">Apache Spark</a> distribution.</li>
+<li>The Apache Spark <a href="http://spark.apache.org/tree/develop/tutorial">tutorial</a> distributed with the <a href="http://spark.apache.org">Apache Spark</a> distribution. See also the examples in the distribution.</li>
 <li><a href="http://spark-summit.org/2013">Talks from Spark Summit 2013</a>.</li>
 <li><a href="http://aws.amazon.com/articles/4926593393724923">Running Spark in EC2</a>.</li>
+<li><a href="http://mesosphere.io/learn/run-spark-on-mesos/">Running Spark on Mesos</a>.</li>
+</ul>
+
+
+<h2>Experience Reports</h2>
+
+<ul>
+<li><a href="http://www.slideshare.net/krishflix/seattle-spark-meetup-spark-at-twitter">Spark at Twitter</a></li>
+</ul>
+
+
+<h2>Spark Based Libraries</h2>
+
+<ul>
 <li><a href="https://github.com/snowplow/spark-example-project">Snowplow's Spark Example Project</a>.</li>
 <li><a href="https://github.com/freeman-lab/thunder">Thunder - Large-scale neural data analysis with Spark</a>.</li>
 </ul>
 
 
-<p>For more about Typesafe:</p>
+<h2>For more about Typesafe:</h2>
 
 <ul>
 <li>See <a href="http://typesafe.com/activator">Typesafe Activator</a> to find other Activator templates.</li>

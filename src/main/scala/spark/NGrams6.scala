@@ -9,6 +9,7 @@ import org.apache.spark.SparkContext._
 object NGrams6 {
   def main(args: Array[String]) = {
 
+    /** A function to generate an Opt for handling the count argument. */
     def count(value: String): Opt = Opt(
       name   = "count",
       value  = value,
@@ -59,8 +60,9 @@ object NGrams6 {
       // supported by this implementation.
 
       val ngramz = sc.textFile(argz("input-path").toString)
-        .flatMap {
-          line => ngramsRE.findAllMatchIn(line.toLowerCase).map(_.toString)
+        .flatMap { line => 
+            val text = line.toLowerCase.split("\\s*\\|\\s*").last
+            ngramsRE.findAllMatchIn(text).map(_.toString)
         }
         .map(ngram => (ngram, 1))
         .reduceByKey((count1, count2) => count1 + count2)
@@ -70,7 +72,7 @@ object NGrams6 {
         .takeOrdered(n)(CountOrdering)
 
       // Write to the console, but because we no longer have an RDD,
-      //we have to use good 'ol Java File IO. Note that the output
+      // we have to use good 'ol Java File IO. Note that the output
       // specifier is now interpreted as a file, not a directory as before.
       println(s"Found ${ngramz.size} ngrams:")
       ngramz foreach {

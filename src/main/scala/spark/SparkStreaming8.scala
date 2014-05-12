@@ -26,12 +26,12 @@ object SparkStreaming8 {
     // spark.cleaner.ttl:  (default: infinite)
     // Duration (seconds) of how long Spark will remember any metadata
     // (stages generated, tasks generated, etc.). Periodic cleanups will
-    // ensure that metadata older than this duration will be forgetten.
+    // ensure that metadata older than this duration will be forgotten.
     // This is useful for running Spark for many hours / days (for example,
     // running 24/7 in case of Spark Streaming applications). Note that any
     // RDD that persists in memory for more than this duration will be
     // cleared as well.
-    // See See http://spark.apache.org/docs/0.9.0/configuration.html for more.
+    // See http://spark.apache.org/docs/0.9.0/configuration.html for more details.
     // Also see http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html
     // for pointers to debug a "BlockManager" problem when streaming. Specifically
     // for this example, it was necessary to specify 2 cores using 
