@@ -158,7 +158,7 @@ sup {
 <body>
 <h1>Apache Spark: A Tutorial</h1>
 
-<h2>Introduction</h2>
+<div><h2>Introduction</h2>
 
 <p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications.</p>
 
@@ -166,7 +166,7 @@ sup {
 
 <p>We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a <em>Spark Shell</em>, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.</p>
 
-<h2>Why Spark?</h2>
+</div><div><h2>Why Spark?</h2>
 
 <p>By 2013, it became increasingly clear that a successor was needed for the venerable <a href="http://wiki.apache.org/hadoop/MapReduce">Hadoop MapReduce</a> compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.</p>
 
@@ -174,7 +174,7 @@ sup {
 
 <p>Spark is now officially supported in <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">Cloudera CDH5</a> and <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">MapR's distribution</a>. Hortonworks has not yet announced whether or not they will support Spark natively, but <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">this page</a> in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.</p>
 
-<h2>Spark Clusters</h2>
+</div><div><h2>Spark Clusters</h2>
 
 <p>Let's briefly discuss the anatomy of a Spark standalone cluster, adapting <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">this discussion (and diagram) from the Spark documentation</a>. Consider the following diagram:</p>
 
@@ -186,7 +186,7 @@ sup {
 
 <p>When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.</p>
 
-<h2>Spark Deployment Options</h2>
+</div><div><h2>Spark Deployment Options</h2>
 
 <p>Spark currently supports <a href="http://spark.apache.org/docs/0.9.1/cluster-overview.html">three cluster managers</a>:</p>
 
@@ -199,9 +199,13 @@ sup {
 
 <p>Note that you can run Spark on a Hadoop cluster using any of these three approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Standalone and Mesos deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.</p>
 
+<p>For information on using YARN, see <a href="http://spark.apache.org/docs/0.9.0/running-on-yarn.html">here</a>.</p>
+
+<p>For information on using Mesos, see <a href="http://spark.apache.org/docs/0.9.1/running-on-mesos.html">here</a> and <a href="http://mesosphere.io/learn/run-spark-on-mesos/">here</a>.</p>
+
 <p>Spark also includes <a href="http://spark.apache.org/docs/0.9.1/ec2-scripts.html">EC2 launch scripts</a> for running clusters on Amazon EC2.</p>
 
-<h2>Resilient, Distributed Datasets</h2>
+</div><div><h2>Resilient, Distributed Datasets</h2>
 
 <p>The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in <em>Resilient, Distributed Datasets</em> (RDDs), where a logical data set is virtualized over the cluster.</p>
 
@@ -211,9 +215,9 @@ sup {
 
 <p>The architecture of RDDs is described in the research paper <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a>.</p>
 
-<h2>Spark 1.0.0</h2>
+</div><div><h2>Spark 1.0.0</h2>
 
-<p>We will use Spark 1.0.0-RC3 so we can use some new features, like Spark SQL, that will be generally available (GA) soon. I'll update the workshop to final artifacts when they are available.</p>
+<p>We will use Spark 1.0.0-RC5 so we can exploit the latest API features. The final release will be available soon. I'll update the workshop to final artifacts when they are available.</p>
 
 <p>For now, we will use the following temporary locations for documentation and jar files:</p>
 
@@ -225,7 +229,7 @@ sup {
 
 <p>I recommend that you open the <a href="http://people.apache.org/~pwendell/spark-1.0.0-rc3-docs/">Documentation link</a>, as the getting-started guides, overviews, and reference pages (<em>Scaladocs</em>) will be useful. The Maven repo is used automatically by the build process.</p>
 
-<h2>Building and Running</h2>
+</div><div><h2>Building and Running</h2>
 
 <p>If you're using the <a href="http://typesafe.com/activator">Activator UI</a>, search for <code>activator-spark</code> and install it in the UI. The code is built automatically.</p>
 
@@ -249,16 +253,12 @@ sup {
 <li><strong>NGrams6:</strong> Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
 <li><strong>Joins7:</strong> Spark supports SQL-style joins and this exercise provides a simple example.</li>
 <li><strong>SparkStreaming8:</strong> The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
-<li><strong>SparkSQL9:</strong> An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called Catalyst. The plan is to replace the Shark (Hive) query planner with Catalyst. For now, SparkSQL provides an API for running SQL queries over RDDs and seamless interoperation with Hive/Shark tables.</li>
-<li><strong>Shark10:</strong> We'll briefly look at Shark, a port of the MapReduce-based <a href="http://hive.apache.org">Hive</a> SQL query tool to Spark.</li>
-<li><strong>MLlib11:</strong> One of the early uses for Spark was machine learning (ML) applications. It's not an extensive library, but it's growing fast. For example, the <a href="http://mahout.apache.org">Mahout</a> project is planning to port its MapReduce algorithsm to Spark. This exercise looks at a representative ML problem.</li>
-<li><strong>GraphX12:</strong> Our last exercise explores the Spark graph library GraphX.</li>
 </ul>
 
 
 <p>Let's examine these exercises in more detail...</p>
 
-<h2>Intro1:</h2>
+</div><div><h2>Intro1:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a></p>
 
@@ -280,12 +280,12 @@ sbt
 
 <p>We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. Here is the content of the script without the comments, but broken into sections with discussions:</p>
 
-<p><code>scala
-import org.apache.spark.SparkContext
+<pre><code>import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 val sc = new SparkContext("local", "Intro (1)")
-</code>
-Import the <code>SparkContext</code> that drives everything.</p>
+</code></pre>
+
+<p>Import the <code>SparkContext</code> that drives everything.</p>
 
 <p>Why are there two, very similar <code>import</code> statements? The first one imports the <code>SparkContext</code> type so we don't have to use a fully-qualified name in the <code>new SparkContext</code> statement. The second is analogous to a <code>static import</code> in Java, where we make some methods and values visible in the current scope, again without requiring qualification.</p>
 
@@ -301,10 +301,9 @@ Import the <code>SparkContext</code> that drives everything.</p>
 
 <p>You can also run Spark under Hadoop YARN, which we'll discuss at the end of the workshop.</p>
 
-<p><code>scala
-val input = sc.textFile("data/kjvdat.txt").map(line =&gt; line.toLowerCase)
+<pre><code>val input = sc.textFile("data/kjvdat.txt").map(line =&gt; line.toLowerCase)
 input.cache
-</code></p>
+</code></pre>
 
 <p>Define a read-only variable <code>input</code> of type RDD (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case.</p>
 
@@ -312,51 +311,45 @@ input.cache
 
 <p>Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides dramatic performance improvements.</p>
 
-<p><code>scala
-val sins = input.filter(line =&gt; line.contains("sin"))
+<pre><code>val sins = input.filter(line =&gt; line.contains("sin"))
 val count = sins.count()         // How many sins?
 val array = sins.collect()       // Convert the RDD into a collection (array)
 array.take(20) foreach println   // Take the first 20, and print them 1/line.
-</code></p>
+</code></pre>
 
 <p>Filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many found, convert the RDD to a collection. (What is the actual type??) and finally print the first twenty lines.</p>
 
 <p>Note: in Scala, the <code>()</code> in method calls are actually optional for no-argument methods.</p>
 
-<p><code>scala
-val filterFunc: String =&gt; Boolean =
-    (s:String) =&gt; s.contains("god") || s.contains("christ")
-</code></p>
+<pre><code>val filterFunc: String =&gt; Boolean = 
+    (s:String) =&gt; s.contains("god") || s.contains("christ") 
+</code></pre>
 
 <p>An alternative approach; create a separate filter <em>function value</em> instead and pass it as an argument to the filter method. Specifically, <code>filterFunc</code> is a value that's a function of type <code>String</code> to <code>Boolean</code>.</p>
 
 <p>Actually, the following more concise form is equivalent, due to type inference:</p>
 
-<p><code>scala
-val filterFunc: String =&gt; Boolean =
-    s =&gt; s.contains("god") || s.contains("christ")
-</code></p>
+<pre><code>val filterFunc: String =&gt; Boolean = 
+    s =&gt; s.contains("god") || s.contains("christ") 
+</code></pre>
 
-<p><code>scala
-val sinsPlusGodOrChrist  = sins filter filterFunc
+<pre><code>val sinsPlusGodOrChrist  = sins filter filterFunc
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
-</code></p>
+</code></pre>
 
 <p>Now use <code>filterFunc</code> with filter to find all the <code>sins</code> verses that mention God or Christ.
 Then, count how many were found. Note that we dropped the parentheses after "count" in this case.</p>
 
-<p><code>scala
-sc.stop()
-</code></p>
+<pre><code>sc.stop()
+</code></pre>
 
 <p>Stop the session. If you exit the REPL immediately, this will happen implicitly, but as we'll see, it's a good practice to always do this in your scripts. You'll also don't typically do this when running the actual Spark Shell, as you'll usually want the context alive until you're finished completely.</p>
 
 <p>Lastly, we need to run some unrelated code to setup the rest of the exercises. Namely, we need to create an <code>output</code> directory we'll use:</p>
 
-<p><code>scala
-val output = new java.io.File("output")
+<pre><code>val output = new java.io.File("output")
 if (output.exists == false) output.mkdir
-</code></p>
+</code></pre>
 
 <p>Now, if we actually used the Spark Shell for this exercise, we would have omitted the two <code>import</code> statements and the statement where we created the <code>ScalaContext</code> value <code>sc</code>.
 The shell automatically does these steps for us.</p>
@@ -367,7 +360,7 @@ The shell automatically does these steps for us.</p>
 
 <p>Before moving on, let's discuss how you would actually run the Spark Shell. When you <a href="TODO">download a full Spark distribution</a>, it includes a <code>bin</code> directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command <code>bin/spark-shell</code> (assuming your working directory is the root of the distribution).</p>
 
-<h2>WordCount2:</h2>
+</div><div><h2>WordCount2:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a></p>
 
@@ -385,12 +378,11 @@ The shell automatically does these steps for us.</p>
 
 <p>As before, here is the text of the script in sections, with code comments removed:</p>
 
-<p><code>scala
-package spark    // Put the code in a package named "spark"
+<pre><code>package spark    // Put the code in a package named "spark"
 import spark.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
-</code></p>
+</code></pre>
 
 <p>We use a <code>spark</code> package for the compiled exercises. The <code>Timestamp</code> class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.</p>
 
@@ -398,28 +390,25 @@ import org.apache.spark.SparkContext._
 
 <p>First, here is the outline of the script, demonstrating a pattern we'll use throughout.</p>
 
-<p>```scala
-object WordCount2 {
-  def main(args: Array[String]) = {</p>
+<pre><code>object WordCount2 {
+  def main(args: Array[String]) = {
 
-<pre><code>val sc = new SparkContext("local", "Word Count (2)")
+    val sc = new SparkContext("local", "Word Count (2)")
 
-try {
-  ...
-} finally {
-  sc.stop()      // Stop (shut down) the context.
+    try {
+      ...
+    } finally {
+      sc.stop()      // Stop (shut down) the context.
+    }
+  }
 }
+
+In case the script fails with an exception, putting the `SparkContext.stop` inside a `finally` clause ensures that will get invoked no matter what. This is most useful when you're running scripts inside the Scala REPL.
+
+The content of the `try` clause is the following:
 </code></pre>
 
-<p>  }
-}</p>
-
-<p>In case the script fails with an exception, putting the <code>SparkContext.stop</code> inside a <code>finally</code> clause ensures that will get invoked no matter what. This is most useful when you're running scripts inside the Scala REPL.</p>
-
-<p>The content of the <code>try</code> clause is the following:</p>
-
-<p>```scala
-val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
+<p>val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 input.cache</p>
 
 <p>val wc = input
@@ -455,7 +444,7 @@ total 328
 
 <p>There are exercises in the file and solutions for some of them, for example <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.</p>
 
-<h2>WordCount3:</h2>
+</div><div><h2>WordCount3:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/WordCount3.scala">WordCount3.scala</a></p>
 
@@ -497,33 +486,29 @@ total 328
 
 <p>Here is the implementation of <code>WordCount3</code>, in sections:</p>
 
-<p><code>scala
-package spark
+<pre><code>package spark
 import spark.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
-</code></p>
+</code></pre>
 
 <p>As before, but with our new <code>CommandLineOptions</code> and <code>Timestamp</code> utilities.</p>
 
-<p>```scala
-object WordCount3 {
-  def main(args: Array[String]) = {</p>
+<pre><code>object WordCount3 {
+  def main(args: Array[String]) = {
 
-<pre><code>val options = CommandLineOptions(
-  this.getClass.getSimpleName,
-  CommandLineOptions.inputPath("data/kjvdat.txt"),
-  CommandLineOptions.outputPath("output/kjv-wc3"),
-  CommandLineOptions.master("local"))
+    val options = CommandLineOptions(
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/kjvdat.txt"),
+      CommandLineOptions.outputPath("output/kjv-wc3"),
+      CommandLineOptions.master("local"))
 
-val argz = options(args.toList)
+    val argz = options(args.toList)
 </code></pre>
 
-<pre><code>
-I won't discuss the implementation of &lt;a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala"&gt;CommandLineOptions.scala&lt;/a&gt; except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument to this method is the default value. 
+<p>I won't discuss the implementation of <a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an <code>Opt</code> type, one for each of the options we discussed above. The single argument to this method is the default value.</p>
 
-```scala
-    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
+<pre><code>    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
 
     try {
       val input = sc.textFile(argz("input-path").toString)
@@ -533,16 +518,14 @@ I won't discuss the implementation of &lt;a class="shortcut" href="#code/src/mai
 
 <p>It starts out much like <code>WordCount2</code>, but it splits each line into fields, where the lines are of the form: <code>book|chapter|verse|text</code>. Only the text is kept. The output is an RDD that we then cache as before. Note that calling <code>last</code> on the split array is robust against lines that don't have the delimiter, if there are any; it simply returns the whole original string.</p>
 
-<p><code>scala
-      val wc2 = input
+<pre><code>      val wc2 = input
         .flatMap(line =&gt; line.split("""\W+"""))
         .countByValue()  // Returns a Map[T, Long]
-</code></p>
+</code></pre>
 
 <p>Split on non-alphanumeric sequences of character as before, but rather than map to <code>(word, 1)</code> tuples and use <code>reduceByKey</code>, as we did in <code>WordCount2</code>, we simply treat the words as values and call <code>countByValue</code> to count the unique occurrences.</p>
 
-<p><code>scala
-      val now = Timestamp.now()
+<pre><code>      val now = Timestamp.now()
       val outpath = s"${argz("output-path")}-$now"
       println(s"Writing output (${wc2.size} records) to: $outpath")
       import java.io._
@@ -550,7 +533,7 @@ I won't discuss the implementation of &lt;a class="shortcut" href="#code/src/mai
       wc2 foreach {
         case (word, count) =&gt; out.println("%20s\t%d".format(word, count))
       }
-      // WARNING: Without this close statement, it appears the output stream is
+      // WARNING: Without this close statement, it appears the output stream is 
       // not completely flushed to disk!
       out.close()
     } finally {
@@ -558,13 +541,13 @@ I won't discuss the implementation of &lt;a class="shortcut" href="#code/src/mai
     }
   }
 }
-</code></p>
+</code></pre>
 
 <p>The result of <code>countByValue</code> is a Scala array, not an RDD, so we use conventional Java I/O to write the output. Note the warning; failure to close the stream explicit appears to cause data truncation when the <code>SparkContext</code> is stopped before the stream is flushed.</p>
 
 <p>Don't forget the try the exercises at the end of the source file.</p>
 
-<h2>Matrix4</h2>
+</div><div><h2>Matrix4</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Matrix4.scala">Matrix4.scala</a></p>
 
@@ -585,32 +568,29 @@ n   Number of columns (default: 10)
 
 <p>Here is the code:</p>
 
-<p>```scala
-package spark
+<pre><code>package spark
 import spark.util.{Matrix, Timestamp}
-import org.apache.spark.SparkContext</p>
+import org.apache.spark.SparkContext
 
-<p>object Matrix4 {</p>
+object Matrix4 {
 
-<p>  def main(args: Array[String]) = {</p>
+  def main(args: Array[String]) = {
 
-<pre><code>case class Dimensions(m: Int, n: Int)
+    case class Dimensions(m: Int, n: Int)
 
-val dims = args match {
-  case Array(m, n) =&gt; Dimensions(m.toInt, n.toInt)
-  case Array(m)    =&gt; Dimensions(m.toInt, 10)
-  case Array()     =&gt; Dimensions(5,       10)
-  case _ =&gt; 
-    println("""Expected optional matrix dimensions, got this: ${args.mkString(" ")}""")
-    sys.exit(1)
-}
+    val dims = args match {
+      case Array(m, n) =&gt; Dimensions(m.toInt, n.toInt)
+      case Array(m)    =&gt; Dimensions(m.toInt, 10)
+      case Array()     =&gt; Dimensions(5,       10)
+      case _ =&gt; 
+        println("""Expected optional matrix dimensions, got this: ${args.mkString(" ")}""")
+        sys.exit(1)
+    }
 </code></pre>
 
-<pre><code>
-`Dimensions` is a convenience class for capturing the default or user-specified matrix dimensions.
+<p><code>Dimensions</code> is a convenience class for capturing the default or user-specified matrix dimensions.</p>
 
-```scala
-    val sc = new SparkContext("local", "Matrix (4)")
+<pre><code>    val sc = new SparkContext("local", "Matrix (4)")
 
     try { 
       // Set up a mxn matrix of numbers.
@@ -640,7 +620,7 @@ val dims = args match {
 
 <p>The <code>collect</code> method is called to convert the RDD to an array, because we're just going to print results to the console. The expression <code>sums_avgs.zipWithIndex</code> creates a tuple with each <code>sumb_avgs</code> value and it's index into the collection. We use that to print the row index.</p>
 
-<h2>Crawl5a</h2>
+</div><div><h2>Crawl5a</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Crawl5a.scala">Crawl5a.scala</a></p>
 
@@ -658,7 +638,7 @@ val dims = args match {
 
 <p>Most of this code is straightforward. It's comments explain any complicated constructs used.</p>
 
-<h2>InvertedIndex5b</h2>
+</div><div><h2>InvertedIndex5b</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/InvertedIndex5b.scala">InvertedIndex5b.scala</a></p>
 
@@ -674,53 +654,50 @@ val dims = args match {
 
 <p>Here is the code:</p>
 
-<p>```scala
-package spark</p>
+<pre><code>package spark
 
-<p>import spark.util.{CommandLineOptions, Timestamp}
+import spark.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._</p>
+import org.apache.spark.SparkContext._
 
-<p>object InvertedIndex5b {
-  def main(args: Array[String]) = {</p>
+object InvertedIndex5b {
+  def main(args: Array[String]) = {
 
-<pre><code>val options = CommandLineOptions(
-  this.getClass.getSimpleName,
-  CommandLineOptions.inputPath("output/crawl"),
-  CommandLineOptions.outputPath("output/inverted-index"),
-  CommandLineOptions.master("local"))
+    val options = CommandLineOptions(
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("output/crawl"),
+      CommandLineOptions.outputPath("output/inverted-index"),
+      CommandLineOptions.master("local"))
 
-val argz = options(args.toList)
+    val argz = options(args.toList)
 
-val sc = new SparkContext(argz("master").toString, "Inverted Index (5b)")
+    val sc = new SparkContext(argz("master").toString, "Inverted Index (5b)")
 
-try {
-  val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-  val input = sc.textFile(argz("input-path").toString) map {
-    case lineRE(name, text) =&gt; (name.trim, text.toLowerCase)
-    case badLine =&gt; 
-      Console.err.println("Unexpected line: $badLine")
-      ("", "")  
-  }
+    try {
+      val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
+      val input = sc.textFile(argz("input-path").toString) map {
+        case lineRE(name, text) =&gt; (name.trim, text.toLowerCase)
+        case badLine =&gt; 
+          Console.err.println("Unexpected line: $badLine")
+          ("", "")  
+      }
 </code></pre>
 
-<pre><code>
-Inside the `try` expression, we load the "crawl" data, where each line was written by `Crawl5a` with the following format: `(document_id, text)` (including the parentheses). Hence, we use a regular expression with "capture groups" for the document and text.
+<p>Inside the <code>try</code> expression, we load the "crawl" data, where each line was written by <code>Crawl5a</code> with the following format: <code>(document_id, text)</code> (including the parentheses). Hence, we use a regular expression with "capture groups" for the document and text.</p>
 
-Note the function passed to `map`. It has the form:
+<p>Note the function passed to <code>map</code>. It has the form:</p>
 
-```scala
-{
+<pre><code>{
   case lineRE(name, text) =&gt; ...
   case line =&gt; ...
 }
+</code></pre>
 
-There is now explicit argument list like we've used before. This syntax is the literal syntax for a *partial function*, a mathematical concept for a function that is not defined at all of its inputs. We have two `case` match clauses, one for when the regular expression successfully matches and returns the capture groups into variables `name` and `text` and the second which will match everything else, assigning the line to the variable `badLine`. (In fact, this catch-all clause makes the function *total*, not *partial*.) The function must return a two-element tuple, so the catch clause simply returns `("","")`.
+<p>There is now explicit argument list like we've used before. This syntax is the literal syntax for a <em>partial function</em>, a mathematical concept for a function that is not defined at all of its inputs. We have two <code>case</code> match clauses, one for when the regular expression successfully matches and returns the capture groups into variables <code>name</code> and <code>text</code> and the second which will match everything else, assigning the line to the variable <code>badLine</code>. (In fact, this catch-all clause makes the function <em>total</em>, not <em>partial</em>.) The function must return a two-element tuple, so the catch clause simply returns <code>("","")</code>.</p>
 
-Note that the specified or default `input-path` is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.
+<p>Note that the specified or default <code>input-path</code> is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.</p>
 
-```scala
-      val now = Timestamp.now()
+<pre><code>      val now = Timestamp.now()
       val out = s"${argz("output-path")}-$now"
       println(s"Writing output to: $out")
 
@@ -760,7 +737,7 @@ Note that the specified or default `input-path` is a directory with Hadoop-style
 
 <p>See if you can understand what this sequence of transformations is doing. The end goal is to output each record string in the following form: <code>(word, (doc1, n1), (doc2, n2), ...)</code>:</p>
 
-<h2>NGrams6</h2>
+</div><div><h2>NGrams6</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/NGrams6.scala">NGrams6.scala</a></p>
 
@@ -790,57 +767,54 @@ Note that the specified or default `input-path` is a directory with Hadoop-style
 
 <p>Here r yur codez:</p>
 
-<p>```scala
-package spark</p>
+<pre><code>package spark
 
-<p>import spark.util.{CommandLineOptions, Timestamp}
+import spark.util.{CommandLineOptions, Timestamp}
 import spark.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._</p>
+import org.apache.spark.SparkContext._
 
-<p>object NGrams6 {
-  def main(args: Array[String]) = {</p>
+object NGrams6 {
+  def main(args: Array[String]) = {
 
-<pre><code>/** A function to generate an Opt for handling the count argument. */
-def count(value: String): Opt = Opt(
-  name   = "count",
-  value  = value,
-  help   = s"-c | --count  N  The number of NGrams to compute (default: $value)",
-  parser = {
-    case ("-c" | "--count") +: n +: tail =&gt; (("count", n), tail)
-  })
+    /** A function to generate an Opt for handling the count argument. */
+    def count(value: String): Opt = Opt(
+      name   = "count",
+      value  = value,
+      help   = s"-c | --count  N  The number of NGrams to compute (default: $value)",
+      parser = {
+        case ("-c" | "--count") +: n +: tail =&gt; (("count", n), tail)
+      })
 
-/** A function to generate an Opt for handling the ngram expression. */
-def ngrams(value: String): Opt = Opt(
-  name   = "ngrams",
-  value  = value,
-  help   = s"-n | --ngrams  S     The NGrams match string (default: $value)",
-  parser = {
-    case ("-n" | "--ngrams") +: s +: tail =&gt; (("ngrams", s), tail)
-  })
+    /** A function to generate an Opt for handling the ngram expression. */
+    def ngrams(value: String): Opt = Opt(
+      name   = "ngrams",
+      value  = value,
+      help   = s"-n | --ngrams  S     The NGrams match string (default: $value)",
+      parser = {
+        case ("-n" | "--ngrams") +: s +: tail =&gt; (("ngrams", s), tail)
+      })
 
-val options = CommandLineOptions(
-  this.getClass.getSimpleName,
-  CommandLineOptions.inputPath("data/kjvdat.txt"),
-  CommandLineOptions.master("local"),
-  count("100"),
-  ngrams("% love % %"))
+    val options = CommandLineOptions(
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/kjvdat.txt"),
+      CommandLineOptions.master("local"),
+      count("100"),
+      ngrams("% love % %"))
 
-val argz = options(args.toList)
+    val argz = options(args.toList)
 
-val sc = new SparkContext(argz("master").toString, "NGrams (6)")
-val ngramsStr = argz("ngrams").toString.toLowerCase
-// Note that the replacement strings use Scala's triple quotes; necessary
-// to ensure that the final string is "\w+" and "\s+" for the reges.
-val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
-val n = argz("count").toInt
+    val sc = new SparkContext(argz("master").toString, "NGrams (6)")
+    val ngramsStr = argz("ngrams").toString.toLowerCase
+    // Note that the replacement strings use Scala's triple quotes; necessary
+    // to ensure that the final string is "\w+" and "\s+" for the reges.
+    val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
+    val n = argz("count").toInt
 </code></pre>
 
-<pre><code>
-Without discussing the details, this exercise defines two new `Opt` instances for handling the NGram phrase and count options. Because we allow the user to mix `%` characters for word wildcards and regular expressions, we convert the `%` to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.
+<p>Without discussing the details, this exercise defines two new <code>Opt</code> instances for handling the NGram phrase and count options. Because we allow the user to mix <code>%</code> characters for word wildcards and regular expressions, we convert the <code>%</code> to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.</p>
 
-```scala 
-    try {
+<pre><code>    try {
       object CountOrdering extends Ordering[(String,Int)] {
         def compare(a:(String,Int), b:(String,Int)) = 
           -(a._2 compare b._2)  // - so that it sorts descending
@@ -871,11 +845,11 @@ We read the data as before, but note that because of our line orientation, we <e
 
 <p>The <code>map</code> and <code>reduceByKey</code> calls are just like we used previously for <code>WordCount2</code>, but now we're counting found NGrams. The final <code>takeOrdered</code> call combines sorting with taking the top <code>n</code> found. This is more efficient than separate sort, then take operations. As a rule, when you see a method that does two things like this, it's usually there for efficiency reasons!</p>
 
-<h2>SparkStreaming8</h2>
+</div><div><h2>SparkStreaming8</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a></p>
 
-<p>The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved, because we need two console windows, or at least one in addition to <code>sbt run</code>.</p>
+<p>The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. Running it is a little more involved, because we need two console windows, or at least one in addition to <code>sbt run</code>.</p>
 
 <p>You'll need <a href="http://netcat.sourceforge.net/">NetCat</a> or NCat that comes with <a href="http://nmap.org/download.html">NMap</a>, which is available for more platforms, like Windows. If you're on a Mac or Linux machine, you may already have the <code>nc</code> (NetCat) shell command available.</p>
 
@@ -904,8 +878,7 @@ input from the socket! (A feature request has been posted.) So, we can't just en
 
 <p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a>:</p>
 
-<p><code>scala
-object SparkStreaming8 {
+<pre><code>object SparkStreaming8 {
   def main(args: Array[String]) = {
     val conf = new SparkConf()
              .setMaster("local[2]")
@@ -916,7 +889,7 @@ object SparkStreaming8 {
              // .set("spark.executor.memory", "1g")
     val sc  = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
-</code></p>
+</code></pre>
 
 <p>Here we construct the <code>SparkContext</code> a different way, by first defining a <code>SparkConf</code> (configuration) object. First, it is necessary to use 2 cores, which is specified using <code>setMaster("local[2]")</code> to avoid a <a href="http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html">problem discussed here</a>.</p>
 
@@ -924,291 +897,45 @@ object SparkStreaming8 {
 
 <p>With the <code>SparkContext</code>, we create a <code>StreamingContext</code>, where we also specify the time interval.</p>
 
-<p><code>scala
-    val (server, port) = args.toList match {
+<pre><code>    val (server, port) = args.toList match {
       case server :: port :: _ =&gt; (server, port.toInt)
       case port :: Nil =&gt; ("localhost", port.toInt)
       case Nil =&gt; ("localhost", 9999)
     }
     println(s"Connecting to $server:$port...")
-</code></p>
+</code></pre>
 
 <p>Use a simple handler for the command-line argument list to extract the optional hostname and port.</p>
 
-<p><code>scala
-    val lines = ssc.socketTextStream(server, port)
-</code></p>
+<pre><code>    val lines = ssc.socketTextStream(server, port)
+</code></pre>
 
 <p>Create a <code>DStream</code> (Discretized Stream) named <code>lines</code> that will connect to the specified server and port. It will periodically generate an RDD from a discrete chunk of the data.</p>
 
 <p>Now we implement an incremental word count:</p>
 
-<p>```scala
-    val words = lines.flatMap(line => line.split("""\W+"""))</p>
+<pre><code>    val words = lines.flatMap(line =&gt; line.split("""\W+"""))
 
-<pre><code>val pairs = words.map(word =&gt; (word, 1))
-val wordCounts = pairs.transform(rdd =&gt; rdd.reduceByKey(_ + _))
+    val pairs = words.map(word =&gt; (word, 1))
+    val wordCounts = pairs.transform(rdd =&gt; rdd.reduceByKey(_ + _))
 
-wordCounts.print()  // print a few counts...
+    wordCounts.print()  // print a few counts...
 
-val now = Timestamp.now()
-val out = s"output/streaming/kjv-wc-$now"
-println(s"Writing output to: $out")
+    val now = Timestamp.now()
+    val out = s"output/streaming/kjv-wc-$now"
+    println(s"Writing output to: $out")
 
-wordCounts.saveAsTextFiles(out, "txt")
+    wordCounts.saveAsTextFiles(out, "txt")
 
-ssc.start()
-ssc.awaitTermination()
-</code></pre>
-
-<p>  }
-}
-```</p>
-
-<p>This works much like our previous word count logic, except for the use of <code>transform</code>, a <code>DStream</code> method for transforming the <code>RDDs</code> into new <code>RDDs</code>. In this case, we are performing "mini-word counts", within each RDD, but not across the whole <code>DStream</code>.</p>
-
-<h2>SparkSQL9</h2>
-
-<p><a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a></p>
-
-<p>An "alpha" feature of Spark 1.0.0 is an integrated SQL query library that is based on a new query planner called <em>Catalyst</em>. The plan is to replace the Shark (Hive) query planner with Catalyst, because the later is much easier to maintain and extend.</p>
-
-<p>For now, SparkSQL provides an API for running SQL queries over RDDs with seamless inter-operation with Hive/Shark tables.</p>
-
-<p><code>SparkSQL9</code> supports the same command-line options as <code>WordCount3</code>:</p>
-
-<pre><code>run-main spark.SparkSQL9 [ -h | --help] \ 
-  [-i | --in | --inpath input] \ 
-  [-o | --out | --outpath output] \ 
-  [-m | --master master]
-</code></pre>
-
-<p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a>:</p>
-
-<p>```scala
-object SparkSQL9 {
-  def main(args: Array[String]) = {</p>
-
-<pre><code>val options = CommandLineOptions(
-  this.getClass.getSimpleName,
-  CommandLineOptions.inputPath("data/kjvdat.txt"),
-  CommandLineOptions.outputPath("output/kjv-queries"),
-  CommandLineOptions.master("local"))
-
-val argz = options(args.toList)
-
-val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
-val sqlContext = new SQLContext(sc)
-import sqlContext._    // Make its methods accessible.
-</code></pre>
-
-<pre><code>
-We declare a case class to hold the four fields in each "record" (Bible verse). In `main`, after the command-line argument handling, we construct a `SparkContext` and use it to construct a `SQLContext`. The last `import` statement makes its method visible without qualification required.
-
-```scala
-    try {
-      // Regex to match the fields separated by "|". 
-      // Also strips the trailing "~" in the KJV file.
-      val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
-      // Use flatMap to effectively remove bad lines.
-      val verses = sc.textFile(argz("input-path").toString) flatMap {
-        case lineRE(book, chapter, verse, text) =&gt; 
-          List(Verse(book, chapter.toInt, verse.toInt, text))
-        case line =&gt; 
-          Console.err.println("Unexpected line: $line")
-          Nil  // Will be eliminated by flattening.
-      }
-      verses.registerAsTable("bible")
-      verses.cache()
-</code></pre>
-
-<p>The regular expression tokenizes each string into the four fields. (If you're uncomfortable with regular expressions, a simpler approach would use the <code>String.split("""\s*|\s*""")</code>, then associate the array elements with the correct fields.)</p>
-
-<p>Because there could be malformed lines, we use a trick with <code>flatMap</code>. When the regular expression matches, we return construct a <code>Verse</code> wrapped in a <code>List</code>. Those <code>Lists</code> will be flattened into one long collection. If the line doesn't match the regex, we print an error and return Nil, which effectively disappears when the nested lists are flattened.</p>
-
-<p>Each <code>util.Verse</code> instance encapsulates a Bible verse:</p>
-
-<p><code>scala
-case class Verse(book: String, chapter: Int, verse: Int, text: String)
-</code></p>
-
-<p>The <code>verses.registerAsTable("bible")</code> method is "enabled" through several "implicit" conversions and methods that we imported by <code>import sqlContext._</code>. It defines a temporary table in the Hive "metastore" for the RDD, with the table name "bible". For this method to work, the records must be defined with case classes.</p>
-
-<p> The actual method imported implicitly is defined in <code>org.apache.spark.sql.SchemaRDDLike</code>, which also has a method <code>saveAsParquetFile</code> to write a schema-preserving <a href="http://parquet.io/">Parquet</a> file, which is the emerging standard format for data sets stored as files in the Hadoop Distributed File System (HDFS). (We'll use it shortly.)</p>
-
-<p><code>scala
-      val godVerses = sql("SELECT * FROM bible WHERE text LIKE '%God%';")
-      println("Number of verses that mention God: "+godVerses.count())
-      godVerses
-        .collect()   // convert to a regular in-memory collection
-        .foreach(println) // print the query results.
-</code></p>
-
-<p>The <code>sql</code> method lets us run Hive Query Language (HQL) queries as strings. For this exercise, we emphasize a more typical interactive SQL workflow; we dump the query results to the console, but you could write text files as before.</p>
-
-<p>```scala
-      val counts = sql("""
-        |SELECT * FROM (
-        |  SELECT book, COUNT(*) AS count FROM bible GROUP BY book) bc
-        |WHERE bc.book &lt;> '';
-        """.stripMargin)
-        // Collect all partitions into 1 partition. Otherwise, there are 100s
-        // output from the last query!
-        .coalesce(1)</p>
-
-<pre><code>  counts
-    .collect()        // Convert to a regular in-memory collection.
-    .foreach(println) // Print the query results.
-</code></pre>
-
-<pre><code>
-Another query, written using Scala's convenient multi-line string format. It is followed by a call to `coalesce(n)` that is used here to collapse lots of small partitions (the output "chunks" from the individual, logical processing units) into `n` larger partitions, 1 in this case.
-
-Now let's actually use the Parquet support:
-
-```scala        
-      // Let's also see how to use the API to read and write Parquet files:
-      counts.saveAsParquetFile("output/sql.parquet")
-      // Now read it back and use it as a table:
-      val counts2 = sqlContext.parquetFile("output/sql.parquet")
-      counts2.registerAsTable("countS2")
-      // Run a SQL query against the table:
-      println("Using a SQL query:")
-      sql("SELECT c.book, c.count FROM counts2 c ORDER BY c.count DESC;")
-        .collect().foreach(println)
-
-      // ... or use the LINQ-inspired DSL that's provided by the class 
-      // org.apache.spark.sql.SchemaRDD that's used implicitly:
-      println("Using the LINQ-style query:")
-      counts2.orderBy('count.desc).select('book, 'count)
-        .collect().foreach(println)
-
-    } finally {
-      sc.stop()
-    }
+    ssc.start()
+    ssc.awaitTermination()
   }
 }
 </code></pre>
 
-<p>These lines illustrate writing out Parquet-formatted output, which includes the schema, then reading it back in, like you might do in subsequent jobs, including other Hadoop applications that understand Parquet.</p>
+<p>This works much like our previous word count logic, except for the use of <code>transform</code>, a <code>DStream</code> method for transforming the <code>RDDs</code> into new <code>RDDs</code>. In this case, we are performing "mini-word counts", within each RDD, but not across the whole <code>DStream</code>.</p>
 
-<p>Note that <code>counts2</code> is independent of <code>counts</code>, yet it retains the same schema information. When we register <code>counts2</code> as a table, we can run SQL queries against it. Or, we can write <a href="TODO">LINQ</a>-style queries against the RDD to achieve the same result, because it is actually of type <code>org.apache.spark.sql.SchemaRDD</code>, which provides these "combinators".</p>
-
-<p>For your convenience, much of the same logic is provided in a file <code>src/main/scala/spark/SparkSQL9b.sc</code>, which you can load into the REPL and use to play with queries. In <code>sbt</code> run these commands, where <code>&gt;</code> is the <code>sbt</code> prompt and <code>scala&gt;</code> is the REPL prompt:</p>
-
-<pre><code>&gt; console
-scala&gt; : load src/main/scala/spark/SparkSQL9b.sc
-scala&gt; // write your queries.
-scala&gt; sc.stop()  // when finished
-scala&gt; ^D         // leave the REPL
-</code></pre>
-
-<h2>HiveSQL10</h2>
-
-<p><a class="shortcut" href="#code/src/main/scala/spark/HiveSQL10.scala">HiveSQL10.scala</a></p>
-
-<p><a href="http://hive.apache.org">Hive</a> is the SQL tool for Hadoop invented by Facebook. It became so popular that the Spark community ported Hive to Spark, calling it <em>Shark</em>, where they replaced the inefficient Hadoop MapReduce with Spark for 30+ times performance improvement! There are other SQL alternatives on Hadoop, as well.</p>
-
-<p>Instead of working directly with Shark, which requires a separate installation, etc., we'll use a handy feature of the SparkSQL API, the ability to work with Hive "metastores" (where table metadata is stored, etc.) and Hive queries directly in code. For more on using Shark itself, including its own REPL, see the <a href="http://shark.cs.berkeley.edu/">Shark website</a>.</p>
-
-<blockquote><p><strong>NOTE:</strong> Because of the third-party dependencies, the Spark SQL maven jars don't include support for Hive/Shark, by default.</p></blockquote>
-
-<p>So, to actually run this exercise, you'll need to clone the <a href="https://github.com/apache/spark">Spark Git</a> repo, build Spark yourself with Hive support enabled, then copy the "assembly" to the <code>lib</code> directory in this project. We don't include a prebuilt assembly because of its size, ~150MB.</p>
-
-<p>If you don't want to go to this trouble, just reading the exercise should give you enough details for now. Also for this reason, this exercise is provided as a script, rather than a compiled program that would fail to compiled without the custom assembly!</p>
-
-<p>If you want to build and run this exercise, execute the following Bash commands (or equivalent Windows commands) to build and install the Hive-enabled Spark assembly, where we assume that <code>$WORK</code> is a "work" directory where you'll build Spark, the root directory for this tutorial is <code>$ROOT</code>, and the <code># ...</code> are comments:</p>
-
-<pre><code>cd $WORK
-git clone https://github.com/apache/spark      # Clone from GitHub
-cd spark                                       # Change to the new directory
-SPARK_HIVE=true sbt/sbt assembly/assembly      # Build an assembly with Hive enabled.
-cp assembly/target/scala-2.10/*.jar $ROOT/lib  # Copy to the tutorial's lib dir.
-cd $ROOT
-</code></pre>
-
-<p>Now restart <code>sbt</code> in this project's root directory (i.e., $ROOT) and you should be able to run this exercise. Then run <code>console</code> to start the REPL. You can load the script in with <code>:load src/main/scala/spark/HiveSQL10.sc</code>, but it's probably better to copy and paste to learn what it's doing.</p>
-
-<p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/HiveSQL10.sc">HiveSQL10.sc</a>:</p>
-
-<p>```scala
-import org.apache.spark.SparkContext
-import org.apache.spark.sql._
-import org.apache.spark.sql.hive.LocalHiveContext</p>
-
-<p>val sc = new SparkContext("local", "Hive SQL (10)")
-val hiveContext = new LocalHiveContext(sc, "warehouse")
-import hiveContext._   // Make methods local, as for SQLContext
-```</p>
-
-<p>The analog of <code>SQLContext</code> we used in the previous exercise is <code>LocalHiveContext</code> that creates an instance of Hive's Metastore in the same process, with data stored in the <code>./metadata</code> directory. Similarly, the table ("warehouse") data is stored in the <code>./warehouse</code> directory. If you have a Hive installation, you can use <code>HiveContext</code> instead to connect to your existing metastore.</p>
-
-<p>```scala
-hql("""
-  |CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
-  |  book    STRING,
-  |  chapter INT,
-  |  verse   INT,
-  |  text    STRING)
-  |  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-  |  LOCATION 'data/kjvdat.txt'
-  |""".stripMargin)</p>
-
-<p>println("Run the same GROUP BY we ran before:")
-hql("""
-  |SELECT * FROM (
-  |  SELECT book, COUNT(*) AS count FROM bible GROUP BY book) bc
-  |WHERE bc.book &lt;> '';
-  |""".stripMargin).collect.foreach(println)</p>
-
-<p>println("Run the 'God' query we ran before:")
-hql("SELECT * FROM bible WHERE text LIKE '%God%';").collect().foreach(println)</p>
-
-<p>// Don't forget this when you're done:
-// sc.stop()
-```</p>
-
-<p>The <code>hql</code> method is analogous to the <code>sql</code> method we used before. It let's us run the full set of Hive SQL statements. We use it create a table for our KJV data. Note that Hive's DDL statements let us specify the field separator for the data and we can make a table <em>external</em>,
-which means that Hive won't "own" the data, but instead just read it from the location we specify.</p>
-
-<p>After that, we run two queries we ran before and dump the results to the console.</p>
-
-<h2>MLlib11</h2>
-
-<p><a class="shortcut" href="#code/src/main/scala/spark/MLlib11.scala">MLlib11.scala</a></p>
-
-<p>One of the early uses for Spark was machine learning (ML) applications. Spark is well suited for this purpose, because many ML algorithms are iterative and Spark can perform iterations efficiently, unlike MapReduce. The ML library, <em>MLlib</em>, isn't extensive, but it's growing fast. Also, the <a href="http://mahout.apache.org">Mahout</a> project recently announced plans to port its MapReduce algorithms to Spark.</p>
-
-<p>This exercise looks at a representative ML problem.</p>
-
-<h2>GraphX12</h2>
-
-<p><a class="shortcut" href="#code/src/main/scala/spark/GraphX12.scala">GraphX12.scala</a></p>
-
-<p>Our last exercise explores the Spark graph library GraphX. TODO</p>
-
-<h2>Running on Hadoop</h2>
-
-<p>TBD</p>
-
-<pre><code>hadoop jar target/scala-2.10/activator-spark-X.Y.Z.jar SCRIPT_NAME \ 
-  [--hdfs | --local ] [--host JOBTRACKER_HOST] \ 
-  --input INPUT_PATH --output OUTPUT_PATH \ 
-  [other-args] 
-</code></pre>
-
-<p>Here is an exercise for <code>NGrams</code>, using HDFS, not the local file system, and assuming the JobTracker host is determined from the local configuration files, so we don't have to specify it:</p>
-
-<pre><code>hadoop jar target/scala-2.10/activator-spark-X.Y.Z.jar NGrams \ 
-  --hdfs  --input /data/docs --output output/wordcount \ 
-  --count 100 --ngrams "% loves? %"
-</code></pre>
-
-<p>Note that when using HDFS, Hadoop treats all paths as <em>directories</em>. So, all the files in an <code>--input</code> directory will be read. In <code>--local</code> mode, the paths are interpreted as <em>files</em>.</p>
-
-<p>An alternative to running the <code>hadoop</code> command directly is to use the <code>scald.rb</code> script that comes with Apache Spark distributions. See the <a href="http://spark.apache.org">Apache Spark</a> website for more information.</p>
-
-<h2>Best Practices, Tips, and Tricks</h2>
+</div><div><h2>Best Practices, Tips, and Tricks</h2>
 
 <h3>Safe Closures</h3>
 
@@ -1216,64 +943,54 @@ which means that Hive won't "own" the data, but instead just read it from the lo
 
 <p>A common mistake is to capture a field in an object, which forces the whole object to be serialized. Sometimes it can't be. Consider this example adapted from <a href="http://spark-summit.org/wp-content/uploads/2013/10/McDonough-spark-tutorial_spark-summit-2013.pdf">this presentation</a>.</p>
 
-<p>```scala
-class RDDApp {
+<pre><code>class RDDApp {
   val factor = 3.14159
-  val log = new Log(...)</p>
+  val log = new Log(...)
 
-<p>  def multiply(rdd: RDD[Int]) = {
-    rdd.map(x => x * factor).reduce(...)
+  def multiply(rdd: RDD[Int]) = {
+    rdd.map(x =&gt; x * factor).reduce(...)
   }
 }
-```</p>
+</code></pre>
 
 <p>The closure passed to <code>map</code> captures the field <code>factor</code> in the instance of <code>RDDApp</code>. However, the JVM must serialize the whole object, and a <code>NotSerializableException</code> will result when it attempts to serialize <code>log</code>.</p>
 
 <p>Here is the work around; assign <code>factor</code> to a local field:</p>
 
-<p>```scala
-class RDDApp {
+<pre><code>class RDDApp {
   val factor = 3.14159
-  val log = new Log(...)</p>
+  val log = new Log(...)
 
-<p>  def multiply(rdd: RDD[Int]) = {
+  def multiply(rdd: RDD[Int]) = {
     val factor2 = factor
-    rdd.map(x => x * factor2).reduce(...)
+    rdd.map(x =&gt; x * factor2).reduce(...)
   }
 }
-```</p>
+</code></pre>
 
 <p>Now, only <code>factor2</code> must be serialized.</p>
 
-<h2>Other Features of the API</h2>
-
-<p>TODO</p>
-
-<h2>YARN</h2>
-
-<p>TODO</p>
-
-<h2>Going Forward from Here</h2>
+</div><div><h2>Going Forward from Here</h2>
 
 <p>This template is not a complete Apache Spark tutorial. To learn more, see the following:</p>
 
 <ul>
 <li>The Apache Spark <a href="http://spark.apache.org/">website</a>.</li>
-<li>The Apache Spark <a href="http://spark.apache.org/tree/develop/tutorial">tutorial</a> distributed with the <a href="http://spark.apache.org">Apache Spark</a> distribution. See also the examples in the distribution.</li>
+<li>The Apache Spark <a href="http://spark.apache.org/tree/develop/tutorial">tutorial</a> distributed with the <a href="http://spark.apache.org">Apache Spark</a> distribution. See also the examples in the distribution and be sure to study the <a href="http://spark.apache.org/docs/0.9.0/api.html">Scaladoc</a> pages for key types such as <code>RDD</code> and <code>SchemaRDD</code>.</li>
 <li><a href="http://spark-summit.org/2013">Talks from Spark Summit 2013</a>.</li>
 <li><a href="http://aws.amazon.com/articles/4926593393724923">Running Spark in EC2</a>.</li>
 <li><a href="http://mesosphere.io/learn/run-spark-on-mesos/">Running Spark on Mesos</a>.</li>
 </ul>
 
 
-<h2>Experience Reports</h2>
+<p><strong>Experience Reports:</strong></p>
 
 <ul>
 <li><a href="http://www.slideshare.net/krishflix/seattle-spark-meetup-spark-at-twitter">Spark at Twitter</a></li>
 </ul>
 
 
-<h2>Spark Based Libraries</h2>
+<p><strong>Other Spark Based Libraries:</strong></p>
 
 <ul>
 <li><a href="https://github.com/snowplow/spark-example-project">Snowplow's Spark Example Project</a>.</li>
@@ -1281,12 +998,12 @@ class RDDApp {
 </ul>
 
 
-<h2>For more about Typesafe:</h2>
+</div><div><h2>For more about Typesafe:</h2>
 
 <ul>
 <li>See <a href="http://typesafe.com/activator">Typesafe Activator</a> to find other Activator templates.</li>
 <li>See <a href="http://typesafe.com">Typesafe</a> for more information about our products and services.</li>
 </ul>
-
+</div>
 </body>
 </html>
