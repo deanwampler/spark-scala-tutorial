@@ -68,7 +68,7 @@ object Joins7 {
       // Project out the flattened data we want:
       //   fullBookName|chapter|verse|text
 
-      val verses2 = verses.map {
+      val verses2 = verses map {
         // Drop the key - the abbreviated book name
         case (_, ((chapter, verse, text), fullBookName)) => 
           (fullBookName, chapter, verse, text)
@@ -82,6 +82,15 @@ object Joins7 {
       sc.stop()
     }
 
-    // Exercise: Try different sacred text files (English language).
+    // Exercise: Try different sacred text files.
+    // Exercise (hard): The output does NOT preserve the original order of the
+    //   verses! This is a consequence of how joins are implemented ("co-groups").
+    //   Fix the ordering. Here is one approach:
+    //   Compute (in advance??) a map from book names (or abbreviations) to
+    //   an index (e.g., Gen -> 1, Exo -> 2, ...). Use this to construct a
+    //   sort key containing the book index, chapter, and verse. Note that 
+    //   the chapter and verse will be strings when extracted from the file,
+    //   so you must convert them to integers (i.e., "x.toInt"). Finally,
+    //   project out the full book name, chapter, verse, and text.
   }
 }

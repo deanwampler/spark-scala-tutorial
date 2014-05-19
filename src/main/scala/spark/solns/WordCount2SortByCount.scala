@@ -48,7 +48,7 @@ object WordCount2SortByCount {
       // with a _SUCCESS marker (empty) file, the data as a "part" file, 
       // and checksum files.
       val now = Timestamp.now()
-      val out = s"output/kjv-wc-sort-by-count-$now"
+      val out = s"output/kjv-wc2-sort-by-count-$now"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

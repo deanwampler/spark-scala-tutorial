@@ -6,7 +6,8 @@ import org.apache.spark.SparkContext._
 
 /**
  * Second, simpler implementation of Word Count.
- * Solution to the exercise that orders by word length.
+ * Solution to the exercise that orders by word length. We'll add the length
+ * to the output, as the 2nd field after the word itself.
  */
 object WordCount3SortByWordLength {
   def main(args: Array[String]) = {
@@ -17,7 +18,7 @@ object WordCount3SortByWordLength {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.outputPath("output/kjv-wc2-word-length.txt"),
+      CommandLineOptions.outputPath("output/kjv-wc3-word-length.txt"),
       CommandLineOptions.master("local"))
 
     val argz = options(args.toList)
@@ -37,11 +38,18 @@ object WordCount3SortByWordLength {
       // Split on non-alphanumeric sequences of character as before. 
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
+      // Note that this implementation would not be a good choice at very
+      // large scale, because countByValue forces it to a single, in-memory
+      // collection on one node, after which we do further processing. 
+      // Try redoing it with the WordCount3 "reduceByKey" approach. What
+      // changes are required to the rest of the script?
       val wc2 = input
         .flatMap(line => line.split("""\W+"""))
         .countByValue()  // Returns a Map[T, Long]
         .toVector        // Extract into a sequence that can be sorted.
-        .sortBy{ case (word, count) => -word.length }  // sort descending
+        .map{ case (word, count) => (word, word.length, count) } // add length
+        .sortBy{ case (_, length, _) => -length }  // sort descending, ignore
+                                                   // 1st, 3rd tuple elements!
 
       // Save to a file, but because we no longer have an RDD, we have to use
       // good 'ol Java File IO. Note that the output specifier is now a file, 
@@ -52,7 +60,8 @@ object WordCount3SortByWordLength {
       import java.io._
       val out = new PrintWriter(outpath)
       wc2 foreach {
-        case (word, count) => out.println("%20s\t%d".format(word, count))
+        case (word, length, count) => 
+          out.println("%20s\t%3d\t%d".format(word, length, count))
       }
       // WARNING: Without this close statement, it appears the output stream is 
       // not completely flushed to disk!

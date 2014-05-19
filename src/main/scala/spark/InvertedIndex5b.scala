@@ -44,7 +44,10 @@ object InvertedIndex5b {
       // and count the unique occurrences.
       input
         .flatMap { 
-          case (path, text) => text.split("""\W+""") map (word => (word, path))
+          case (path, text) => 
+            // If we don't trim leading whitespace, the regex split creates
+            // an undesired leading "" word!
+            text.trim.split("""\W+""") map (word => (word, path))
         }
         .map { 
           case (word, path) => ((word, path), 1) 
@@ -71,16 +74,18 @@ object InvertedIndex5b {
     }
 
     // Exercise: Sort the output by the words. How much overhead does this add?
-    // Exercise: For each output record, sort the list of (path, n) tuples by n.
+    // Exercise: For each output record, sort the list of (path, n) tuples by n,
+    //   descending.
     // Exercise: Try you own set of text files. First run Crawl5a to generate
     //   the "web crawl" data.
     // Exercise (hard): Try combining some of the processing steps or reordering
     //   steps to make it more efficient.
     // Exercise (hard): As written the output data has an important limitation 
     //   for use in a search engine. Really common words, like "a", "an", "the", 
-    //   etc. are pervasive. There are two tools to improve this. One is to filter
-    //   out so-called "stop" words that aren't useful for the index. The second
-    //   is to use a variation of this algorithm called "term frequency-inverse 
-    //   document frequency" (TF-IDF). Look up this algorithm and implement it.
+    //   etc. are pervasive. There are two tools to improve this. One is to 
+    //   filter out so-called "stop" words that aren't useful for the index.
+    //   The second is to use a variation of this algorithm called "term 
+    //   frequency-inverse document frequency" (TF-IDF). Look up this algorithm
+    //   and implement it.
   }
 }

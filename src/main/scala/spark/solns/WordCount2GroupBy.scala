@@ -41,8 +41,14 @@ object WordCount2GroupBy {
       // Save, but it actually writes Hadoop-style output; to a directory, 
       // with a _SUCCESS marker (empty) file, the data as a "part" file, 
       // and checksum files.
+      // Note that when you look at the output, you'll see some very 
+      // long lines for the many words that have very low counts (e.g., 1),
+      // while very frequent words (counts in the 1000s) usually don't overlap,
+      // e.g., "for" has 8971 occurrences, while "unto" has 8997, so they have
+      // nearly the same frequency, but not the exact same, so they aren't
+      // grouped together.
       val now = Timestamp.now()
-      val out = s"output/kjv-wc-group-by-count-$now"
+      val out = s"output/kjv-wc2-group-by-count-$now"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {
