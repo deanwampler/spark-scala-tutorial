@@ -32,24 +32,21 @@ object Resolvers {
 
 object Dependency {
   object Version {
-    val Spark     = "1.0.0"
+    val Spark     = "0.9.1" //"1.0.0"
     val ScalaTest = "2.0"
   }
 
   val sparkCore      = "org.apache.spark" %% "spark-core"      % Version.Spark   
   val sparkStreaming = "org.apache.spark" %% "spark-streaming" % Version.Spark   
   val sparkExamples  = "org.apache.spark" %% "spark-examples"  % Version.Spark   
-  val sparkSQL       = "org.apache.spark" %% "spark-sql"       % Version.Spark   
   val sparkRepl      = "org.apache.spark" %% "spark-repl"      % Version.Spark   
-  val sparkGraphX    = "org.apache.spark" %% "spark-graphx"    % Version.Spark   
-  val scalaTest      = "org.scalatest"     % "scalatest_2.10"  % Version.ScalaTest %  "test" 
 }
 
 object Dependencies {
   import Dependency._
 
   val activatorspark = 
-    Seq(sparkCore, sparkStreaming, sparkExamples, sparkSQL, sparkRepl, sparkGraphX, scalaTest)
+    Seq(sparkCore, sparkStreaming, sparkExamples, sparkRepl)
 }
 
 object ActivatorSparkBuild extends Build {
