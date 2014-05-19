@@ -16,7 +16,7 @@ File | Description
 
 There are many other texts from the world's religious traditions at the [www.sacred-texts.com](http://www.sacred-texts.com) site, but most of the others aren't formatted into one convenient file like these examples.
 
-Here are Hive DDL statements for these files, if you want to put them into Hive. See also [HiveSQL10.scala](../src/main/scala/spark/HiveSQL10.scala).
+Here are Hive DDL statements for these files, if you want to put them into Hive.
 
 For example, this DDL statement can be used for the `data/kjvdat.txt` file, where I'll assume you've copied the file to a directory `hdfs://server/data/kjvdat` in HDFS, which requires directory paths rather than file names, where `server` is the server name or IP address for the *NameNode*.
 
