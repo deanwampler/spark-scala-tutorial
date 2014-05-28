@@ -32,21 +32,24 @@ object Resolvers {
 
 object Dependency {
   object Version {
-    val Spark     = "0.9.1" //"1.0.0"
-    val ScalaTest = "2.0"
+    val Spark      = "0.9.1" //"1.0.0"
+    val ScalaTest  = "2.1.4"
+    val ScalaCheck = "1.11.3"
   }
 
-  val sparkCore      = "org.apache.spark" %% "spark-core"      % Version.Spark   
+  val sparkCore      = "org.apache.spark" %% "spark-core"      % Version.Spark
   val sparkStreaming = "org.apache.spark" %% "spark-streaming" % Version.Spark   
-  val sparkExamples  = "org.apache.spark" %% "spark-examples"  % Version.Spark   
   val sparkRepl      = "org.apache.spark" %% "spark-repl"      % Version.Spark   
+
+  val scalaTest      = "org.scalatest"    %% "scalatest"       % Version.ScalaTest  % "test"
+  val scalaCheck     = "org.scalacheck"   %% "scalacheck"      % Version.ScalaCheck % "test"
 }
 
 object Dependencies {
   import Dependency._
 
   val activatorspark = 
-    Seq(sparkCore, sparkStreaming, sparkExamples, sparkRepl)
+    Seq(sparkCore, sparkStreaming, sparkRepl, scalaTest, scalaCheck)
 }
 
 object ActivatorSparkBuild extends Build {
@@ -62,7 +65,9 @@ object ActivatorSparkBuild extends Build {
       resolvers := allResolvers,
       libraryDependencies ++= Dependencies.activatorspark,
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
-      mainClass := Some("run")))
+      mainClass := Some("run"),
+      // Must run Spark jobs sequentially because they compete for port 4040!
+      parallelExecution in Test := false))
 }
 
 
