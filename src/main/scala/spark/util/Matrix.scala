@@ -9,6 +9,8 @@ import org.apache.spark.SparkContext._
  * Note: Must be serializable, which is automatic for case classes.
  */
 case class Matrix(m: Int, n: Int) {
+  assert(m > 0 && n > 0, "m and n must be > 0")
+
   private def makeRow(start: Long): Array[Long] = 
     Array.iterate(start, n)(i => i+1)
 
@@ -28,5 +30,6 @@ case class Matrix(m: Int, n: Int) {
 
   private def rowString(rowI: Array[Long]) = 
     rowI map (cell => cellFormat.format(cell)) mkString ", "
+
   override def toString = repr map rowString mkString "\n"
 }

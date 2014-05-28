@@ -9,11 +9,15 @@ import org.apache.spark.SparkContext
  */
 object Matrix4 {
 
+  // overrideable for tests.
+  var out = Console.out
+
   def main(args: Array[String]) = {
 
     case class Dimensions(m: Int, n: Int)
 
-    val dims = args match {
+    // Process command-line args. differently. 
+    val dims = args.take(2) match {
       case Array(m, n) => Dimensions(m.toInt, n.toInt)
       case Array(m)    => Dimensions(m.toInt, 10)
       case Array()     => Dimensions(5,       10)
@@ -36,10 +40,10 @@ object Matrix4 {
         (sum, sum/dims.n)
       }.collect
 
-      println(s"${dims.m}x${dims.n} Matrix:")
+      out.println(s"${dims.m}x${dims.n} Matrix:")
       sums_avgs.zipWithIndex foreach {
         case ((sum, avg), index) => 
-          println(f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d")
+          out.println(f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d")
       }
     } finally {
       sc.stop()

@@ -26,7 +26,8 @@ object Joins7 {
       CommandLineOptions.inputPath("data/kjvdat.txt"),
       abbrevs,
       CommandLineOptions.outputPath("output/kjv-joins"),
-      CommandLineOptions.master("local"))
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
 
     val argz = options(args.toList)
 
@@ -75,9 +76,10 @@ object Joins7 {
       }
 
       val now = Timestamp.now()
-      val outpath = s"${argz("output-path")}-$now"
-      println(s"Writing output to: $outpath")
-      verses2.saveAsTextFile(outpath)
+      val out = s"${argz("output-path")}-$now"
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output to: $out")
+      verses2.saveAsTextFile(out)
     } finally {
       sc.stop()
     }

@@ -19,7 +19,8 @@ object WordCount3SortByWordLength {
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
       CommandLineOptions.outputPath("output/kjv-wc3-word-length.txt"),
-      CommandLineOptions.master("local"))
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
 
     val argz = options(args.toList)
 
@@ -56,7 +57,8 @@ object WordCount3SortByWordLength {
       // not a directory as before, the format of each line will be diffierent,
       val now = Timestamp.now()
       val outpath = s"${argz("output-path")}-$now"
-      println(s"Writing output (${wc2.size} records) to: $outpath")
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output (${wc2.size} records) to: $outpath")
       import java.io._
       val out = new PrintWriter(outpath)
       wc2 foreach {

@@ -10,9 +10,9 @@ import org.apache.spark.streaming._
  * Run this application in one terminal, optionally specifying "server port"
  * arguments. In another terminal use NetCat (http://netcat.sourceforge.net/) or
  * NCat that comes with NMap (http://nmap.org/download.html), which is available
- * for more platforms, to send data to this process:
- * Terminal one: sbt run-main spark.SparkStreaming7 [localhost [9999]]
+ * for more platforms, to send data to this process. Start NetCat/NCat first:
  * Terminal two (NetCat): nc -c -l -p 9999
+ * Terminal one: sbt run-main spark.SparkStreaming7 [localhost [9999]]
  * Unfortunately, Spark Streaming does not yet provide a way to detect end of
  * input from the socket! (A feature request has been posted.) So, we have to ^C
  * the application (and sbt with it). The "-c" option to nc will cause it to 
@@ -25,7 +25,7 @@ object SparkStreaming8 {
     // the TTL to be set:
     // spark.cleaner.ttl:  (default: infinite)
     // Duration (seconds) of how long Spark will remember any metadata
-    // (stages generated, tasks generated, etc.). Periodic cleanups will
+    // (stages generated, tasks generated, etc.). Periodic TestUtils will
     // ensure that metadata older than this duration will be forgotten.
     // This is useful for running Spark for many hours / days (for example,
     // running 24/7 in case of Spark Streaming applications). Note that any
@@ -46,32 +46,36 @@ object SparkStreaming8 {
     val sc  = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-    // (A simpler handle for the command-line argument list than CommandLineOptions.)
-    // Create a DStream (Discretized Stream) that will connect to server:port
-    // and periodically generate an RDD from a discrete chunk of data.
-    val (server, port) = args.toList match {
-      case server :: port :: _ => (server, port.toInt)
-      case port :: Nil => ("localhost", port.toInt)
-      case Nil => ("localhost", 9999)
+    try {
+      // (A simpler handle for the command-line argument list than CommandLineOptions.)
+      // Create a DStream (Discretized Stream) that will connect to server:port
+      // and periodically generate an RDD from a discrete chunk of data.
+      val (server, port) = args.toList match {
+        case server :: port :: _ => (server, port.toInt)
+        case port :: Nil => ("localhost", port.toInt)
+        case Nil => ("localhost", 9999)
+      }
+      println(s"Connecting to $server:$port...")
+      val lines = ssc.socketTextStream(server, port)
+
+      // Word Count...
+      val words = lines.flatMap(line => line.split("""\W+"""))
+
+      val pairs = words.map(word => (word, 1))
+      val wordCounts = pairs.transform(rdd => rdd.reduceByKey(_ + _))
+
+      wordCounts.print()  // print a few counts...
+
+      // Generates a separate directory inside "out" each interval!!
+      // val now = Timestamp.now()
+      // val out = s"output/streaming/kjv-wc-$now"
+      // println(s"Writing output to: $out")
+      // wordCounts.saveAsTextFiles(out, "txt")
+
+      ssc.start()
+      ssc.awaitTermination()
+    } finally {
+      ssc.stop()
     }
-    println(s"Connecting to $server:$port...")
-    val lines = ssc.socketTextStream(server, port)
-
-    // Word Count...
-    val words = lines.flatMap(line => line.split("""\W+"""))
-
-    val pairs = words.map(word => (word, 1))
-    val wordCounts = pairs.transform(rdd => rdd.reduceByKey(_ + _))
-
-    wordCounts.print()  // print a few counts...
-
-    val now = Timestamp.now()
-    val out = s"output/streaming/kjv-wc-$now"
-    println(s"Writing output to: $out")
-
-    wordCounts.saveAsTextFiles(out, "txt")
-
-    ssc.start()
-    ssc.awaitTermination()
   }
 }

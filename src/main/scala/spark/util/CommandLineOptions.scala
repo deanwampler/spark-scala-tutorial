@@ -12,7 +12,7 @@ case class CommandLineOptions(programName: String, opts: Opt*) {
   def helpMsg = s"""
     |usage: java ... $programName [options] 
     |where the options are the following:
-    |  -h | --help  Show this message and quit.
+    |-h | --help  Show this message and quit.
     |""".stripMargin + opts.map(_.help).mkString("\n")
 
   lazy val matchers: Parser = 
@@ -35,9 +35,11 @@ case class CommandLineOptions(programName: String, opts: Opt*) {
     // The actuals are already key-value pairs:
     val map2 = foundOpts.toMap
     val finalMap = map1 ++ map2
-    println(s"$programName:")
-    finalMap foreach {
-      case (key, value) => printf("  %15s: %s\n", key, value)
+    if (finalMap("quiet").toBoolean == false) {
+      println(s"$programName:")
+      finalMap foreach {
+        case (key, value) => printf("  %15s: %s\n", key, value)
+      }
     }
     finalMap
   }
@@ -82,7 +84,7 @@ object CommandLineOptions {
   def inputPath(value: String): Opt = Opt(
     name   = "input-path",
     value  = value,
-    help   = s"-i | --in  | --input  path   The input root directory of files to crawl (default: $value)",
+    help   = s"-i | --in  | --inpath  path   The input root directory of files to crawl (default: $value)",
     parser = {
       case ("-i" | "--in" | "--inpath") +: path +: tail => (("input-path", path), tail)
     })
@@ -91,7 +93,7 @@ object CommandLineOptions {
   def outputPath(value: String): Opt = Opt(
     name   = "output-path",
     value  = value,
-    help   = s"-o | --out | --output path   The output location (default: $value)",
+    help   = s"-o | --out | --outpath path   The output location (default: $value)",
     parser = {
       case ("-o" | "--out" | "--outpath") +: path +: tail => (("output-path", path), tail)
     })
@@ -102,9 +104,18 @@ object CommandLineOptions {
     value  = value,
     help   = s"""
        |-m | --master M      The "master" argument passed to SparkContext, "M" is one of:
-       |                    "local", local[N]", "mesos://host:port", or "spark://host:port"
-       |                    (default: $value).""".stripMargin,
+       |                     "local", local[N]", "mesos://host:port", or "spark://host:port"
+       |                     (default: $value).""".stripMargin,
     parser = {
       case ("-m" | "--master") +: master +: tail => (("master", master), tail)
+    })
+
+  /** Common argument: Quiet suppresses some print statements. */
+  def quiet: Opt = Opt(
+    name   = "quiet",
+    value  = "false",
+    help   = s"""-q | --quiet         Suppress some informational output.""",
+    parser = {
+      case ("-q" | "--quiet") +: tail => (("quiet", "true"), tail)
     })
 }

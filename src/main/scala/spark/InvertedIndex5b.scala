@@ -12,7 +12,8 @@ object InvertedIndex5b {
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("output/crawl"),
       CommandLineOptions.outputPath("output/inverted-index"),
-      CommandLineOptions.master("local"))
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
 
     val argz = options(args.toList)
 
@@ -37,7 +38,8 @@ object InvertedIndex5b {
 
       val now = Timestamp.now()
       val out = s"${argz("output-path")}-$now"
-      println(s"Writing output to: $out")
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output to: $out")
 
       // Split on non-alphanumeric sequences of character as before. 
       // Rather than map to "(word, 1)" tuples, we treat the words by values

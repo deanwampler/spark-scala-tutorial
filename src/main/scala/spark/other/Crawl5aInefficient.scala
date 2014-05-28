@@ -22,7 +22,8 @@ object Crawl5aInefficient {
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/enron-spam-ham"),
       CommandLineOptions.outputPath("output/crawl-inefficient"),
-      CommandLineOptions.master("local"))
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
 
     val argz = options(args.toList)
 
@@ -37,7 +38,8 @@ object Crawl5aInefficient {
       // val now = Timestamp.now()
       // val out = s"${argz("output-path").toString}-$now"
       val out = s"${argz("output-path")}"
-      println(s"Writing output to: $out")
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output to: $out")
 
       ingestFiles(argz("input-path").toString, sc).saveAsTextFile(out)
     } finally {

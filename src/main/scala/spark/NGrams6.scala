@@ -7,6 +7,10 @@ import org.apache.spark.SparkContext._
 
 /** NGrams6 - Find the ngrams in a corpus */
 object NGrams6 {
+
+  // overrideable for tests.
+  var out = Console.out
+
   def main(args: Array[String]) = {
 
     /** A function to generate an Opt for handling the count argument. */
@@ -38,6 +42,7 @@ object NGrams6 {
       CommandLineOptions.inputPath("data/kjvdat.txt"),
       // CommandLineOptions.outputPath("output/ngrams"), // just write to the console 
       CommandLineOptions.master("local"),
+      CommandLineOptions.quiet,
       count("100"),
       ngrams("% love % %"))
 
@@ -74,9 +79,9 @@ object NGrams6 {
       // Write to the console, but because we no longer have an RDD,
       // we have to use good 'ol Java File IO. Note that the output
       // specifier is now interpreted as a file, not a directory as before.
-      println(s"Found ${ngramz.size} ngrams:")
+      out.println(s"Found ${ngramz.size} ngrams:")
       ngramz foreach {
-        case (ngram, count) => println("%30s\t%d".format(ngram, count))
+        case (ngram, count) => out.println("%30s\t%d".format(ngram, count))
       }
     } finally {
       sc.stop()

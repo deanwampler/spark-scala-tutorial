@@ -14,7 +14,6 @@ import org.apache.spark.SparkContext._
  */
 object WordCount3 {
   def main(args: Array[String]) = {
-
     // I extracted command-line processing code into a separate utility class,
     // an illustration of how it's convenient that we can mix "normal" code
     // with "big data" processing code. 
@@ -22,7 +21,8 @@ object WordCount3 {
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
       CommandLineOptions.outputPath("output/kjv-wc3"),
-      CommandLineOptions.master("local"))
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
 
     val argz = options(args.toList)
 
@@ -56,7 +56,8 @@ object WordCount3 {
       // and the order of the output will not be the same, either. 
       val now = Timestamp.now()
       val outpath = s"${argz("output-path")}-$now"
-      println(s"Writing output (${wc2.size} records) to: $outpath")
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output (${wc2.size} records) to: $outpath")
       import java.io._
       val out = new PrintWriter(outpath)
       wc2 foreach {

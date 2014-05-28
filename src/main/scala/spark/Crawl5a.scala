@@ -14,14 +14,12 @@ import org.apache.spark.rdd.RDD
 object Crawl5a {
   def main(args: Array[String]) = {
 
-    // I extracted the command-line processing code in WordCount3 into
-    // a separate utility class. Here, I'm using named arguments for clarity,
-    // but this is not required:
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/enron-spam-ham"),
       CommandLineOptions.outputPath("output/crawl"),
-      CommandLineOptions.master("local"))
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
 
     val argz = options(args.toList)
 
@@ -40,7 +38,8 @@ object Crawl5a {
       // val now = Timestamp.now()
       // val out = s"${args("output-path").toString}-$now"
       val out = argz("output-path").toString
-      println(s"Writing output to: $out")
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output to: $out")
       sc.makeRDD(names_contents).saveAsTextFile(out)
     } finally {
       sc.stop()
