@@ -756,7 +756,7 @@ object SparkStreaming8 {
 
 Here we construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use 2 cores, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
 
-Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic cleanups is necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/0.9.0/configuration.html) for more details.
+Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/0.9.0/configuration.html) for more details.
 
 With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval.
 

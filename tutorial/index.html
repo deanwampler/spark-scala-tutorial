@@ -893,7 +893,7 @@ input from the socket! (A feature request has been posted.) So, we can't just en
 
 <p>Here we construct the <code>SparkContext</code> a different way, by first defining a <code>SparkConf</code> (configuration) object. First, it is necessary to use 2 cores, which is specified using <code>setMaster("local[2]")</code> to avoid a <a href="http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html">problem discussed here</a>.</p>
 
-<p>Spark Streaming requires the TTL to be set, <code>spark.cleaner.ttl</code>, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic cleanups is necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See <a href="http://spark.apache.org/docs/0.9.0/configuration.html">Configuration</a> for more details.</p>
+<p>Spark Streaming requires the TTL to be set, <code>spark.cleaner.ttl</code>, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See <a href="http://spark.apache.org/docs/0.9.0/configuration.html">Configuration</a> for more details.</p>
 
 <p>With the <code>SparkContext</code>, we create a <code>StreamingContext</code>, where we also specify the time interval.</p>
 
