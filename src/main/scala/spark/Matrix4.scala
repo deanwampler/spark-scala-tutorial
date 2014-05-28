@@ -9,7 +9,7 @@ import org.apache.spark.SparkContext
  */
 object Matrix4 {
 
-  // overrideable for tests.
+  // Override for tests.
   var out = Console.out
 
   def main(args: Array[String]) = {

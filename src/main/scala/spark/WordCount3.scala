@@ -58,6 +58,7 @@ object WordCount3 {
       val outpath = s"${argz("output-path")}-$now"
       if (argz("quiet").toBoolean == false) 
         println(s"Writing output (${wc2.size} records) to: $outpath")
+        
       import java.io._
       val out = new PrintWriter(outpath)
       wc2 foreach {

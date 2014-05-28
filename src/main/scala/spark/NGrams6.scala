@@ -8,7 +8,7 @@ import org.apache.spark.SparkContext._
 /** NGrams6 - Find the ngrams in a corpus */
 object NGrams6 {
 
-  // overrideable for tests.
+  // Override for tests.
   var out = Console.out
 
   def main(args: Array[String]) = {
