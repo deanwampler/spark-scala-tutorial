@@ -10,6 +10,7 @@ class WordCount3Spec extends FunSpec {
       val out    = "output/kjv-wc3"
       val out2   = out+"-"
       val golden = "golden/kjv-wc3/data.txt"
+      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       WordCount3.main(Array(
         "--quiet", "--inpath", "data/kjvdat.txt", "--outpath", out))

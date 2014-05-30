@@ -85,6 +85,7 @@ object Joins7 {
     }
 
     // Exercise: Try different sacred text files.
+    // Exercise: Try outer joins (see http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions).
     // Exercise (hard): The output does NOT preserve the original order of the
     //   verses! This is a consequence of how joins are implemented ("co-groups").
     //   Fix the ordering. Here is one approach:

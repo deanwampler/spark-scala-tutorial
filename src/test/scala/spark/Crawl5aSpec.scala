@@ -10,7 +10,8 @@ class Crawl5aSpec extends FunSpec {
       val out    = "output/crawl"
       val out2   = s"$out/part-00000"
       val golden = "golden/crawl/part-00000"
-
+      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
+      
       // The defaults for --input and --output are fine:
       Crawl5a.main(Array("--quiet"))
       

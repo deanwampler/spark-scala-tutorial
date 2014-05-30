@@ -12,7 +12,7 @@ object TestUtil {
         case ((a, e), i) => assert(a == e, s"$a != $e at line $i")
       }
     } finally {
-      //rmrf(dirToDelete)
+      rmrf(dirToDelete)
     }
 
   def rmrf(root: String): Unit = rmrf(new File(root))
@@ -23,7 +23,6 @@ object TestUtil {
       root.listFiles foreach rmrf
       root.delete()
     }
-    else throw new RuntimeException(s"$root doesn't exist!")
   }
 
   def rm(file: String): Unit = rm(new File(file))

@@ -4,7 +4,7 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "1.1.0"
+  val Version = "1.2.0"
   val ScalaVersion = "2.10.4"
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq (
@@ -13,7 +13,7 @@ object BuildSettings {
     scalaVersion  := ScalaVersion,
     organization  := "com.typesafe",
     description   := "Activator Spark Template",
-    scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8")
+    scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8", "-Xlint")
   )
 }
 
@@ -32,7 +32,7 @@ object Resolvers {
 
 object Dependency {
   object Version {
-    val Spark      = "0.9.1" //"1.0.0"
+    val Spark      = "1.0.0"
     val ScalaTest  = "2.1.4"
     val ScalaCheck = "1.11.3"
   }
@@ -66,7 +66,7 @@ object ActivatorSparkBuild extends Build {
       libraryDependencies ++= Dependencies.activatorspark,
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
-      // Must run Spark jobs sequentially because they compete for port 4040!
+      // Must run Spark tests sequentially because they compete for port 4040!
       parallelExecution in Test := false))
 }
 

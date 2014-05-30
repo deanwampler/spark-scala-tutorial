@@ -14,13 +14,13 @@ By 2013, it became increasingly clear that a successor was needed for the venera
 
 Spark was seen as the best, general-purpose alternative, so [Cloudera led the way](http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html) in embracing Spark as a replacement for MapReduce. 
 
-Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/). Hortonworks has not yet announced whether or not they will support Spark natively, but [this page](http://spark.apache.org/docs/0.9.1/cluster-overview.html) in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.
+Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/). Hortonworks has not yet announced whether or not they will support Spark natively, but [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.
 
 ## Spark Clusters
 
-Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/0.9.1/cluster-overview.html). Consider the following diagram:
+Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.0.0/cluster-overview.html). Consider the following diagram:
 
-![Spark Cluster](http://spark.apache.org/docs/0.9.1/img/cluster-overview.png)
+![Spark Cluster](http://spark.apache.org/docs/1.0.0/img/cluster-overview.png)
 
 Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, either Spark's own manager or the corresponding management services provided by [Mesos](http://mesos.apache.org/) or [Hadoop's YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html). The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
@@ -30,19 +30,19 @@ When possible, run the driver locally on the cluster to reduce network IO as it 
 
 ## Spark Deployment Options
 
-Spark currently supports [three cluster managers](http://spark.apache.org/docs/0.9.1/cluster-overview.html):
+Spark currently supports [three cluster managers](http://spark.apache.org/docs/1.0.0/cluster-overview.html):
 
-* [Standalone](http://spark.apache.org/docs/0.9.1/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
-* [Apache Mesos](http://spark.apache.org/docs/0.9.1/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
-* [Hadoop YARN](http://spark.apache.org/docs/0.9.1/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
+* [Standalone](http://spark.apache.org/docs/1.0.0/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
+* [Apache Mesos](http://spark.apache.org/docs/1.0.0/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
+* [Hadoop YARN](http://spark.apache.org/docs/1.0.0/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
 
 Note that you can run Spark on a Hadoop cluster using any of these three approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Standalone and Mesos deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
 
-For information on using YARN, see [here](http://spark.apache.org/docs/0.9.1/running-on-yarn.html).
+For information on using YARN, see [here](http://spark.apache.org/docs/1.0.0/running-on-yarn.html).
 
-For information on using Mesos, see [here](http://spark.apache.org/docs/0.9.1/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
+For information on using Mesos, see [here](http://spark.apache.org/docs/1.0.0/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
 
-Spark also includes [EC2 launch scripts](http://spark.apache.org/docs/0.9.1/ec2-scripts.html) for running clusters on Amazon EC2.
+Spark also includes [EC2 launch scripts](http://spark.apache.org/docs/1.0.0/ec2-scripts.html) for running clusters on Amazon EC2.
 
 ## Resilient, Distributed Datasets
 
@@ -56,14 +56,14 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ## The Spark Version
 
-This workshop uses Spark 0.9.1. Spark 1.0.0 is forthcoming and I'll update to it when it's released. No code or behavior changes should occur between these versions.
+This workshop uses Spark 1.0.0.
 
-For now, use the following documentation links for learning more about Spark:
+The following documentation links provide more information about Spark:
 
-* [Documentation](http://spark.apache.org/docs/0.9.1/).
-* [API](http://spark.apache.org/docs/0.9.1/api/core/index.html#org.apache.spark.package).
+* [Documentation](http://spark.apache.org/docs/1.0.0/).
+* [API](http://spark.apache.org/docs/1.0.0/api/core/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/0.9.1/) includes a getting-started guide, overviews, and the *Scaladocs* reference pages.
+The [Documentation](http://spark.apache.org/docs/1.0.0/) includes a getting-started guide, overviews, and the *Scaladocs* reference pages.
 
 ## Building and Testing
 
@@ -744,44 +744,255 @@ We read the data as before, but note that because of our line orientation, we *w
 
 The `map` and `reduceByKey` calls are just like we used previously for `WordCount2`, but now we're counting found NGrams. The final `takeOrdered` call combines sorting with taking the top `n` found. This is more efficient than separate sort, then take operations. As a rule, when you see a method that does two things like this, it's usually there for efficiency reasons!
 
+## Joins7
+
+<a class="shortcut" href="#code/src/main/scala/spark/Joins7.scala">Joins7.scala</a> 
+
+Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
+
+Here, we will join the KJV Bible data with a small "table" that maps the book abbreviations to the full names, e.g., `Gen` to `Genesis`. 
+
+`Joins7` supports the following command-line options:
+
+```
+run-main spark.Joins7 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-o | --out | --outpath output] \ 
+  [-m | --master master] \ 
+  [-a | --abbreviations path] \ 
+  [-q | --quiet]
+```
+
+Where the `--abbreviations` is the path to the file with book abbreviations to book names. It defaults to `data/abbrevs-to-names.tsv`. Note that the format is tab-separated values, which the script must handle correctly.
+
+Here r yur codez:
+
+```
+object Joins7 {
+  def main(args: Array[String]) = {
+
+    /** The "dictionary" of book abbreviations to full names */
+    val abbrevsFile = "data/abbrevs-to-names.tsv"
+    val abbrevs = Opt(
+      name   = "abbreviations",
+      value  = abbrevsFile,
+      help   = s"-a | --abbreviations  path The dictionary of book abbreviations to full names (default: $abbrevsFile)",
+      parser = {
+        case ("-a" | "--abbreviations") +: path +: tail => (("abbreviations", path), tail)
+      })
+
+    val options = CommandLineOptions(
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/kjvdat.txt"),
+      abbrevs,
+      CommandLineOptions.outputPath("output/kjv-joins"),
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet)
+
+    val argz = options(args.toList)
+
+    val sc = new SparkContext(argz("master").toString, "Joins (7)")
+```
+
+The input sacred text (default: `data/kjvdat.txt`) is assumed to have the format `book|chapter|verse|text`:
+
+```
+    try {
+      val input = sc.textFile(argz("input-path").toString)
+        .map { line => 
+          val ary = line.split("\\s*\\|\\s*")
+          (ary(0), (ary(1), ary(2), ary(3)))
+        }
+```
+
+Note the output tuple format from the `map`. For joins, Spark wants a `(key,value)` tuple, so we use a nested tuple for the chapter, verse, and text. The abbreviations file is handled similarly, but the delimiter is a tab:
+
+```
+      val abbrevs = sc.textFile(argz("abbreviations").toString)
+        .map{ line => 
+          val ary = line.split("\\s+", 2)
+          (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
+        }
+```
+
+Note the second argument to `split`. Just in case a full book name has a nested tab, we explicitly only want to split on the first tab found, yielding two strings.
+
+```
+      // Cache both RDDs in memory for fast, repeated access.
+      input.cache
+      abbrevs.cache
+
+      // Join on the key, the first field in the tuples; the book abbreviation.
+
+      val verses = input.join(abbrevs)
+      
+      if (input.count != verses.count) {
+        println(s"input count, ${input.count}, doesn't match output count, ${verses.count}")
+      }
+```
+
+We perform an inner join on the keys of each RDD and add a sanity check for the output. Since this is an inner join, the sanity check catches the case where an abbreviation wasn't found and the corresponding verses were dropped!
+
+The schema of `verses` is this: `(key, (value1, value2))`, where `value` is `(chapter, verse, text)` from the KJV input and `value` is the full book name, the second "field" from the abbreviations file. We now flatten the records to the final desired form, `fullBookName|chapter|verse|text`:
+
+```
+      val verses2 = verses map {
+        // Drop the key - the abbreviated book name
+        case (_, ((chapter, verse, text), fullBookName)) => 
+          (fullBookName, chapter, verse, text)
+      }
+```
+
+Lastly, we write the output:
+
+```
+      val now = Timestamp.now()
+      val out = s"${argz("output-path")}-$now"
+      if (argz("quiet").toBoolean == false) 
+        println(s"Writing output to: $out")
+      verses2.saveAsTextFile(out)
+    } finally {
+      sc.stop()
+    }
+  }
+}
+```
+
+The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), which many other methods for computing "co-groups", outer joins, etc.
+
 ## SparkStreaming8
 
 <a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a> 
 
-The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. Running it is a little more involved, because we need two console windows, or at least one in addition to `sbt run`.
+The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command.
 
-You'll need [NetCat](http://netcat.sourceforge.net/) or NCat that comes with [NMap](http://nmap.org/download.html), which is available for more platforms, like Windows. If you're on a Mac or Linux machine, you may already have the `nc` (NetCat) shell command available. 
+In Activator or `sbt`, run `SparkStreaming8` as we've done for the other exercises. It will read the KJV Bible text file, then terminate after 5 seconds, because otherwise the app will run forever, waiting for a changed text file to appear! 
 
-We'll use it to send data to the spark streaming process. Open a second console window to use `nc` or `ncat`.
+Alternatively, the app can receive text over a socket connection. We'll use a console network app to send data to the spark streaming process, either the `nc` console app that's part of [NetCat](http://netcat.sourceforge.net/) or the `NCat` app that comes with [NMap](http://nmap.org/download.html), which is available for more platforms, like Windows. If you're on a Mac or Linux machine, you probably already have `nc` installed. 
 
-In Activator or your `sbt` console window, run this command in `SparkStreaming8` as before. Note that it has default arguments for the host (`localhost`) and the port (`9999`), e.g., you could use this `sbt` command to override them:
-
-```
-run-main spark.SparkStreaming8 some_host some_port
-```
-
-However you start it, it will wait for traffic on the socket.
-
-In the second console, run this command or the equivalent for `ncat`:
+To try the app with a socket connection, open a second console window to use `nc` or `ncat`. Then, run this `nc` command (or the equivalent for `ncat`):
 
 ```
 nc -c -l -p 9999
 ```
 
-The `-c` option tells it to terminate if the socket drops, the `-l` option puts `nc` in listen mode, and the `-p` option is used to specify the port.
+The `-c` option (which could be omitted) tells it to terminate if the socket drops, the `-l` option puts `nc` into listen mode, and the `-p` option is used to specify the port.
 
-Now, type (or copy and paste) text into the console running `nc`. After each carriage return, the text is sent to the `SparkStreaming8` app, where word count is performed on it.
+If you've been using Activator, open another console/shell window and change to the project directory. If you've been using `sbt`, just use the same session. Run `SparkStreaming8` with the following `sbt` command:
 
-Unfortunately, Spark Streaming does not yet provide a way to detect the end of
-input from the socket! (A feature request has been posted.) So, we can't just end the `nc` process and have the `SparkStreaming8` app exit gracefully. Instead, we have to ^C to kill `SparkStreaming8` (and `sbt` with it). Because we invoked `nc` with `-c` it will terminate automatically when we do this; `nc` **does** detect dropped sockets.
 
-Spark Streaming uses a clever hack; it runs more or less the same Spark code (or code that at least looks conceptually the same) on deltas of data, say all the events received within 1-second intervals. Those deltas are `RDDs` encapsulated in a `DStream` (Discretized Stream).
+Note that it has default arguments for the host (`localhost`) and the port (`9999`), e.g., you could use this `sbt` command to override them:
+
+```
+run-main spark.SparkStreaming8 --socket localhost:9999
+```
+
+Back to the `nc` console, type (or copy and paste) text into the window. After each carriage return, the text is sent to the `SparkStreaming8` app, where word count is performed on it and some output is written to that app's console window.
+
+Once again, `SparkStreaming8` will terminate after 5 seconds, because otherwise the app will try to run forever!
+
+However, it does detect if the socket connection drops, e.g., you hit `^C` in the `nc` window. It will take a few moments to shut itself down. The app has a "listener" that 
+will shutdown when the socket drops. However, by default, Spark Streaming will attempt to re-establish the connection, which is probably what you would want in a long-running system.
+
+The 5-second timeout is still on in the streaming scenario, but you can disable it when using either input mode by also passing the argument `--no-term` ("no terminate"):
+
+```
+run-main spark.SparkStreaming8 --socket localhost:9999 --no-term
+```
+
+Restart `nc` in the other window and try this variant of `run-main`. After a few seconds, use `^C` to kill `nc` and watch the error messages generated in the `sbt` window. Note how long it takes for the application to shutdown.
+
+You can use any `server:port` combination you want, even on a remote machine.
+
+To recap, `SparkStreaming8` supports the following command-line options:
+
+```
+run-main spark.SparkStreaming8 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-s | --socket server:port] \ 
+  [-n | --no | --no-term] \ 
+  [-q | --quiet]
+```
+
+Where the default is `--inpath data/kjvdat.txt`.
+
+## How Spark Streaming Works
+
+Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on *deltas* of data, say all the events received within 1-second intervals (which is what we used here). Those deltas are `RDDs` encapsulated in a `DStream` ("Discretized Stream").
+
+A `StreamingContext` is used to wrap the normal `SparkContext`, too.
+
+## The SparkStreaming8 Code
 
 Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a>:
 
 ```
 object SparkStreaming8 {
+  // Override for tests, etc.
+  var out = Console.out
+
+  val timeout = 5 * 1000   // 5 seconds
+
+  /** 
+   * Use "--socket host:port" to listen for events. 
+   * To read "events" from a directory of files instead, e.g., for testing,
+   * use the "--inpath" argument.
+   */
+  def socket(hostPort: String): Opt = Opt(
+    name   = "socket",
+    value  = hostPort,
+    help   = s"-s | --socket host:port  Listen to a socket for events (default: $hostPort unless --inpath used)",
+    parser = {
+      case ("-s" | "--socket") +: hp +: tail => (("socket", hp), tail)
+    })
+
+  /** 
+   * Use "--no-term" to keep this process running "forever" (or until ^C). 
+   */
+  def noterm(): Opt = Opt(
+    name   = "no-term",
+    value  = "",  // ignored
+    help   = s"-n | --no | --no-term  Run forever; don't terminate after $timeout seconds)",
+    parser = {
+      case ("-n" | "--no" | "--no-term") +: tail => (("no-term", "true"), tail)
+    })
+
+  case class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
+    override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
+      out.println(s"Receiver Error: $error. Stopping...")
+      sc.stop()
+    }
+    override def onReceiverStopped(stopped: StreamingListenerReceiverStopped):Unit = {
+      out.println(s"Receiver Stopped: $stopped. Stopping...")
+      sc.stop()
+    }
+  }
+```
+
+We define `Opt` objects for the new command-line options `--socket server:port` and `--no-term`.
+
+The `EndOfStreamListener` will be used to detect when a socket connection drops. It will start the exit process. Note that it is not triggered when the end of file is reached while reading directories of files. In this case, we have to rely on the 5-second timeout to quit.
+
+```
   def main(args: Array[String]) = {
+
+    val options = CommandLineOptions(
+      this.getClass.getSimpleName,
+      CommandLineOptions.inputPath("data/kjvdat.txt"),
+      // We write to "out" instead of to a directory:
+      // CommandLineOptions.outputPath("output/kjv-wc3"),  
+      // For this process, use at least 2 cores!
+      CommandLineOptions.master("local[2]"),
+      socket(""),  // empty default, so we know the user specified this option.
+      noterm(),
+      CommandLineOptions.quiet)
+
+    val argz = options(args.toList)
+```
+
+The usual command-line argument processing.
+
+```    
     val conf = new SparkConf()
              .setMaster("local[2]")
              .setAppName("Spark Streaming (8)")
@@ -791,34 +1002,25 @@ object SparkStreaming8 {
              // .set("spark.executor.memory", "1g")
     val sc  = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
+    ssc.addStreamingListener(EndOfStreamListener(ssc))
 ```
 
-Here we construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use 2 cores, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
+Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use 2 cores, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
 
-Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/0.9.1/configuration.html) for more details.
+Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/1.0.0/configuration.html) for more details.
 
-With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval.
+With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval. Finally, we add a listener for socket drops.
 
 ```
     try {
-      // (A simpler handle for the command-line argument list than CommandLineOptions.)
-      // Create a DStream (Discretized Stream) that will connect to server:port
-      // and periodically generate an RDD from a discrete chunk of data.
-      val (server, port) = args.toList match {
-        case server :: port :: _ => (server, port.toInt)
-        case port :: Nil => ("localhost", port.toInt)
-        case Nil => ("localhost", 9999)
-      }
-      println(s"Connecting to $server:$port...")
+      val lines = 
+        if (argz("socket") == "") useDirectory(ssc, argz("input-path"))
+        else useSocket(ssc, argz("socket"))
 ```
 
-Use a simple handler for the command-line argument list to extract the optional hostname and port.
+If a socket connection wasn't specified, then use the `input-path` to read from one or more files (the default case). Otherwise use a socket. An `InputDStream` is returned in either case as `lines`. The two methods `useDirectory` and `useSocket` are listed below.
 
-```
-      val lines = ssc.socketTextStream(server, port)
-```
-
-Create a `DStream` (Discretized Stream) named `lines` that will connect to the specified server and port. It will periodically generate an RDD from a discrete chunk of the data.
+From the `DStream` (Discretized Stream) that fronts either the socket or the files, an RDD will be periodically generated for each discrete chunk of (possibly empty) data in each 1-second interval.
 
 Now we implement an incremental word count:
 
@@ -837,17 +1039,49 @@ Now we implement an incremental word count:
       // wordCounts.saveAsTextFiles(out, "txt")
     
       ssc.start()
-      ssc.awaitTermination()
+      if (argz("no-term") == "") ssc.awaitTermination(timeout)
+      else  ssc.awaitTermination()
     } finally {
+      // Having the ssc.stop here is only needed when we use the timeout.
+      out.println("+++++++++++++ Stopping! +++++++++++++")
       ssc.stop()
     }
   }
-}
 ```
 
 This works much like our previous word count logic, except for the use of `transform`, a `DStream` method for transforming the `RDDs` into new `RDDs`. In this case, we are performing "mini-word counts", within each RDD, but not across the whole `DStream`.
 
 Note that we comment out writing the results to files, as it creates a separate output directory *per interval* (1 second), most of which are empty for this example. However, it's worth uncommenting these lines for one run to see what's produced.
+
+Lastly, we wait for termination. By default, we set a `timeout` of 5 seconds.
+
+The app ends with `useSocket` and `useDirectory`:
+
+```
+  private def useSocket(sc: StreamingContext, serverPort: String): DStream[String] = {
+    try {
+      // Pattern match to extract the 0th, 1st array elements after the split.
+      val Array(server, port) = serverPort.split(":")
+      out.println(s"Connecting to $server:$port...")
+      sc.socketTextStream(server, port.toInt)
+    } catch {
+      case th: Throwable => 
+        sc.stop()
+        throw new RuntimeException(
+          s"Failed to initialize host:port socket with host:port string '$serverPort':",
+          th)
+    }
+  }
+
+  // Hadoop text file compatible.
+  private def useDirectory(sc: StreamingContext, dirName: String): DStream[String] = {
+    out.println(s"Reading 'events' from directory $dirName")
+    sc.textFileStream(dirName)
+  }
+}
+```
+
+This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/1.0.0/streaming-programming-guide.html) for more information.
 
 ## Best Practices, Tips, and Tricks
 
@@ -891,7 +1125,7 @@ Now, only `factor2` must be serialized.
 This template is not a complete Apache Spark tutorial. To learn more, see the following:
 
 * The Apache Spark [website](http://spark.apache.org/). 
-* The Apache Spark [tutorial](http://spark.apache.org/tree/develop/tutorial) distributed with the [Apache Spark](http://spark.apache.org) distribution. See also the examples in the distribution and be sure to study the [Scaladoc](http://spark.apache.org/docs/0.9.1/api.html) pages for key types such as `RDD` and `SchemaRDD`.
+* The Apache Spark [tutorial](http://spark.apache.org/tree/develop/tutorial) distributed with the [Apache Spark](http://spark.apache.org) distribution. See also the examples in the distribution and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as `RDD` and `SchemaRDD`.
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
 * [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).
 * [Running Spark on Mesos](http://mesosphere.io/learn/run-spark-on-mesos/).

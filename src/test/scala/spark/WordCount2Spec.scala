@@ -10,6 +10,7 @@ class WordCount2Spec extends FunSpec {
       val out    = "output/kjv-wc2-"
       val out2   = s"$out/part-00000"
       val golden = "golden/kjv-wc2/part-00000"
+      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       WordCount2.main(Array.empty[String])
 

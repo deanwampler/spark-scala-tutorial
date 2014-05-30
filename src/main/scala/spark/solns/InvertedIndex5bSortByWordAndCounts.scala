@@ -73,7 +73,7 @@ object InvertedIndex5bSortByWordAndCounts {
           case (word, seq) => 
             val seq2 = seq.map {
               case (redundantWord, (path, n)) => (path, n)
-            }
+            }.toSeq
             // New: sort the sequence by count, descending
             .sortBy { 
               case (path, n) => -n 

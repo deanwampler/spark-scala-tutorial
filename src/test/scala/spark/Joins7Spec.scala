@@ -10,6 +10,7 @@ class Joins7Spec extends FunSpec {
       val out     = "output/kjv-joins"
       val out2    = out+"-"
       val golden  = "golden/kjv-joins/part-00000"
+      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
       
       Joins7.main(Array(
         "--quiet", "--inpath", "data/kjvdat.txt", 

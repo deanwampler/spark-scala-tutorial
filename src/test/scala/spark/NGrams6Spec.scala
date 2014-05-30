@@ -10,6 +10,8 @@ class NGrams6Spec extends FunSpec {
       Timestamp.isTest = true
       val out    = "output/ngrams.txt"
       val golden = "golden/ngrams/100.txt"
+      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
+
       val fileStream = new FileOutputStream(new File(out))
       NGrams6.out = new PrintStream(fileStream, true)
 
