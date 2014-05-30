@@ -858,7 +858,7 @@ Lastly, we write the output:
 }
 ```
 
-The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), which many other methods for computing "co-groups", outer joins, etc.
+The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), with many other methods for computing "co-groups", outer joins, etc.
 
 ## SparkStreaming8
 
