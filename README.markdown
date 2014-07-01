@@ -4,4 +4,4 @@ This [Activator](http://typesafe.com/activator) template gets you up and running
 
 > NEW: Now supports Spark 1.0.0!
 
-See the [tutorial](tutorial/index.md) for details.
+See the [tutorial](tutorial/README.md) for details.
