@@ -108,7 +108,7 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 
 Let's now work through these exercises...
 
-## Intro1:
+## Intro1
 
 <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>
 
@@ -221,7 +221,7 @@ You can exit the Scala "console" now. Type `:quit` or use `^d` (control-d). You'
 
 Before moving on, let's discuss how you would actually run the Spark Shell. When you [download a full Spark distribution](TODO), it includes a `bin` directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command `bin/spark-shell` (assuming your working directory is the root of the distribution).
 
-## WordCount2:
+## WordCount2
 
 <a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> 
 
@@ -311,7 +311,7 @@ In a real cluster with lots of data and lots of concurrent processing, there wou
 
 There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.
 
-## WordCount3:
+## WordCount3
 
 <a class="shortcut" href="#code/src/main/scala/spark/WordCount3.scala">WordCount3.scala</a> 
 
