@@ -2,6 +2,11 @@
 
 ![image](http://spark.apache.org/docs/1.0.1/img/spark-logo-100x40px.png)
 
+Dean Wampler, Ph.D.<br/>
+Typesafe<br/>
+[dean.wampler@typesafe.com](mailto:dean.wampler@typesafe.com)<br/>
+[@deanwampler](https://twitter.com/deanwampler)
+
 ## Introduction
 
 This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications. 
