@@ -15,6 +15,8 @@ This workshop demonstrates how to write and run [Apache Spark](http://spark.apac
 
 We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a *Spark Shell*, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.
 
+> New in Version 2.0, I've added new examples and exercises for [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which integrates structured data and embedded SQL queries with normal Spark code. It even has a Hive integration module so you can query existing Hive tables, even create and delete them.
+
 ## Why Spark?
 
 By 2013, it became increasingly clear that a successor was needed for the venerable [Hadoop MapReduce](http://wiki.apache.org/hadoop/MapReduce) compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.
@@ -61,6 +63,12 @@ RDDs support common data operations, such as *map*, *flatmap*, *filter*, *fold/r
 
 The architecture of RDDs is described in the research paper [Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf).
 
+## Spark SQL
+
+A new API in Spark is [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop.
+
+Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive.
+
 ## The Spark Version
 
 This workshop uses Spark 1.0.1.
@@ -105,6 +113,9 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`. 
 * **Joins7:** Spark supports SQL-style joins and this exercise provides a simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
+* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](data/README.html) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
+* **SparkSQLParquet10:** Demonstrates reading Parquet-formatted data, namely the data written in the previous example.
+* **HiveSQL10:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
 
@@ -1160,12 +1171,83 @@ class RDDApp {
 
 Now, only `factor2` must be serialized.
 
+## SparkSQL9
+
+<a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a> 
+
+TODO
+
+Reads and parses the King James Bible text, `kjvdat.txt`.
+
+As in the previous *Spark Workshop*, command line options can be used to override the defaults. We'll have to use `sbt` from a command window to use this feature (rather than the *Activator UI*), and we'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments. 
+
+The "\" characters in the following and subsequent command descriptions are used to indicate long lines that I wrapped to fit. Enter the commands on a single line without the "\". I use `[...]` to indicate optional arguments, and `|` to indicate alternative flags:
+
+```
+run-main spark.SparkSQL9 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-o | --out | --outpath output] \ 
+  [-m | --master master] \ 
+  [-q | --quiet]
+```
+
+Where the options have the following meanings:
+
+```
+-h | --help     Show help and exit.
+-i ... input    Read this input source (default: data/kjvdat.txt).
+-o ... output   Write to this output location (default: output/verses.parquet).
+-m ... master   local, local[k], etc. as discussed previously.
+-q | --quiet    Suppress some informational output.
+```
+
+The options work the same as before, except we don't append a timestamp to the output path, because its contents will be read by the next exercise.
+
+**NOTE:** Because we don't append a timestamp to the output path, you'll get a runtime error if the directory already exists. Just delete or rename the existing directory, or specify a different output path.
+
+Code description TODO.
+
+As before, there are suggested exercises at the end of the source file. Some solutions are provided in the `solns` source package.
+
+## SparkSQLParquet10
+
+<a class="shortcut" href="#code/src/main/scala/spark/SparkSQLParquet10.scala">SparkSQLParquet10.scala</a> 
+
+TODO
+
+Reads the Parquet output of the previous example and works with the data using the SQL API.
+
+The command-line options are similar, but there is no output option as all results are printed to the console:
+
+```
+run-main spark.SparkSQLParquet10 [ -h | --help] \ 
+  [-i | --in | --inpath input] \ 
+  [-m | --master master] \ 
+  [-q | --quiet]
+```
+
+Code description TODO.
+
+
+## HiveSQL11
+
+<a class="shortcut" href="#code/src/main/scala/spark/HiveSQL11.scala">HiveSQL11.scala</a> 
+
+TODO
+
+This is actually a script file, but you'll find it most useful if you start the `console` in SBT, then copy and paste the statements, to see what each one does. Then you can experiment with the API, especially if you already know Hive!.
+
+Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but is not a production configuration.
+
+Code description TODO.
+
 ## Going Forward from Here
 
 This template is not a complete Apache Spark tutorial. To learn more, see the following:
 
 * The Apache Spark [website](http://spark.apache.org/). 
 * The Apache Spark [tutorial](http://spark.apache.org/tree/develop/tutorial) distributed with the [Apache Spark](http://spark.apache.org) distribution. See also the examples in the distribution and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as `RDD` and `SchemaRDD`.
+* The [Spark SQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
 * [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).
 * [Running Spark on Mesos](http://mesosphere.io/learn/run-spark-on-mesos/).

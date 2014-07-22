@@ -16,3 +16,5 @@ dist
 /.settings
 /project/*-shim.sbt
 *.class
+derby.log
+metastore
