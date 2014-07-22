@@ -133,7 +133,7 @@ object SparkStreaming8 {
 
       wordCounts.print()  // print a few counts...
 
-      // Generates a separate directory inside "out" each interval!!
+      // Generates a separate subdirectory for each interval!!
       // val now = Timestamp.now()
       // val out = s"output/streaming/kjv-wc-$now"
       // println(s"Writing output to: $out")

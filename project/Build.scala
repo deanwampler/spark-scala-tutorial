@@ -4,7 +4,7 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "1.2.0"
+  val Version = "1.3.0"
   val ScalaVersion = "2.10.4"
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq (
@@ -19,20 +19,17 @@ object BuildSettings {
 
 
 object Resolvers {
-  // This is a temporary location within the Apache repo for the 1.0.0-RC3
-  // release of Spark.
-  val apache = "Apache Repository" at "https://repository.apache.org/content/repositories/orgapachespark-1012/"
   val typesafe = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   val sonatype = "Sonatype Release" at "https://oss.sonatype.org/content/repositories/releases"
   val mvnrepository = "MVN Repo" at "http://mvnrepository.com/artifact"
 
-  val allResolvers = Seq(apache, typesafe, sonatype, mvnrepository)
+  val allResolvers = Seq(typesafe, sonatype, mvnrepository)
 
 }
 
 object Dependency {
   object Version {
-    val Spark      = "1.0.0"
+    val Spark      = "1.0.1"
     val ScalaTest  = "2.1.4"
     val ScalaCheck = "1.11.3"
   }

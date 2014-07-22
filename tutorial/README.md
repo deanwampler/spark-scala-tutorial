@@ -1,4 +1,6 @@
-# Apache Spark: A Tutorial
+# Apache Spark: An Introductory Workshop
+
+![image](http://spark.apache.org/docs/1.0.1/img/spark-logo-100x40px.png)
 
 ## Introduction
 
@@ -56,26 +58,24 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ## The Spark Version
 
-This workshop uses Spark 1.0.0.
+This workshop uses Spark 1.0.1.
 
 The following documentation links provide more information about Spark:
 
-* [Documentation](http://spark.apache.org/docs/1.0.0/).
-* [API](http://spark.apache.org/docs/1.0.0/api/core/index.html#org.apache.spark.package).
+* [Documentation](http://spark.apache.org/docs/1.0.1/).
+* [Scaladocs API](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/1.0.0/) includes a getting-started guide, overviews, and the *Scaladocs* reference pages.
+The [Documentation](http://spark.apache.org/docs/1.0.1/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package) useful for the workshop.
 
 ## Building and Testing
 
-If you're using the [Activator UI](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically. 
+If you're using the [Typesafe Activator UI](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically. 
 
 If you grabbed this workshop from [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
 
-If you're using the Activator UI, first run the automated tests with <a class="shortcut" href="#test">test</a>.
+To compile the code and run the tests, either use the Activator UI <a class="shortcut" href="#test">test</a> link or start `sbt` and enter `test` at the prompt.
 
-If you are using `sbt` from the command line, start `sbt`, then type `test`.
-
-Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the last *Spark Streaming* exercise (for various reasons...).
+Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the *Spark Streaming* exercise, which uses multiple processes.
 
 ## Running the Exercises
 
@@ -85,7 +85,7 @@ In Activator, use the <a class="shortcut" href="#run">run</a> panel, select one 
 
 In `sbt`, enter `run`. It will present the same list of main classes. Enter one of the numbers to select the executable you want to run. Enter the number in the `[...]` brackets corresponding to  **WordCount2** to verify that everything works.
 
-Note that the exercises with package names that contain `solns` are solutions to exercises. The `other` package has alternative implementations for your consideration.
+Note that the some exercises have package names with the word `solns`. They are solutions to the exercises. The `other` package has alternative implementations of some examples or exercises, for your consideration.
 
 ## The Exercises
 
@@ -126,7 +126,7 @@ sbt
 
 At the `sbt` prompt, type `console`. You'll see a welcome message and a `scala>` prompt.
 
-We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. Here is the content of the script without the comments, but broken into sections with discussions:
+We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
 
 ```
 import org.apache.spark.SparkContext
@@ -206,9 +206,13 @@ if (output.exists == false) output.mkdir
 Now, if we actually used the Spark Shell for this exercise, we would have omitted the two `import` statements and the statement where we created the `ScalaContext` value `sc`. 
 The shell automatically does these steps for us.
 
-There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/scala/spark/solns` directory. Solutions are provided for all the suggested exercises, but we do accept pull requests ;) All the solutions provided for the rest of the exercises are also built with the rest of the code, so you'll be able to run them the same way.
+There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/scala/spark/solns` directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;) 
 
-> Note: If you don't want to modify the original code when working on an exercise, just copy the file and give the exercise type a new name.
+All the solutions provided for the rest of the exercises are compiled by `activator` or `sbt`, so you'll be able to run them the same way.
+
+> Note: If you don't want to modify the original code when working on an exercise, just copy and edit the file, and give the `object` (a *singleton* class) a new name.
+
+You can exit the Scala "console" now. Type `:quit` or use `^d` (control-d). You'll be back at the `sbt` prompt.
 
 Before moving on, let's discuss how you would actually run the Spark Shell. When you [download a full Spark distribution](TODO), it includes a `bin` directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command `bin/spark-shell` (assuming your working directory is the root of the distribution).
 
@@ -298,7 +302,9 @@ total 328
 
 In a real cluster with lots of data and lots of concurrent processing, there would be many `part-NNNNN` files. They contain the actual data. The `_SUCCESS` file is a useful convention that signals the end of processing. It's useful because tools that are watching for the data to be written so they can perform subsequent processing will know the files are complete when they see this marker file. Finally, there are "hidden" CRC files for these other two files.
 
-There are exercises in the file and solutions for some of them, for example <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.
+**Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?
+
+There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.
 
 ## WordCount3:
 
@@ -309,12 +315,14 @@ This exercise also implements *Word Count*, but it uses a slightly simpler appro
 Finally, it does some data cleansing to improve the results. The sacred text files included in the `data` directory, such as `kjvdat.txt` are actually formatted records of the form:
 
 ```
-book|chapter|verse|text
+book|chapter#|verse#|text
 ```
 
-That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but abbreviated "Gen"), the chapter and verse numbers, and then the verse text. We just want to word count the verses, although including the book names would be fine.
+That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but abbreviated "Gen"), the chapter and verse numbers, and then the verse text. We just want to count words in the verses, although including the book names wouldn't change the results significantly. (Now you can figure out the answer to the "quiz" in the previous section...)
 
-Command line options can be used to override the defaults. You'll have to use `sbt` from a command window to use this feature. Note the use of the `run-main` task that lets us specify a particular "main" to run and optional arguments. The "\" are used to wrap long lines, `[...]` indicate optional arguments, and `|` indicate alternative flags:
+Command line options can be used to override the defaults. You'll have to use `sbt` from a command window to use this feature, and you'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments. 
+
+The "\" characters in the following and subsequent command descriptions are used to indicate long lines that I wrapped to fit. Enter the commands on a single line without the "\". I use `[...]` to indicate optional arguments, and `|` to indicate alternative flags:
 
 ```
 run-main spark.WordCount3 [ -h | --help] \ 
@@ -334,15 +342,25 @@ Where the options have the following meanings:
 -q | --quiet    Suppress some informational output.
 ```
 
-You can try different variants of `local[k]`, but keep k less than the number of cores in your machine. The `input` and `master` arguments are basically the same things we discussed for `WordCount2`, but the `output` argument is used slightly differently. As we'll see, we'll output the results using a different mechanism than before, so the `output/kjvdat-wc3` (or your override) will be converted to file (not a Hadoop-style directory) `output/kjvdat-wc3-${now}.txt`, where `${now}` will be replaced with the current timestamp. The `quiet` option is mostly for the automated tests benefit.
+Here is an example that simply specifies all the default values for the options (again, all on one line without the "\"):
 
-When you specify an input path for Spark, you can specify `bash`-style "globs" and even a list of them.
+```
+run-main spark.WordCount3 \ 
+  --input data/kjvdat.txt --output output/kjv-wc3 \ 
+  --master local
+```
+
+You can try different variants of `local[k]` for the `master` option, but keep `k` less than the number of cores in your machine. 
+
+The `input` and `master` arguments are basically the same things we discussed for `WordCount2`, but the `output` argument is used slightly differently. As we'll see, we'll output the results using a different mechanism than before, so the `output/kjvdat-wc3` (or your alternative) will be converted to a simple file, not a Hadoop-style directory; `output/kjvdat-wc3-${now}`, where `${now}` will be replaced with the current timestamp. The `quiet` option is mostly for the automated tests to use.
+
+When you specify an input path for Spark, you can specify `bash`-style "globs" and even a list of them:
 
 * `data/foo`: Just the file `foo` or if it's a directory, all its files, one level deep (unless the program does some extra handling itself).
 * `data/foo*.txt`: All files in `data` whose names start with `foo` and end with the `.txt` extension.
 * `data/foo*.txt,data2/bar*.dat`: A comma-separated list of globs.
 
-Here is the implementation of `WordCount3`, in sections:
+Okay, with that out of the way, let's walk through the implementation of `WordCount3`, in sections:
 
 ```
 package spark
@@ -351,7 +369,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-As before, but with our new `CommandLineOptions` and `Timestamp` utilities.
+As before, but with our new `CommandLineOptions` and `Timestamp` utilities. (Note how Scala provides a concise syntax for selectively importing a few types in a package.)
 
 ```
 object WordCount3 {
@@ -367,7 +385,7 @@ object WordCount3 {
     val argz = options(args.toList)
 ```
 
-I won't discuss the implementation of <a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument to this method is the default value. 
+I won't discuss the implementation of <a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option. 
 
 ```
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
@@ -378,7 +396,7 @@ I won't discuss the implementation of <a class="shortcut" href="#code/src/main/s
       input.cache
 ```
 
-It starts out much like `WordCount2`, but it splits each line into fields, where the lines are of the form: `book|chapter|verse|text`. Only the text is kept. The output is an RDD that we then cache as before. Note that calling `last` on the split array is robust against lines that don't have the delimiter, if there are any; it simply returns the whole original string.
+It starts out much like `WordCount2`, but it splits each line into fields, where the lines are of the form: `book|chapter#|verse#|text`. Only the text is kept. The `input` reference is an *RDD* that we then cache, as before. Note that calling `last` on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.
 
 ```
       val wc2 = input
@@ -386,7 +404,7 @@ It starts out much like `WordCount2`, but it splits each line into fields, where
         .countByValue()  // Returns a Map[T, Long]
 ```
 
-Split on non-alphanumeric sequences of character as before, but rather than map to `(word, 1)` tuples and use `reduceByKey`, as we did in `WordCount2`, we simply treat the words as values and call `countByValue` to count the unique occurrences.
+Take input and split on non-alphanumeric sequences of character as we did in `WordCount2`, but rather than map to `(word, 1)` tuples and use `reduceByKey`, we simply treat the words as values and call `countByValue` to count the unique occurrences. Hence, a simpler (and probably more efficient) approach.
 
 ```
       val now = Timestamp.now()
@@ -409,7 +427,7 @@ Split on non-alphanumeric sequences of character as before, but rather than map 
 }
 ```
 
-The result of `countByValue` is a Scala array, not an RDD, so we use conventional Java I/O to write the output. Note the warning; failure to close the stream explicit appears to cause data truncation when the `SparkContext` is stopped before the stream is flushed.
+The result of `countByValue` is a Scala `Map`, not an *RDD*, so we use conventional Java I/O to write the output. Note the warning in the comment; failure to close the stream explicitly appears to cause data truncation when the `SparkContext` is stopped before the stream is flushed.
 
 Don't forget the try the exercises at the end of the source file. 
 
@@ -417,17 +435,17 @@ Don't forget the try the exercises at the end of the source file.
 
 <a class="shortcut" href="#code/src/main/scala/spark/Matrix4.scala">Matrix4.scala</a> 
 
-Spark was originally used for Machine Learning algorithms. It has a built-in Matrix API that is useful for many machine learning algorithms. This exercise explores it briefly.
+An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.
 
 The sample data is generated internally; there is no input that is read. The output is written to the console.
 
-Here is the `run-main` command with options:
+Here is the `run-main` command with optional arguments:
 
 ```
 run-main spark.Matrix4 [m [n]]
 ```
 
-Where the smaller set of supported options are:
+The supported options are:
 
 ```
 m   Number of rows (default: 5)
@@ -489,9 +507,11 @@ object Matrix4 {
 }
 ```
 
-The comments explain most of the steps. The crucial part is the call to `parallelize` that creates N parallel operations. If you have less than N cores, some of the operations will have to run sequentially. The argument to `parallelize` is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to `i`. We then grab the `i-1` row (because of zero indexing) and use the `reduce` method to sum the column elements. A final tuple with the sum and the average is returned. 
+The comments explain most of the steps. The crucial part is the call to `parallelize` that creates N parallel operations. If you have less than N cores available, some of the operations will have to wait for an available core. 
 
-The `collect` method is called to convert the RDD to an array, because we're just going to print results to the console. The expression `sums_avgs.zipWithIndex` creates a tuple with each `sumb_avgs` value and it's index into the collection. We use that to print the row index.
+The argument to `parallelize` is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to `i`. We then grab the `i-1` row (because of zero indexing) and use the `reduce` method to sum the column elements. A final tuple with the sum and the average is returned. 
+
+The `collect` method is called to convert the RDD to an array, because we're just going to print results to the console. The expression `sums_avgs.zipWithIndex` creates a tuple with each `sums_avgs` value and it's index into the collection. We use that to print the row index.
 
 ## Crawl5a
 
@@ -511,7 +531,15 @@ run-main spark.Crawl5a [ -h | --help] \
 
 In this case, no timestamp is appended to the output path, since it will be read by the next exercise `InvertedIndex5b`. So, if you rerun `Crawl5a`, you'll have to delete or rename the previous output manually.
 
-Most of this code is straightforward. It's comments explain any complicated constructs used. 
+Most of this code is straightforward. Its comments explain any complicated constructs used. 
+
+The output format is demonstrated with the following line from the output `(email_file_name, text)`:
+
+```
+(0038.2001-08-05.SA_and_HP.spam.txt,  Subject: free foreign currency newsletter ...)
+```
+
+The next step has to parse this format.
 
 ## InvertedIndex5b
 
@@ -573,7 +601,9 @@ Note the function passed to `map`. It has the form:
 }
 ```
 
-There is now explicit argument list like we've used before. This syntax is the literal syntax for a *partial function*, a mathematical concept for a function that is not defined at all of its inputs. We have two `case` match clauses, one for when the regular expression successfully matches and returns the capture groups into variables `name` and `text` and the second which will match everything else, assigning the line to the variable `badLine`. (In fact, this catch-all clause makes the function *total*, not *partial*.) The function must return a two-element tuple, so the catch clause simply returns `("","")`.
+There is now explicit argument list like we've used before. This syntax is the literal syntax for a *partial function*, a mathematical concept for a function that is not defined at all of its inputs. It is implemented with Scala's `PartialFunction` type.
+
+We have two `case` match clauses, one for when the regular expression successfully matches and returns the capture groups into variables `name` and `text` and the second which will match everything else, assigning the line to the variable `badLine`. (In fact, this catch-all clause makes the function *total*, not *partial*.) The function must return a two-element tuple, so the catch clause simply returns `("","")`.
 
 Note that the specified or default `input-path` is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.
 
@@ -617,13 +647,21 @@ Note that the specified or default `input-path` is a directory with Hadoop-style
 }
 ```
 
-See if you can understand what this sequence of transformations is doing. The end goal is to output each record string in the following form: `(word, (doc1, n1), (doc2, n2), ...)`:
+See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first "N" lines of the crawl output), then hack on the script to output some of the results from each step. 
+
+A few useful [RDD](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
+
+The end goal is to output each record string in the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
+
+```
+(ability,(0018.2003-12-18.GP.spam.txt,2), (0020.2001-07-28.SA_and_HP.spam.txt,1))
+```
 
 ## NGrams6
 
 <a class="shortcut" href="#code/src/main/scala/spark/NGrams6.scala">NGrams6.scala</a> 
 
-In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N=3-5 appears to provide the optimal balance.
+In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
 This exercise finds all NGrams matching a user-specified pattern. The default is the 4-word phrases the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the user can also specify an NGram Phrase that is a regular expression or a mixture, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, or `hated` as the second word. 
 
@@ -645,13 +683,7 @@ Where
 -n | --ngrams string  Match string (default "% love % %"). Quote the string!
 ```
                       
-The `%` are wildcards for words and the whitespace is replaced with a more general regular expression. You can specify regular expressions if you want. What would the following match?
-
-```
--n "% (lov|hat)ed? % %"
-```
-
-Here r yur codez:
+I'm in yür codez:
 
 ```
 package spark
@@ -706,11 +738,12 @@ object NGrams6 {
     val ngramsStr = argz("ngrams").toString.toLowerCase
     // Note that the replacement strings use Scala's triple quotes; necessary
     // to ensure that the final string is "\w+" and "\s+" for the reges.
-    val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
+    val ngramsRE = 
+      ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
     val n = argz("count").toInt
 ```
 
-Without discussing the details, this exercise defines two new `Opt` instances for handling the NGram phrase and count options. Because we allow the user to mix `%` characters for word wildcards and regular expressions, we convert the `%` to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.
+Without discussing the details, this example defines two new `Opt` instances for handling the NGram phrase and count options. Because we allow the user to mix `%` characters for word wildcards and regular expressions, we convert the `%` to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.
 
 ``` 
     try {
@@ -794,7 +827,7 @@ object Joins7 {
     val sc = new SparkContext(argz("master").toString, "Joins (7)")
 ```
 
-The input sacred text (default: `data/kjvdat.txt`) is assumed to have the format `book|chapter|verse|text`:
+The input sacred text (default: `data/kjvdat.txt`) is assumed to have the format `book|chapter#|verse#|text`:
 
 ```
     try {
@@ -827,7 +860,7 @@ Note the second argument to `split`. Just in case a full book name has a nested 
       val verses = input.join(abbrevs)
       
       if (input.count != verses.count) {
-        println(s"input count, ${input.count}, doesn't match output count, ${verses.count}")
+        println(s"input count != verses count (${input.count} != ${verses.count})")
       }
 ```
 
@@ -859,6 +892,8 @@ Lastly, we write the output:
 ```
 
 The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), with many other methods for computing "co-groups", outer joins, etc.
+
+You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not in the correct order! (See the exercises in the source file.) 
 
 ## SparkStreaming8
 

@@ -152,13 +152,15 @@ sup {
 	}
 }
 </style>
-<title>Apache Spark: A Tutorial</title>
+<title>Apache Spark: An Introductory Workshop</title>
 <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax:{inlineMath:[['$$$','$$$']]}});</script><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </head>
 <body>
-<h1>Apache Spark: A Tutorial</h1>
+<h1>Apache Spark: An Introductory Workshop</h1>
 
-<div><h2>Introduction</h2>
+<p><img src="http://spark.apache.org/docs/1.0.1/img/spark-logo-100x40px.png" alt="image" /></p>
+
+<h2>Introduction</h2>
 
 <p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications.</p>
 
@@ -166,7 +168,7 @@ sup {
 
 <p>We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a <em>Spark Shell</em>, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.</p>
 
-</div><div><h2>Why Spark?</h2>
+<h2>Why Spark?</h2>
 
 <p>By 2013, it became increasingly clear that a successor was needed for the venerable <a href="http://wiki.apache.org/hadoop/MapReduce">Hadoop MapReduce</a> compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.</p>
 
@@ -174,7 +176,7 @@ sup {
 
 <p>Spark is now officially supported in <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">Cloudera CDH5</a> and <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">MapR's distribution</a>. Hortonworks has not yet announced whether or not they will support Spark natively, but <a href="http://spark.apache.org/docs/1.0.0/cluster-overview.html">this page</a> in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.</p>
 
-</div><div><h2>Spark Clusters</h2>
+<h2>Spark Clusters</h2>
 
 <p>Let's briefly discuss the anatomy of a Spark standalone cluster, adapting <a href="http://spark.apache.org/docs/1.0.0/cluster-overview.html">this discussion (and diagram) from the Spark documentation</a>. Consider the following diagram:</p>
 
@@ -186,7 +188,7 @@ sup {
 
 <p>When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.</p>
 
-</div><div><h2>Spark Deployment Options</h2>
+<h2>Spark Deployment Options</h2>
 
 <p>Spark currently supports <a href="http://spark.apache.org/docs/1.0.0/cluster-overview.html">three cluster managers</a>:</p>
 
@@ -205,7 +207,7 @@ sup {
 
 <p>Spark also includes <a href="http://spark.apache.org/docs/1.0.0/ec2-scripts.html">EC2 launch scripts</a> for running clusters on Amazon EC2.</p>
 
-</div><div><h2>Resilient, Distributed Datasets</h2>
+<h2>Resilient, Distributed Datasets</h2>
 
 <p>The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in <em>Resilient, Distributed Datasets</em> (RDDs), where a logical data set is virtualized over the cluster.</p>
 
@@ -215,33 +217,31 @@ sup {
 
 <p>The architecture of RDDs is described in the research paper <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a>.</p>
 
-</div><div><h2>The Spark Version</h2>
+<h2>The Spark Version</h2>
 
-<p>This workshop uses Spark 1.0.0.</p>
+<p>This workshop uses Spark 1.0.1.</p>
 
 <p>The following documentation links provide more information about Spark:</p>
 
 <ul>
-<li><a href="http://spark.apache.org/docs/1.0.0/">Documentation</a>.</li>
-<li><a href="http://spark.apache.org/docs/1.0.0/api/core/index.html#org.apache.spark.package">API</a>.</li>
+<li><a href="http://spark.apache.org/docs/1.0.1/">Documentation</a>.</li>
+<li><a href="http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package">Scaladocs API</a>.</li>
 </ul>
 
 
-<p>The <a href="http://spark.apache.org/docs/1.0.0/">Documentation</a> includes a getting-started guide, overviews, and the <em>Scaladocs</em> reference pages.</p>
+<p>The <a href="http://spark.apache.org/docs/1.0.1/">Documentation</a> includes a getting-started guide and overviews. You'll find the <a href="http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package">Scaladocs API</a> useful for the workshop.</p>
 
-</div><div><h2>Building and Testing</h2>
+<h2>Building and Testing</h2>
 
-<p>If you're using the <a href="http://typesafe.com/activator">Activator UI</a>, search for <code>activator-spark</code> and install it in the UI. The code is built automatically.</p>
+<p>If you're using the <a href="http://typesafe.com/activator">Typesafe Activator UI</a>, search for <code>activator-spark</code> and install it in the UI. The code is built automatically.</p>
 
 <p>If you grabbed this workshop from <a href="https://github.com/deanwampler/activator-spark">Github</a>, you'll need to install <code>sbt</code> and use a command line to build and run the applications. In that case, see the <a href="http://www.scala-sbt.org/">sbt website</a> for instructions on installing <code>sbt</code>.</p>
 
-<p>If you're using the Activator UI, first run the automated tests with <a class="shortcut" href="#test">test</a>.</p>
+<p>To compile the code and run the tests, either use the Activator UI <a class="shortcut" href="#test">test</a> link or start <code>sbt</code> and enter <code>test</code> at the prompt.</p>
 
-<p>If you are using <code>sbt</code> from the command line, start <code>sbt</code>, then type <code>test</code>.</p>
+<p>Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the <em>Spark Streaming</em> exercise, which uses multiple processes.</p>
 
-<p>Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the last <em>Spark Streaming</em> exercise (for various reasons...).</p>
-
-</div><div><h2>Running the Exercises</h2>
+<h2>Running the Exercises</h2>
 
 <p>Next, let's try running one of the exercises.</p>
 
@@ -249,9 +249,9 @@ sup {
 
 <p>In <code>sbt</code>, enter <code>run</code>. It will present the same list of main classes. Enter one of the numbers to select the executable you want to run. Enter the number in the <code>[...]</code> brackets corresponding to  <strong>WordCount2</strong> to verify that everything works.</p>
 
-<p>Note that the exercises with package names that contain <code>solns</code> are solutions to exercises. The <code>other</code> package has alternative implementations for your consideration.</p>
+<p>Note that the some exercises have package names with the word <code>solns</code>. They are solutions to the exercises. The <code>other</code> package has alternative implementations of some examples or exercises, for your consideration.</p>
 
-</div><div><h2>The Exercises</h2>
+<h2>The Exercises</h2>
 
 <p>Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:</p>
 
@@ -270,7 +270,7 @@ sup {
 
 <p>Let's now work through these exercises...</p>
 
-</div><div><h2>Intro1:</h2>
+<h2>Intro1:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a></p>
 
@@ -292,7 +292,7 @@ sbt
 
 <p>At the <code>sbt</code> prompt, type <code>console</code>. You'll see a welcome message and a <code>scala&gt;</code> prompt.</p>
 
-<p>We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. Here is the content of the script without the comments, but broken into sections with discussions:</p>
+<p>We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:</p>
 
 <pre><code>import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -368,13 +368,17 @@ if (output.exists == false) output.mkdir
 <p>Now, if we actually used the Spark Shell for this exercise, we would have omitted the two <code>import</code> statements and the statement where we created the <code>ScalaContext</code> value <code>sc</code>.
 The shell automatically does these steps for us.</p>
 
-<p>There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the <code>src/main/scala/spark/solns</code> directory. Solutions are provided for all the suggested exercises, but we do accept pull requests ;) All the solutions provided for the rest of the exercises are also built with the rest of the code, so you'll be able to run them the same way.</p>
+<p>There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the <code>src/main/scala/spark/solns</code> directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;)</p>
 
-<blockquote><p>Note: If you don't want to modify the original code when working on an exercise, just copy the file and give the exercise type a new name.</p></blockquote>
+<p>All the solutions provided for the rest of the exercises are compiled by <code>activator</code> or <code>sbt</code>, so you'll be able to run them the same way.</p>
+
+<blockquote><p>Note: If you don't want to modify the original code when working on an exercise, just copy and edit the file, and give the <code>object</code> (a <em>singleton</em> class) a new name.</p></blockquote>
+
+<p>You can exit the Scala "console" now. Type <code>:quit</code> or use <code>^d</code> (control-d). You'll be back at the <code>sbt</code> prompt.</p>
 
 <p>Before moving on, let's discuss how you would actually run the Spark Shell. When you <a href="TODO">download a full Spark distribution</a>, it includes a <code>bin</code> directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command <code>bin/spark-shell</code> (assuming your working directory is the root of the distribution).</p>
 
-</div><div><h2>WordCount2:</h2>
+<h2>WordCount2:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a></p>
 
@@ -456,9 +460,11 @@ total 328
 
 <p>In a real cluster with lots of data and lots of concurrent processing, there would be many <code>part-NNNNN</code> files. They contain the actual data. The <code>_SUCCESS</code> file is a useful convention that signals the end of processing. It's useful because tools that are watching for the data to be written so they can perform subsequent processing will know the files are complete when they see this marker file. Finally, there are "hidden" CRC files for these other two files.</p>
 
-<p>There are exercises in the file and solutions for some of them, for example <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.</p>
+<p><strong>Quiz:</strong> If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?</p>
 
-</div><div><h2>WordCount3:</h2>
+<p>There are exercises described in the source file. Solutions for some of them are implemented in the <code>solns</code> package. For example, <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.</p>
+
+<h2>WordCount3:</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/WordCount3.scala">WordCount3.scala</a></p>
 
@@ -466,12 +472,14 @@ total 328
 
 <p>Finally, it does some data cleansing to improve the results. The sacred text files included in the <code>data</code> directory, such as <code>kjvdat.txt</code> are actually formatted records of the form:</p>
 
-<pre><code>book|chapter|verse|text
+<pre><code>book|chapter#|verse#|text
 </code></pre>
 
-<p>That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but abbreviated "Gen"), the chapter and verse numbers, and then the verse text. We just want to word count the verses, although including the book names would be fine.</p>
+<p>That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but abbreviated "Gen"), the chapter and verse numbers, and then the verse text. We just want to count words in the verses, although including the book names wouldn't change the results significantly. (Now you can figure out the answer to the "quiz" in the previous section...)</p>
 
-<p>Command line options can be used to override the defaults. You'll have to use <code>sbt</code> from a command window to use this feature. Note the use of the <code>run-main</code> task that lets us specify a particular "main" to run and optional arguments. The "\" are used to wrap long lines, <code>[...]</code> indicate optional arguments, and <code>|</code> indicate alternative flags:</p>
+<p>Command line options can be used to override the defaults. You'll have to use <code>sbt</code> from a command window to use this feature, and you'll have to use the <code>run-main</code> task, which lets us specify a particular <code>main</code> to run and optional arguments.</p>
+
+<p>The "\" characters in the following and subsequent command descriptions are used to indicate long lines that I wrapped to fit. Enter the commands on a single line without the "\". I use <code>[...]</code> to indicate optional arguments, and <code>|</code> to indicate alternative flags:</p>
 
 <pre><code>run-main spark.WordCount3 [ -h | --help] \ 
   [-i | --in | --inpath input] \ 
@@ -489,9 +497,18 @@ total 328
 -q | --quiet    Suppress some informational output.
 </code></pre>
 
-<p>You can try different variants of <code>local[k]</code>, but keep k less than the number of cores in your machine. The <code>input</code> and <code>master</code> arguments are basically the same things we discussed for <code>WordCount2</code>, but the <code>output</code> argument is used slightly differently. As we'll see, we'll output the results using a different mechanism than before, so the <code>output/kjvdat-wc3</code> (or your override) will be converted to file (not a Hadoop-style directory) <code>output/kjvdat-wc3-${now}.txt</code>, where <code>${now}</code> will be replaced with the current timestamp. The <code>quiet</code> option is mostly for the automated tests benefit.</p>
+<p>Here is an example that simply specifies all the default values for the options (again, all on one line without the "\"):</p>
 
-<p>When you specify an input path for Spark, you can specify <code>bash</code>-style "globs" and even a list of them.</p>
+<pre><code>run-main spark.WordCount3 \ 
+  --input data/kjvdat.txt --output output/kjv-wc3 \ 
+  --master local
+</code></pre>
+
+<p>You can try different variants of <code>local[k]</code> for the <code>master</code> option, but keep <code>k</code> less than the number of cores in your machine.</p>
+
+<p>The <code>input</code> and <code>master</code> arguments are basically the same things we discussed for <code>WordCount2</code>, but the <code>output</code> argument is used slightly differently. As we'll see, we'll output the results using a different mechanism than before, so the <code>output/kjvdat-wc3</code> (or your alternative) will be converted to a simple file, not a Hadoop-style directory; <code>output/kjvdat-wc3-${now}</code>, where <code>${now}</code> will be replaced with the current timestamp. The <code>quiet</code> option is mostly for the automated tests to use.</p>
+
+<p>When you specify an input path for Spark, you can specify <code>bash</code>-style "globs" and even a list of them:</p>
 
 <ul>
 <li><code>data/foo</code>: Just the file <code>foo</code> or if it's a directory, all its files, one level deep (unless the program does some extra handling itself).</li>
@@ -500,7 +517,7 @@ total 328
 </ul>
 
 
-<p>Here is the implementation of <code>WordCount3</code>, in sections:</p>
+<p>Okay, with that out of the way, let's walk through the implementation of <code>WordCount3</code>, in sections:</p>
 
 <pre><code>package spark
 import spark.util.{CommandLineOptions, Timestamp}
@@ -508,7 +525,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 </code></pre>
 
-<p>As before, but with our new <code>CommandLineOptions</code> and <code>Timestamp</code> utilities.</p>
+<p>As before, but with our new <code>CommandLineOptions</code> and <code>Timestamp</code> utilities. (Note how Scala provides a concise syntax for selectively importing a few types in a package.)</p>
 
 <pre><code>object WordCount3 {
   def main(args: Array[String]) = {
@@ -523,7 +540,7 @@ import org.apache.spark.SparkContext._
     val argz = options(args.toList)
 </code></pre>
 
-<p>I won't discuss the implementation of <a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an <code>Opt</code> type, one for each of the options we discussed above. The single argument to this method is the default value.</p>
+<p>I won't discuss the implementation of <a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an <code>Opt</code> type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., <code>CommandLineOptions.inputPath("data/kjvdat.txt")</code>) specifies the default value for that option.</p>
 
 <pre><code>    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
 
@@ -533,14 +550,14 @@ import org.apache.spark.SparkContext._
       input.cache
 </code></pre>
 
-<p>It starts out much like <code>WordCount2</code>, but it splits each line into fields, where the lines are of the form: <code>book|chapter|verse|text</code>. Only the text is kept. The output is an RDD that we then cache as before. Note that calling <code>last</code> on the split array is robust against lines that don't have the delimiter, if there are any; it simply returns the whole original string.</p>
+<p>It starts out much like <code>WordCount2</code>, but it splits each line into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. Only the text is kept. The <code>input</code> reference is an <em>RDD</em> that we then cache, as before. Note that calling <code>last</code> on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.</p>
 
 <pre><code>      val wc2 = input
         .flatMap(line =&gt; line.split("""\W+"""))
         .countByValue()  // Returns a Map[T, Long]
 </code></pre>
 
-<p>Split on non-alphanumeric sequences of character as before, but rather than map to <code>(word, 1)</code> tuples and use <code>reduceByKey</code>, as we did in <code>WordCount2</code>, we simply treat the words as values and call <code>countByValue</code> to count the unique occurrences.</p>
+<p>Take input and split on non-alphanumeric sequences of character as we did in <code>WordCount2</code>, but rather than map to <code>(word, 1)</code> tuples and use <code>reduceByKey</code>, we simply treat the words as values and call <code>countByValue</code> to count the unique occurrences. Hence, a simpler (and probably more efficient) approach.</p>
 
 <pre><code>      val now = Timestamp.now()
       val outpath = s"${argz("output-path")}-$now"
@@ -562,24 +579,24 @@ import org.apache.spark.SparkContext._
 }
 </code></pre>
 
-<p>The result of <code>countByValue</code> is a Scala array, not an RDD, so we use conventional Java I/O to write the output. Note the warning; failure to close the stream explicit appears to cause data truncation when the <code>SparkContext</code> is stopped before the stream is flushed.</p>
+<p>The result of <code>countByValue</code> is a Scala <code>Map</code>, not an <em>RDD</em>, so we use conventional Java I/O to write the output. Note the warning in the comment; failure to close the stream explicitly appears to cause data truncation when the <code>SparkContext</code> is stopped before the stream is flushed.</p>
 
 <p>Don't forget the try the exercises at the end of the source file.</p>
 
-</div><div><h2>Matrix4</h2>
+<h2>Matrix4</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Matrix4.scala">Matrix4.scala</a></p>
 
-<p>Spark was originally used for Machine Learning algorithms. It has a built-in Matrix API that is useful for many machine learning algorithms. This exercise explores it briefly.</p>
+<p>An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.</p>
 
 <p>The sample data is generated internally; there is no input that is read. The output is written to the console.</p>
 
-<p>Here is the <code>run-main</code> command with options:</p>
+<p>Here is the <code>run-main</code> command with optional arguments:</p>
 
 <pre><code>run-main spark.Matrix4 [m [n]]
 </code></pre>
 
-<p>Where the smaller set of supported options are:</p>
+<p>The supported options are:</p>
 
 <pre><code>m   Number of rows (default: 5)
 n   Number of columns (default: 10)
@@ -638,11 +655,13 @@ object Matrix4 {
 }
 </code></pre>
 
-<p>The comments explain most of the steps. The crucial part is the call to <code>parallelize</code> that creates N parallel operations. If you have less than N cores, some of the operations will have to run sequentially. The argument to <code>parallelize</code> is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to <code>i</code>. We then grab the <code>i-1</code> row (because of zero indexing) and use the <code>reduce</code> method to sum the column elements. A final tuple with the sum and the average is returned.</p>
+<p>The comments explain most of the steps. The crucial part is the call to <code>parallelize</code> that creates N parallel operations. If you have less than N cores available, some of the operations will have to wait for an available core.</p>
 
-<p>The <code>collect</code> method is called to convert the RDD to an array, because we're just going to print results to the console. The expression <code>sums_avgs.zipWithIndex</code> creates a tuple with each <code>sumb_avgs</code> value and it's index into the collection. We use that to print the row index.</p>
+<p>The argument to <code>parallelize</code> is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to <code>i</code>. We then grab the <code>i-1</code> row (because of zero indexing) and use the <code>reduce</code> method to sum the column elements. A final tuple with the sum and the average is returned.</p>
 
-</div><div><h2>Crawl5a</h2>
+<p>The <code>collect</code> method is called to convert the RDD to an array, because we're just going to print results to the console. The expression <code>sums_avgs.zipWithIndex</code> creates a tuple with each <code>sums_avgs</code> value and it's index into the collection. We use that to print the row index.</p>
+
+<h2>Crawl5a</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Crawl5a.scala">Crawl5a.scala</a></p>
 
@@ -659,9 +678,16 @@ object Matrix4 {
 
 <p>In this case, no timestamp is appended to the output path, since it will be read by the next exercise <code>InvertedIndex5b</code>. So, if you rerun <code>Crawl5a</code>, you'll have to delete or rename the previous output manually.</p>
 
-<p>Most of this code is straightforward. It's comments explain any complicated constructs used.</p>
+<p>Most of this code is straightforward. Its comments explain any complicated constructs used.</p>
 
-</div><div><h2>InvertedIndex5b</h2>
+<p>The output format is demonstrated with the following line from the output <code>(email_file_name, text)</code>:</p>
+
+<pre><code>(0038.2001-08-05.SA_and_HP.spam.txt,  Subject: free foreign currency newsletter ...)
+</code></pre>
+
+<p>The next step has to parse this format.</p>
+
+<h2>InvertedIndex5b</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/InvertedIndex5b.scala">InvertedIndex5b.scala</a></p>
 
@@ -718,7 +744,9 @@ object InvertedIndex5b {
 }
 </code></pre>
 
-<p>There is now explicit argument list like we've used before. This syntax is the literal syntax for a <em>partial function</em>, a mathematical concept for a function that is not defined at all of its inputs. We have two <code>case</code> match clauses, one for when the regular expression successfully matches and returns the capture groups into variables <code>name</code> and <code>text</code> and the second which will match everything else, assigning the line to the variable <code>badLine</code>. (In fact, this catch-all clause makes the function <em>total</em>, not <em>partial</em>.) The function must return a two-element tuple, so the catch clause simply returns <code>("","")</code>.</p>
+<p>There is now explicit argument list like we've used before. This syntax is the literal syntax for a <em>partial function</em>, a mathematical concept for a function that is not defined at all of its inputs. It is implemented with Scala's <code>PartialFunction</code> type.</p>
+
+<p>We have two <code>case</code> match clauses, one for when the regular expression successfully matches and returns the capture groups into variables <code>name</code> and <code>text</code> and the second which will match everything else, assigning the line to the variable <code>badLine</code>. (In fact, this catch-all clause makes the function <em>total</em>, not <em>partial</em>.) The function must return a two-element tuple, so the catch clause simply returns <code>("","")</code>.</p>
 
 <p>Note that the specified or default <code>input-path</code> is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.</p>
 
@@ -761,13 +789,20 @@ object InvertedIndex5b {
 }
 </code></pre>
 
-<p>See if you can understand what this sequence of transformations is doing. The end goal is to output each record string in the following form: <code>(word, (doc1, n1), (doc2, n2), ...)</code>:</p>
+<p>See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first "N" lines of the crawl output), then hack on the script to output some of the results from each step.</p>
 
-</div><div><h2>NGrams6</h2>
+<p>A few useful <a href="http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> methods include <code>RDD.sample</code> or <code>RDD.take</code>, to select a subset of elements. Use <code>RDD.saveAsTextFile</code> to write to a file or use <code>RDD.collect</code> to convert the RDD data into a "normal" collection and then use one of the <code>print*</code> methods to dump the contents.</p>
+
+<p>The end goal is to output each record string in the following form: <code>(word, (doc1, n1), (doc2, n2), ...)</code>. For example, the word "ability" appears twice in one email and once in another (both SPAM):</p>
+
+<pre><code>(ability,(0018.2003-12-18.GP.spam.txt,2), (0020.2001-07-28.SA_and_HP.spam.txt,1))
+</code></pre>
+
+<h2>NGrams6</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/NGrams6.scala">NGrams6.scala</a></p>
 
-<p>In <em>Natural Language Processing</em>, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or <em>NGrams</em>. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N=3-5 appears to provide the optimal balance.</p>
+<p>In <em>Natural Language Processing</em>, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or <em>NGrams</em>. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.</p>
 
 <p>This exercise finds all NGrams matching a user-specified pattern. The default is the 4-word phrases the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the user can also specify an NGram Phrase that is a regular expression or a mixture, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, or <code>hated</code> as the second word.</p>
 
@@ -787,12 +822,7 @@ object InvertedIndex5b {
 -n | --ngrams string  Match string (default "% love % %"). Quote the string!
 </code></pre>
 
-<p>The <code>%</code> are wildcards for words and the whitespace is replaced with a more general regular expression. You can specify regular expressions if you want. What would the following match?</p>
-
-<pre><code>-n "% (lov|hat)ed? % %"
-</code></pre>
-
-<p>Here r yur codez:</p>
+<p>I'm in yür codez:</p>
 
 <pre><code>package spark
 
@@ -846,11 +876,12 @@ object NGrams6 {
     val ngramsStr = argz("ngrams").toString.toLowerCase
     // Note that the replacement strings use Scala's triple quotes; necessary
     // to ensure that the final string is "\w+" and "\s+" for the reges.
-    val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
+    val ngramsRE = 
+      ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
     val n = argz("count").toInt
 </code></pre>
 
-<p>Without discussing the details, this exercise defines two new <code>Opt</code> instances for handling the NGram phrase and count options. Because we allow the user to mix <code>%</code> characters for word wildcards and regular expressions, we convert the <code>%</code> to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.</p>
+<p>Without discussing the details, this example defines two new <code>Opt</code> instances for handling the NGram phrase and count options. Because we allow the user to mix <code>%</code> characters for word wildcards and regular expressions, we convert the <code>%</code> to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.</p>
 
 <pre><code>    try {
       object CountOrdering extends Ordering[(String,Int)] {
@@ -883,7 +914,7 @@ We read the data as before, but note that because of our line orientation, we <e
 
 <p>The <code>map</code> and <code>reduceByKey</code> calls are just like we used previously for <code>WordCount2</code>, but now we're counting found NGrams. The final <code>takeOrdered</code> call combines sorting with taking the top <code>n</code> found. This is more efficient than separate sort, then take operations. As a rule, when you see a method that does two things like this, it's usually there for efficiency reasons!</p>
 
-</div><div><h2>Joins7</h2>
+<h2>Joins7</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/Joins7.scala">Joins7.scala</a></p>
 
@@ -931,7 +962,7 @@ We read the data as before, but note that because of our line orientation, we <e
     val sc = new SparkContext(argz("master").toString, "Joins (7)")
 </code></pre>
 
-<p>The input sacred text (default: <code>data/kjvdat.txt</code>) is assumed to have the format <code>book|chapter|verse|text</code>:</p>
+<p>The input sacred text (default: <code>data/kjvdat.txt</code>) is assumed to have the format <code>book|chapter#|verse#|text</code>:</p>
 
 <pre><code>    try {
       val input = sc.textFile(argz("input-path").toString)
@@ -961,7 +992,7 @@ We read the data as before, but note that because of our line orientation, we <e
       val verses = input.join(abbrevs)
 
       if (input.count != verses.count) {
-        println(s"input count, ${input.count}, doesn't match output count, ${verses.count}")
+        println(s"input count != verses count (${input.count} != ${verses.count})")
       }
 </code></pre>
 
@@ -992,7 +1023,9 @@ We read the data as before, but note that because of our line orientation, we <e
 
 <p>The <code>join</code> method we used is implemented by <a href="http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions">spark.rdd.PairRDDFunctions</a>, with many other methods for computing "co-groups", outer joins, etc.</p>
 
-</div><div><h2>SparkStreaming8</h2>
+<p>You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not in the correct order! (See the exercises in the source file.)</p>
+
+<h2>SparkStreaming8</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a></p>
 
@@ -1043,13 +1076,13 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>Where the default is <code>--inpath data/kjvdat.txt</code>.</p>
 
-</div><div><h2>How Spark Streaming Works</h2>
+<h2>How Spark Streaming Works</h2>
 
 <p>Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on <em>deltas</em> of data, say all the events received within 1-second intervals (which is what we used here). Those deltas are <code>RDDs</code> encapsulated in a <code>DStream</code> ("Discretized Stream").</p>
 
 <p>A <code>StreamingContext</code> is used to wrap the normal <code>SparkContext</code>, too.</p>
 
-</div><div><h2>The SparkStreaming8 Code</h2>
+<h2>The SparkStreaming8 Code</h2>
 
 <p>Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a>:</p>
 
@@ -1204,7 +1237,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>This is just the tip of the iceberg for Streaming. See the <a href="http://spark.apache.org/docs/1.0.0/streaming-programming-guide.html">Streaming Programming Guide</a> for more information.</p>
 
-</div><div><h2>Best Practices, Tips, and Tricks</h2>
+<h2>Best Practices, Tips, and Tricks</h2>
 
 <h3>Safe Closures</h3>
 
@@ -1239,7 +1272,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>Now, only <code>factor2</code> must be serialized.</p>
 
-</div><div><h2>Going Forward from Here</h2>
+<h2>Going Forward from Here</h2>
 
 <p>This template is not a complete Apache Spark tutorial. To learn more, see the following:</p>
 
@@ -1267,12 +1300,12 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 </ul>
 
 
-</div><div><h2>For more about Typesafe:</h2>
+<h2>For more about Typesafe:</h2>
 
 <ul>
 <li>See <a href="http://typesafe.com/activator">Typesafe Activator</a> to find other Activator templates.</li>
 <li>See <a href="http://typesafe.com">Typesafe</a> for more information about our products and services.</li>
 </ul>
-</div>
+
 </body>
 </html>
