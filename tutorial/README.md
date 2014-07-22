@@ -67,7 +67,7 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 A new API in Spark is [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop.
 
-Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive.
+Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new engine is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
@@ -115,7 +115,7 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
 * **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](data/README.html) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
 * **SparkSQLParquet10:** Demonstrates reading Parquet-formatted data, namely the data written in the previous example.
-* **HiveSQL10:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
+* **HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
 
@@ -1175,9 +1175,11 @@ Now, only `factor2` must be serialized.
 
 <a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a> 
 
-TODO
+The new Spark SQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as an alternative to the regular manipulation methods on the RDD type. There is also a builder DSL for constructing these queries, rather than using a string.
 
-Reads and parses the King James Bible text, `kjvdat.txt`.
+Furthermore, Spark SQL embeds access to a Hive _metastore_, so you can create, modify, and delete tables, query them, etc.
+
+This example treats the King James Bible text, `kjvdat.txt`, as a table with a schema. It runs several queries on the data and writes out data in the [Parquet](http://parquet.io) format, which is growing in popularity in the Hadoop world.
 
 As in the previous *Spark Workshop*, command line options can be used to override the defaults. We'll have to use `sbt` from a command window to use this feature (rather than the *Activator UI*), and we'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments. 
 
@@ -1205,17 +1207,95 @@ The options work the same as before, except we don't append a timestamp to the o
 
 **NOTE:** Because we don't append a timestamp to the output path, you'll get a runtime error if the directory already exists. Just delete or rename the existing directory, or specify a different output path.
 
-Code description TODO.
+The codez!
 
-As before, there are suggested exercises at the end of the source file. Some solutions are provided in the `solns` source package.
+```
+    val options = CommandLineOptions(...)  // as before
+    val argz = options(args.toList)
+
+    val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
+    val sqlc = new SQLContext(sc)
+    import sqlc._
+    
+    try {
+      ...
+    } finally {
+      sc.stop()
+    }
+
+```
+
+After the typical options parsing and creating a `SparkContext`, we create a special `SQLContext` that wraps then. The import statement that follows pulls in some context objects and "implicit" conversations needed later. Implicit conversions are invoked by the compiler when an instance of one object needs to be wrapped in or converted to another one, e.g., to create the illusion that you can call new methods on the object that aren't defined for the original type! (If you don't know Scala and you didn't follow that explanation, it's not critical for what follows.)
+
+Here is the contents of the `try` block:
+
+```
+      val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|...~?\s*$""".r
+      val verses = sc.textFile(argz("input-path").toString) flatMap {
+        case lineRE(book, chapter, verse, text) => 
+          Seq(Verse(book, chapter.toInt, verse.toInt, text))
+        case line => 
+          Console.err.println("Unexpected line: $line")
+          Seq.empty[Verse]  // Will be eliminated by flattening.
+      }
+      ...
+```
+
+Defines a regex to extract the fields on each line, separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
+
+```
+      verses.registerAsTable("kjv_bible")
+      verses.cache()
+
+      val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%';")    
+      println("Number of verses that mention God: "+godVerses.count())
+      godVerses
+        .collect()   // convert to a regular in-memory collection
+        .foreach(println) // print the query results.
+      ...
+```
+
+Registers the RDD as a temporary table in the Hive metadata store. A single process [Derby SQL](http://db.apache.org/derby/) database is used. It writes its data to a `metastore` directory in the current directory. The data is also cached in memory. 
+
+Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`SQLContext`) converts it to a The actual method is defined on `org.apache.spark.sql.SchemaRDD`, which provides the `registerAsTable` method.
+
+The call to `sql` was imported from the `sqlc` (`SQLContext`) instance. We can write a SQL query and the results are returned as a new RDD! We then `collect` it into an `Array[Verse]` and then print each line.
+
+```
+      val counts = sql("""
+        |SELECT book, COUNT(*) FROM kjv_bible GROUP BY book;
+        |""".stripMargin)
+        .coalesce(1)
+      println("Verses per book:")
+      counts
+        .collect()        // Convert to a regular in-memory collection.
+        .foreach(println) // Print the query results.
+      ...
+```
+
+Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
+
+Then take the RDD returned by the query and collect all partitions into 1 partition. Otherwise, there are hundreds of partitions output from the last query!
+
+Finally, collect the counts and write them out.
+
+```
+      val out = argz("output-path").toString
+      println(s"Saving 'verses' as a Parquet file to $out.")
+      println("NOTE: You'll get an error if the directory already exists!")
+      verses.saveAsParquetFile(out)
+```
+
+Lastly, write the data to a Parquet file. The implicit conversion from RDD to
+`org.apache.spark.sql.SchemaRDD` is invoked again to call its `saveAsParquetFile` method. Note that a benefit of Parquet is that the data schema is written to the file, too.
+
+That's it! As before, there are suggested exercises at the end of the source file. Some solutions are provided in the `solns` source package.
 
 ## SparkSQLParquet10
 
 <a class="shortcut" href="#code/src/main/scala/spark/SparkSQLParquet10.scala">SparkSQLParquet10.scala</a> 
 
-TODO
-
-Reads the Parquet output of the previous example and works with the data using the SQL API.
+This example continues the use of the Parquet support. It reads the data written by the previous example.
 
 The command-line options are similar, but there is no output option as all results are printed to the console:
 
@@ -1226,20 +1306,85 @@ run-main spark.SparkSQLParquet10 [ -h | --help] \
   [-q | --quiet]
 ```
 
-Code description TODO.
+The code is very similar up to the `try {...} finally {...}` expression in the previous example. We'll just discuss the code within the `try` block.
+
+```
+      println("Reading in the Parquet file from output/verses.parquet:")
+      val verses2 = sqlContext.parquetFile("output/verses.parquet")
+      verses2.registerAsTable("verses2")
+      ...
+```
+
+Read the Parquet data back in and register it as a table.
+
+```
+      println("Using the table from Parquet File, select Jesus verses:")
+      val jesusVerses = sql("SELECT * FROM verses2 WHERE text LIKE '%Jesus%';")
+      println("Number of Jesus Verses: "+jesusVerses.count())
+      ...
+```
+
+Run a SQL query like before.
+
+```
+      println("GROUP BY using the LINQ-style query API:")
+      import org.apache.spark.sql.catalyst.expressions.Sum
+
+      verses2.groupBy('book)(Sum('verse) as 'count).orderBy('count.desc)
+        .collect().foreach(println)
+```
+
+Finally, use the [LINQ](http://msdn.microsoft.com/en-us/library/bb397926.aspx)-inspired DSL that's implemented by the same class `SchemaRDD` we saw in the last example. 
+
+> Note: it seems like a bug that the `import` statement is required here.
 
 
 ## HiveSQL11
 
 <a class="shortcut" href="#code/src/main/scala/spark/HiveSQL11.scala">HiveSQL11.scala</a> 
 
-TODO
+The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, Spark SQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
 
-This is actually a script file, but you'll find it most useful if you start the `console` in SBT, then copy and paste the statements, to see what each one does. Then you can experiment with the API, especially if you already know Hive!.
+This is actually a script file, to emphasize the idea of using the REPL to do interactive analysis. IT works for the rest of the Spark SQL API, too. 
 
-Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but is not a production configuration.
+You'll find it most useful to start the `console` in SBT, then copy and paste groups of the statements, so you can see what each one does. Then you can experiment with the API, especially if you already know Hive!
 
-Code description TODO.
+Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
+
+```
+import org.apache.spark.SparkContext
+import org.apache.spark.sql._
+import org.apache.spark.sql.hive.LocalHiveContext
+import spark.util.Verse
+val sc = new SparkContext("local[2]", "Hive SQL (10)")
+val hiveContext = new LocalHiveContext(sc)
+import hiveContext._   // Make methods local, like for SQLContext
+...
+```
+
+Analogous to the previous examples, but now we crate a `LocalHiveContext`.
+
+```
+println("Create the 'external' kjv Hive table:")
+hql("""
+  |CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+  |  book    STRING,
+  |  chapter INT,
+  |  verse   INT,
+  |  text    STRING)
+  |ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+  |LOCATION '/tmp/data'
+  |""".stripMargin)
+...
+```
+
+Use HiveQL to create a table. In this case, an `EXTERNAL` table, where we just tell it use data in a particular directory (`LOCATION`). 
+
+A few things are necessary to do first or keep in mind:
+
+* You must first copy `data/kjvdat.txt` to an empty `/tmp/kjv` directory, because Hive expects the `LOCATION` to be an *absolute* directory path. Also, Hive (like all Hadoop applications) will expect this path to be a directory and it will read all the files in it. If you are on Windows (and not running Cygwin), pick a suitable location on your hard drive and change the `LOCATION` line to use the correct, absolute path.
+* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's REPL or scripts, they cause errors here!
+* The query results are returned in an RDD. To dump to the console, we use `collect.foreach(println)`, which converts the RDD to an in-memory array,    then loops over each record and prints the results.
 
 ## Going Forward from Here
 

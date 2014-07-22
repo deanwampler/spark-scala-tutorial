@@ -228,7 +228,7 @@ Typesafe<br/>
 
 <p>A new API in Spark is <a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">Spark SQL</a>, which adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in <a href="http://hive.apache.org">Hive</a>, the original SQL tool for Hadoop.</p>
 
-<p>Several years ago, the Spark team ported the Hive frontend to Spark, calling it <a href="http://shark.cs.berkeley.edu/">Shark</a>. That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive.</p>
+<p>Several years ago, the Spark team ported the Hive frontend to Spark, calling it <a href="http://shark.cs.berkeley.edu/">Shark</a>. That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new engine is called <a href="http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html">Catalyst</a>.</p>
 
 <h2>The Spark Version</h2>
 
@@ -280,7 +280,7 @@ Typesafe<br/>
 <li><strong>SparkStreaming8:</strong> The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
 <li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The <code>data</code> directory has a <a href="data/README.html">README</a> that discusses the sources of the data files.) This script ends by writing data in the de-facto standard <a href="http://parquet.io">Parquet</a> format that is increasingly popular in <em>Big Data</em> applications.</li>
 <li><strong>SparkSQLParquet10:</strong> Demonstrates reading Parquet-formatted data, namely the data written in the previous example.</li>
-<li><strong>HiveSQL10:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
+<li><strong>HiveSQL11:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
 </ul>
 
 
@@ -1292,9 +1292,11 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a></p>
 
-<p>TODO</p>
+<p>The new Spark SQL API extends RDDs with a "schema" for records, defined using a Scala <em>case class</em>, and allows you to embed queries using a subset of SQL in strings, as an alternative to the regular manipulation methods on the RDD type. There is also a builder DSL for constructing these queries, rather than using a string.</p>
 
-<p>Reads and parses the King James Bible text, <code>kjvdat.txt</code>.</p>
+<p>Furthermore, Spark SQL embeds access to a Hive <em>metastore</em>, so you can create, modify, and delete tables, query them, etc.</p>
+
+<p>This example treats the King James Bible text, <code>kjvdat.txt</code>, as a table with a schema. It runs several queries on the data and writes out data in the <a href="http://parquet.io">Parquet</a> format, which is growing in popularity in the Hadoop world.</p>
 
 <p>As in the previous <em>Spark Workshop</em>, command line options can be used to override the defaults. We'll have to use <code>sbt</code> from a command window to use this feature (rather than the <em>Activator UI</em>), and we'll have to use the <code>run-main</code> task, which lets us specify a particular <code>main</code> to run and optional arguments.</p>
 
@@ -1320,17 +1322,89 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p><strong>NOTE:</strong> Because we don't append a timestamp to the output path, you'll get a runtime error if the directory already exists. Just delete or rename the existing directory, or specify a different output path.</p>
 
-<p>Code description TODO.</p>
+<p>The codez!</p>
 
-<p>As before, there are suggested exercises at the end of the source file. Some solutions are provided in the <code>solns</code> source package.</p>
+<pre><code>    val options = CommandLineOptions(...)  // as before
+    val argz = options(args.toList)
+
+    val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
+    val sqlc = new SQLContext(sc)
+    import sqlc._
+
+    try {
+      ...
+    } finally {
+      sc.stop()
+    }
+</code></pre>
+
+<p>After the typical options parsing and creating a <code>SparkContext</code>, we create a special <code>SQLContext</code> that wraps then. The import statement that follows pulls in some context objects and "implicit" conversations needed later. Implicit conversions are invoked by the compiler when an instance of one object needs to be wrapped in or converted to another one, e.g., to create the illusion that you can call new methods on the object that aren't defined for the original type! (If you don't know Scala and you didn't follow that explanation, it's not critical for what follows.)</p>
+
+<p>Here is the contents of the <code>try</code> block:</p>
+
+<pre><code>      val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|...~?\s*$""".r
+      val verses = sc.textFile(argz("input-path").toString) flatMap {
+        case lineRE(book, chapter, verse, text) =&gt; 
+          Seq(Verse(book, chapter.toInt, verse.toInt, text))
+        case line =&gt; 
+          Console.err.println("Unexpected line: $line")
+          Seq.empty[Verse]  // Will be eliminated by flattening.
+      }
+      ...
+</code></pre>
+
+<p>Defines a regex to extract the fields on each line, separated by "|", and also removes the trailing "~" unique to this file. Then it invokes <code>flatMap</code> over the file lines (each considered a record) to extract each "good" lines and convert them into a <code>Verse</code> instances. <code>Verse</code> is defined in the <code>util</code> package. If a line is bad, a log message is written and an empty sequence is returned. Using <code>flatMap</code> and sequences means we'll effectively remove the bad lines.</p>
+
+<pre><code>      verses.registerAsTable("kjv_bible")
+      verses.cache()
+
+      val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%';")    
+      println("Number of verses that mention God: "+godVerses.count())
+      godVerses
+        .collect()   // convert to a regular in-memory collection
+        .foreach(println) // print the query results.
+      ...
+</code></pre>
+
+<p>Registers the RDD as a temporary table in the Hive metadata store. A single process <a href="http://db.apache.org/derby/">Derby SQL</a> database is used. It writes its data to a <code>metastore</code> directory in the current directory. The data is also cached in memory.</p>
+
+<p>Even though <code>verses</code> is an RDD, an "implicit" conversion imported from <code>sqlc</code> (<code>SQLContext</code>) converts it to a The actual method is defined on <code>org.apache.spark.sql.SchemaRDD</code>, which provides the <code>registerAsTable</code> method.</p>
+
+<p>The call to <code>sql</code> was imported from the <code>sqlc</code> (<code>SQLContext</code>) instance. We can write a SQL query and the results are returned as a new RDD! We then <code>collect</code> it into an <code>Array[Verse]</code> and then print each line.</p>
+
+<pre><code>      val counts = sql("""
+        |SELECT book, COUNT(*) FROM kjv_bible GROUP BY book;
+        |""".stripMargin)
+        .coalesce(1)
+      println("Verses per book:")
+      counts
+        .collect()        // Convert to a regular in-memory collection.
+        .foreach(println) // Print the query results.
+      ...
+</code></pre>
+
+<p>Note that the SQL dialect currently supported by the <code>sql</code> method is a subset of <a href="http://hive.apache.org">HiveSQL</a>. For example, it doesn't permit column aliasing, e.g., <code>COUNT(*) AS count</code>. Nor does it appear to support <code>WHERE</code> clauses in some situations.</p>
+
+<p>Then take the RDD returned by the query and collect all partitions into 1 partition. Otherwise, there are hundreds of partitions output from the last query!</p>
+
+<p>Finally, collect the counts and write them out.</p>
+
+<pre><code>      val out = argz("output-path").toString
+      println(s"Saving 'verses' as a Parquet file to $out.")
+      println("NOTE: You'll get an error if the directory already exists!")
+      verses.saveAsParquetFile(out)
+</code></pre>
+
+<p>Lastly, write the data to a Parquet file. The implicit conversion from RDD to
+<code>org.apache.spark.sql.SchemaRDD</code> is invoked again to call its <code>saveAsParquetFile</code> method. Note that a benefit of Parquet is that the data schema is written to the file, too.</p>
+
+<p>That's it! As before, there are suggested exercises at the end of the source file. Some solutions are provided in the <code>solns</code> source package.</p>
 
 <h2>SparkSQLParquet10</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/SparkSQLParquet10.scala">SparkSQLParquet10.scala</a></p>
 
-<p>TODO</p>
-
-<p>Reads the Parquet output of the previous example and works with the data using the SQL API.</p>
+<p>This example continues the use of the Parquet support. It reads the data written by the previous example.</p>
 
 <p>The command-line options are similar, but there is no output option as all results are printed to the console:</p>
 
@@ -1340,19 +1414,82 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
   [-q | --quiet]
 </code></pre>
 
-<p>Code description TODO.</p>
+<p>The code is very similar up to the <code>try {...} finally {...}</code> expression in the previous example. We'll just discuss the code within the <code>try</code> block.</p>
+
+<pre><code>      println("Reading in the Parquet file from output/verses.parquet:")
+      val verses2 = sqlContext.parquetFile("output/verses.parquet")
+      verses2.registerAsTable("verses2")
+      ...
+</code></pre>
+
+<p>Read the Parquet data back in and register it as a table.</p>
+
+<pre><code>      println("Using the table from Parquet File, select Jesus verses:")
+      val jesusVerses = sql("SELECT * FROM verses2 WHERE text LIKE '%Jesus%';")
+      println("Number of Jesus Verses: "+jesusVerses.count())
+      ...
+</code></pre>
+
+<p>Run a SQL query like before.</p>
+
+<pre><code>      println("GROUP BY using the LINQ-style query API:")
+      import org.apache.spark.sql.catalyst.expressions.Sum
+
+      verses2.groupBy('book)(Sum('verse) as 'count).orderBy('count.desc)
+        .collect().foreach(println)
+</code></pre>
+
+<p>Finally, use the <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>-inspired DSL that's implemented by the same class <code>SchemaRDD</code> we saw in the last example.</p>
+
+<blockquote><p>Note: it seems like a bug that the <code>import</code> statement is required here.</p></blockquote>
 
 <h2>HiveSQL11</h2>
 
 <p><a class="shortcut" href="#code/src/main/scala/spark/HiveSQL11.scala">HiveSQL11.scala</a></p>
 
-<p>TODO</p>
+<p>The previous examples used the new <a href="http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html">Catalyst</a> query engine. However, Spark SQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.</p>
 
-<p>This is actually a script file, but you'll find it most useful if you start the <code>console</code> in SBT, then copy and paste the statements, to see what each one does. Then you can experiment with the API, especially if you already know Hive!.</p>
+<p>This is actually a script file, to emphasize the idea of using the REPL to do interactive analysis. IT works for the rest of the Spark SQL API, too.</p>
 
-<p>Note that the Hive "metadata" is stored in a <code>megastore</code> directory created in the current working directory. This is written and managed by Hive's embedded <a href="http://db.apache.org/derby/">Derby SQL</a> store, but is not a production configuration.</p>
+<p>You'll find it most useful to start the <code>console</code> in SBT, then copy and paste groups of the statements, so you can see what each one does. Then you can experiment with the API, especially if you already know Hive!</p>
 
-<p>Code description TODO.</p>
+<p>Note that the Hive "metadata" is stored in a <code>megastore</code> directory created in the current working directory. This is written and managed by Hive's embedded <a href="http://db.apache.org/derby/">Derby SQL</a> store, but it's not a production deployment option.</p>
+
+<pre><code>import org.apache.spark.SparkContext
+import org.apache.spark.sql._
+import org.apache.spark.sql.hive.LocalHiveContext
+import spark.util.Verse
+val sc = new SparkContext("local[2]", "Hive SQL (10)")
+val hiveContext = new LocalHiveContext(sc)
+import hiveContext._   // Make methods local, like for SQLContext
+...
+</code></pre>
+
+<p>Analogous to the previous examples, but now we crate a <code>LocalHiveContext</code>.</p>
+
+<pre><code>println("Create the 'external' kjv Hive table:")
+hql("""
+  |CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+  |  book    STRING,
+  |  chapter INT,
+  |  verse   INT,
+  |  text    STRING)
+  |ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+  |LOCATION '/tmp/data'
+  |""".stripMargin)
+...
+</code></pre>
+
+<p>Use HiveQL to create a table. In this case, an <code>EXTERNAL</code> table, where we just tell it use data in a particular directory (<code>LOCATION</code>).</p>
+
+<p>A few things are necessary to do first or keep in mind:</p>
+
+<ul>
+<li>You must first copy <code>data/kjvdat.txt</code> to an empty <code>/tmp/kjv</code> directory, because Hive expects the <code>LOCATION</code> to be an <em>absolute</em> directory path. Also, Hive (like all Hadoop applications) will expect this path to be a directory and it will read all the files in it. If you are on Windows (and not running Cygwin), pick a suitable location on your hard drive and change the <code>LOCATION</code> line to use the correct, absolute path.</li>
+<li><strong>Omit semicolons</strong> at the end of the HQL (Hive SQL) string. While those would be required in Hive's REPL or scripts, they cause errors here!</li>
+<li>The query results are returned in an RDD. To dump to the console, we use <code>collect.foreach(println)</code>, which converts the RDD to an in-memory array,    then loops over each record and prints the results.</li>
+</ul>
+
 
 <h2>Going Forward from Here</h2>
 
