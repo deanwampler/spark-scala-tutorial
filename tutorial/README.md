@@ -362,7 +362,7 @@ Here is an example that simply specifies all the default values for the options 
 
 ```
 run-main spark.WordCount3 \ 
-  --input data/kjvdat.txt --output output/kjv-wc3 \ 
+  --inpath data/kjvdat.txt --output output/kjv-wc3 \ 
   --master local
 ```
 
