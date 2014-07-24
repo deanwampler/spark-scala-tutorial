@@ -4,7 +4,7 @@ import spark.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in 
 // org.apache.spark.rdd.PairRDDFunctions
-// (http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
+// (http://spark.apache.org/docs/1.0.1/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
 import org.apache.spark.SparkContext._
 
 /**
@@ -65,14 +65,14 @@ object WordCount2 {
     //   The data directory contains similar files for the Tanach (t3utf.dat - in Hebrew),
     //   the Latin Vulgate (vuldat.txt), the Septuagint (sept.txt - Greek)
     // Exercise: See the Scaladoc page for `OrderedRDDFunctions`:
-    //   http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.OrderedRDDFunctions
+    //   http://spark.apache.org/docs/1.0.1/api/core/index.html#org.apache.spark.rdd.OrderedRDDFunctions
     //   Sort the output by word, try both ascending and descending.
     //   Note this can be expensive for large data sets!
     // Exercise: Take the output from the previous exercise and count the number
     //   of words that start with each letter of the alphabet and each digit.
     // Exercise (Hard): Sort the output by count. You can't use the same 
     //   approach as in the previous exercise. Hint: See RDD.keyBy
-    //   (http://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.rdd.RDD)
+    //   (http://spark.apache.org/docs/1.0.1/api/core/index.html#org.apache.spark.rdd.RDD)
     //   What's the most frequent word that isn't a "stop word".
     // Exercise (Hard): Group the word-count pairs by count. In other words,
     //   All pairs where the count is 1 are together (i.e., just one occurrence

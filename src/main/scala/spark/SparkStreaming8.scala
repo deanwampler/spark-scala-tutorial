@@ -103,7 +103,7 @@ object SparkStreaming8 {
     // running 24/7 in case of Spark Streaming applications). Note that any
     // RDD that persists in memory for more than this duration will be
     // cleared as well.
-    // See http://spark.apache.org/docs/0.9.0/configuration.html for more details.
+    // See http://spark.apache.org/docs/1.0.1/configuration.html for more details.
     // Also see http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html
     // for pointers to debug a "BlockManager" problem when streaming. Specifically
     // for this example, it was necessary to specify 2 cores using 
