@@ -105,7 +105,7 @@ Note that the some exercises have package names with the word `solns`. They are 
 Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
 * **Intro1:** Actually, this *isn't* listed by the `run` command, because it is a script we'll use with the interactive *Spark Shell*.
-* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](../data/README.md) that discusses the sources of the data files.)
+* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.)
 * **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 * **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
 * **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
@@ -113,7 +113,7 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`. 
 * **Joins7:** Spark supports SQL-style joins and this exercise provides a simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](../data/README.md) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
+* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
 * **SparkSQLParquet10:** Demonstrates reading Parquet-formatted data, namely the data written in the previous example.
 * **HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
@@ -169,7 +169,7 @@ input.cache
 
 Define a read-only variable `input` of type RDD (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case. 
 
-> The `data` directory has a [README](data/README.html) that discusses the files present and where they came from.
+> The `data` directory has a [README](../data/README.html) that discusses the files present and where they came from.
 
 Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides dramatic performance improvements.
 

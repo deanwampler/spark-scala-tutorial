@@ -270,7 +270,7 @@ Typesafe<br/>
 
 <ul>
 <li><strong>Intro1:</strong> Actually, this <em>isn't</em> listed by the <code>run</code> command, because it is a script we'll use with the interactive <em>Spark Shell</em>.</li>
-<li><strong>WordCount2:</strong> The <em>Word Count</em> algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The <code>data</code> directory has a <a href="data/README.html">README</a> that discusses the sources of the data files.)</li>
+<li><strong>WordCount2:</strong> The <em>Word Count</em> algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The <code>data</code> directory has a <a href="../data/README.html">README</a> that discusses the sources of the data files.)</li>
 <li><strong>WordCount3:</strong> An alternative implementation of <em>Word Count</em> that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</li>
 <li><strong>Matrix4:</strong> Demonstrates Spark's Matrix API, useful for many machine learning algorithms.</li>
 <li><strong>Crawl5a:</strong> Simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.</li>
@@ -278,7 +278,7 @@ Typesafe<br/>
 <li><strong>NGrams6:</strong> Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
 <li><strong>Joins7:</strong> Spark supports SQL-style joins and this exercise provides a simple example.</li>
 <li><strong>SparkStreaming8:</strong> The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.</li>
-<li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The <code>data</code> directory has a <a href="data/README.html">README</a> that discusses the sources of the data files.) This script ends by writing data in the de-facto standard <a href="http://parquet.io">Parquet</a> format that is increasingly popular in <em>Big Data</em> applications.</li>
+<li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The <code>data</code> directory has a <a href="../data/README.html">README</a> that discusses the sources of the data files.) This script ends by writing data in the de-facto standard <a href="http://parquet.io">Parquet</a> format that is increasingly popular in <em>Big Data</em> applications.</li>
 <li><strong>SparkSQLParquet10:</strong> Demonstrates reading Parquet-formatted data, namely the data written in the previous example.</li>
 <li><strong>HiveSQL11:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
 </ul>
@@ -337,7 +337,7 @@ input.cache
 
 <p>Define a read-only variable <code>input</code> of type RDD (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case.</p>
 
-<blockquote><p>The <code>data</code> directory has a <a href="data/README.html">README</a> that discusses the files present and where they came from.</p></blockquote>
+<blockquote><p>The <code>data</code> directory has a <a href="../data/README.html">README</a> that discusses the files present and where they came from.</p></blockquote>
 
 <p>Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides dramatic performance improvements.</p>
 
