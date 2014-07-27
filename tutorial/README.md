@@ -23,13 +23,13 @@ By 2013, it became increasingly clear that a successor was needed for the venera
 
 Spark was seen as the best, general-purpose alternative, so [Cloudera led the way](http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html) in embracing Spark as a replacement for MapReduce. 
 
-Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/). Hortonworks has not yet announced whether or not they will support Spark natively, but [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.
+Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has not yet announced whether or not they will support Spark natively, but [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.
 
 ## Spark Clusters
 
-Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.0.0/cluster-overview.html). Consider the following diagram:
+Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.0.1/cluster-overview.html). Consider the following diagram:
 
-![Spark Cluster](http://spark.apache.org/docs/1.0.0/img/cluster-overview.png)
+![Spark Cluster](http://spark.apache.org/docs/1.0.1/img/cluster-overview.png)
 
 Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, either Spark's own manager or the corresponding management services provided by [Mesos](http://mesos.apache.org/) or [Hadoop's YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html). The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
@@ -39,19 +39,19 @@ When possible, run the driver locally on the cluster to reduce network IO as it 
 
 ## Spark Deployment Options
 
-Spark currently supports [three cluster managers](http://spark.apache.org/docs/1.0.0/cluster-overview.html):
+Spark currently supports [three cluster managers](http://spark.apache.org/docs/1.0.1/cluster-overview.html):
 
-* [Standalone](http://spark.apache.org/docs/1.0.0/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
-* [Apache Mesos](http://spark.apache.org/docs/1.0.0/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
-* [Hadoop YARN](http://spark.apache.org/docs/1.0.0/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
+* [Standalone](http://spark.apache.org/docs/1.0.1/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
+* [Apache Mesos](http://spark.apache.org/docs/1.0.1/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
+* [Hadoop YARN](http://spark.apache.org/docs/1.0.1/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
 
 Note that you can run Spark on a Hadoop cluster using any of these three approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Standalone and Mesos deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
 
-For information on using YARN, see [here](http://spark.apache.org/docs/1.0.0/running-on-yarn.html).
+For information on using YARN, see [here](http://spark.apache.org/docs/1.0.1/running-on-yarn.html).
 
-For information on using Mesos, see [here](http://spark.apache.org/docs/1.0.0/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
+For information on using Mesos, see [here](http://spark.apache.org/docs/1.0.1/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
 
-Spark also includes [EC2 launch scripts](http://spark.apache.org/docs/1.0.0/ec2-scripts.html) for running clusters on Amazon EC2.
+Spark also includes [EC2 launch scripts](http://spark.apache.org/docs/1.0.1/ec2-scripts.html) for running clusters on Amazon EC2.
 
 ## Resilient, Distributed Datasets
 
@@ -121,9 +121,9 @@ Let's now work through these exercises...
 
 ## Intro1
 
-<a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>
+<a class="shortcut" href="#src/main/scala/spark/Intro1.sc">Intro1.sc</a>
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. 
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file <a class="shortcut" href="#src/main/scala/spark/Intro1.sc">Intro1.sc</a>. 
 
 The comments in this and the subsequent files try to explain the API calls being made.
 
