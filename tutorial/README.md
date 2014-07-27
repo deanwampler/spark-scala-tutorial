@@ -1397,6 +1397,7 @@ This template is not a complete Apache Spark tutorial. To learn more, see the fo
 * The Apache Spark [tutorial](http://spark.apache.org/tree/develop/tutorial) distributed with the [Apache Spark](http://spark.apache.org) distribution. See also the examples in the distribution and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as `RDD` and `SchemaRDD`.
 * The [Spark SQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
+* [Talks from Spark Summit 2014](http://spark-summit.org/2014/training).
 * [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).
 * [Running Spark on Mesos](http://mesosphere.io/learn/run-spark-on-mesos/).
 
