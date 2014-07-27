@@ -121,9 +121,9 @@ Let's now work through these exercises...
 
 ## Intro1
 
-<a class="shortcut" href="#src/main/scala/spark/Intro1.sc">Intro1.sc</a>
+[Intro1.sc](src/main/scala/spark/Intro1.sc)
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file <a class="shortcut" href="#src/main/scala/spark/Intro1.sc">Intro1.sc</a>. 
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.sc](src/main/scala/spark/Intro1.sc). 
 
 The comments in this and the subsequent files try to explain the API calls being made.
 
