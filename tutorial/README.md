@@ -1344,7 +1344,7 @@ Finally, use the [LINQ](http://msdn.microsoft.com/en-us/library/bb397926.aspx)-i
 
 ## HiveSQL11
 
-[HiveSQL11.scala](../src/main/scala/spark/HiveSQL11.scala)
+[HiveSQL11.sc](../src/main/scala/spark/HiveSQL11.sc)
 
 The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, Spark SQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
 
