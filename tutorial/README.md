@@ -142,7 +142,8 @@ sbt
 
 At the `sbt` prompt, type `console`. You'll see a welcome message and a `scala>` prompt.
 
-We're going to paste in the code from <a class="shortcut" href="#code/src/main/scala/spark/Intro1.sc">Intro1.sc</a>. You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
+We're going to paste in the code from [Intro1.sc](../src/main/scala/spark/Intro1.sc)
+. You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
 
 ```
 import org.apache.spark.SparkContext
@@ -234,13 +235,14 @@ Before moving on, let's discuss how you would actually run the Spark Shell. When
 
 ## WordCount2
 
-<a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> 
+[WordCount2.scala](../src/main/scala/spark/WordCount2.scala)
 
 The classic, simple *Word Count* algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.
 
 In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "local" counts can be done in parallel. 
 
-<a class="shortcut" href="#code/src/main/scala/spark/WordCount2.scala">WordCount2.scala</a> uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
+[WordCount2.scala](../src/main/scala/spark/WordCount2.scala)
+ uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
 
 If using the <a class="shortcut" href="#run">run</a> panel, select `scala.WordCount2` and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.
 
@@ -320,11 +322,12 @@ In a real cluster with lots of data and lots of concurrent processing, there wou
 
 **Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?
 
-There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, <a class="shortcut" href="#code/src/main/scala/spark/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a> solves a "group by" exercise.
+There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](../src/main/scala/spark/solns/WordCount2GroupBy.scala)
+solves a "group by" exercise.
 
 ## WordCount3
 
-<a class="shortcut" href="#code/src/main/scala/spark/WordCount3.scala">WordCount3.scala</a> 
+[WordCount3.scala](../src/main/scala/spark/WordCount3.scala)
 
 This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. 
 
@@ -401,7 +404,7 @@ object WordCount3 {
     val argz = options(args.toList)
 ```
 
-I won't discuss the implementation of <a class="shortcut" href="#code/src/main/scala/spark/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option. 
+I won't discuss the implementation of [CommandLineOptions.scala](../src/main/scala/spark/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option. 
 
 ```
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
@@ -449,7 +452,7 @@ Don't forget the try the exercises at the end of the source file.
 
 ## Matrix4
 
-<a class="shortcut" href="#code/src/main/scala/spark/Matrix4.scala">Matrix4.scala</a> 
+[Matrix4.scala](../src/main/scala/spark/Matrix4.scala)
 
 An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.
 
@@ -531,7 +534,7 @@ The `collect` method is called to convert the RDD to an array, because we're jus
 
 ## Crawl5a
 
-<a class="shortcut" href="#code/src/main/scala/spark/Crawl5a.scala">Crawl5a.scala</a> 
+[Crawl5a.scala](../src/main/scala/spark/Crawl5a.scala)
 
 This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
@@ -559,7 +562,7 @@ The next step has to parse this format.
 
 ## InvertedIndex5b
 
-<a class="shortcut" href="#code/src/main/scala/spark/InvertedIndex5b.scala">InvertedIndex5b.scala</a> 
+[InvertedIndex5b.scala](../src/main/scala/spark/InvertedIndex5b.scala)
 
 Using the crawl data just generated, compute the index of words to documents (emails).
 
@@ -675,7 +678,7 @@ The end goal is to output each record string in the following form: `(word, (doc
 
 ## NGrams6
 
-<a class="shortcut" href="#code/src/main/scala/spark/NGrams6.scala">NGrams6.scala</a> 
+[NGrams6.scala](../src/main/scala/spark/NGrams6.scala)
 
 In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
@@ -795,7 +798,7 @@ The `map` and `reduceByKey` calls are just like we used previously for `WordCoun
 
 ## Joins7
 
-<a class="shortcut" href="#code/src/main/scala/spark/Joins7.scala">Joins7.scala</a> 
+[Joins7.scala](../src/main/scala/spark/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
 
@@ -913,7 +916,7 @@ You can verify that the output file looks like the input KJV file with the book 
 
 ## SparkStreaming8
 
-<a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a> 
+[SparkStreaming8.scala](../src/main/scala/spark/SparkStreaming8.scala)
 
 The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command.
 
@@ -975,7 +978,7 @@ A `StreamingContext` is used to wrap the normal `SparkContext`, too.
 
 ## The SparkStreaming8 Code
 
-Here is the code for <a class="shortcut" href="#code/src/main/scala/spark/SparkStreaming8.scala">SparkStreaming8.scala</a>:
+Here is the code for [SparkStreaming8.scala](../src/main/scala/spark/SparkStreaming8.scala):
 
 ```
 object SparkStreaming8 {
@@ -1173,7 +1176,7 @@ Now, only `factor2` must be serialized.
 
 ## SparkSQL9
 
-<a class="shortcut" href="#code/src/main/scala/spark/SparkSQL9.scala">SparkSQL9.scala</a> 
+[SparkSQL9.scala](../src/main/scala/spark/SparkSQL9.scala)
 
 The new Spark SQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as an alternative to the regular manipulation methods on the RDD type. There is also a builder DSL for constructing these queries, rather than using a string.
 
@@ -1293,7 +1296,7 @@ That's it! As before, there are suggested exercises at the end of the source fil
 
 ## SparkSQLParquet10
 
-<a class="shortcut" href="#code/src/main/scala/spark/SparkSQLParquet10.scala">SparkSQLParquet10.scala</a> 
+[SparkSQLParquet10.scala](../src/main/scala/spark/SparkSQLParquet10.scala)
 
 This example continues the use of the Parquet support. It reads the data written by the previous example.
 
@@ -1341,7 +1344,7 @@ Finally, use the [LINQ](http://msdn.microsoft.com/en-us/library/bb397926.aspx)-i
 
 ## HiveSQL11
 
-<a class="shortcut" href="#code/src/main/scala/spark/HiveSQL11.scala">HiveSQL11.scala</a> 
+[HiveSQL11.scala](../src/main/scala/spark/HiveSQL11.scala)
 
 The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, Spark SQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
 
