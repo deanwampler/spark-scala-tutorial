@@ -1,4 +1,5 @@
 import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive.LocalHiveContext
 import com.typesafe.sparkworkshop.util.Verse
@@ -6,11 +7,15 @@ import com.typesafe.sparkworkshop.util.Verse
 /**
  * Example of Accessing Hive Tables directly. SQL, using the KJV Bible text.
  * Writes "query" results to the console, rather than a file.
- * To get a feel for interactive use, this file is a script, not a typical
- * "application".
+ * This script requires a Hadoop distribution, due to Hive's dependencies
+ * See the SparkSQL documentation for details.
+ * For that reason, it doesn't assume you'll use the SBT console.
+ * Instead, use Spark's "spark-submit" script instead.
  */
 
-val sc = new SparkContext("local[2]", "Hive SQL (11)")
+val master = "local[2]"
+
+val sc = new SparkContext(master, "Hive SQL (11)")
 
 // The analog of SQLContext we used in the previous exercise is Hive context
 // that starts up an instance of Hive where metadata is stored locally in

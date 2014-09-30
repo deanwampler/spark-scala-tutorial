@@ -66,11 +66,11 @@ RDDs support common data operations, such as *map*, *flatmap*, *filter*, *fold/r
 
 The architecture of RDDs is described in the research paper [Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf).
 
-## Spark SQL
+## SparkSQL
 
-[Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
+[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
 
-Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
+Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
@@ -124,9 +124,9 @@ Let's now work through these exercises...
 
 ## Intro1
 
-[Intro1.sc](../src/main/scala/spark/Intro1.sc)
+[Intro1.sc](../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc)
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.sc](../src/main/scala/spark/Intro1.sc).
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.sc](../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc).
 
 The comments in this and the subsequent files try to explain the API calls being made.
 
@@ -145,7 +145,7 @@ sbt
 
 At the `sbt` prompt, type `console`. You'll see a welcome message and a `scala>` prompt.
 
-We're going to paste in the code from [Intro1.sc](../src/main/scala/spark/Intro1.sc)
+We're going to paste in the code from [Intro1.sc](../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc)
 . You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
 
 ```
@@ -226,7 +226,7 @@ if (output.exists == false) output.mkdir
 Now, if we actually used the Spark Shell for this exercise, we would have omitted the two `import` statements and the statement where we created the `ScalaContext` value `sc`.
 The shell automatically does these steps for us.
 
-There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/scala/spark/solns` directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;)
+There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/scala/com/typesafe/sparkworkshop/solns` directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;)
 
 All the solutions provided for the rest of the exercises are compiled by `activator` or `sbt`, so you'll be able to run them the same way.
 
@@ -238,13 +238,13 @@ Before moving on, let's discuss how you would actually run the Spark Shell. When
 
 ## WordCount2
 
-[WordCount2.scala](../src/main/scala/spark/WordCount2.scala)
+[WordCount2.scala](../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala)
 
 The classic, simple *Word Count* algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.
 
 In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "local" counts can be done in parallel.
 
-[WordCount2.scala](../src/main/scala/spark/WordCount2.scala)
+[WordCount2.scala](../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala)
  uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
 
 If using the <a class="shortcut" href="#run">run</a> panel, select `scala.WordCount2` and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.
@@ -325,12 +325,12 @@ In a real cluster with lots of data and lots of concurrent processing, there wou
 
 **Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?
 
-There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](../src/main/scala/spark/solns/WordCount2GroupBy.scala)
+There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](../src/main/scala/com/typesafe/sparkworkshop/solns/WordCount2GroupBy.scala)
 solves a "group by" exercise.
 
 ## WordCount3
 
-[WordCount3.scala](../src/main/scala/spark/WordCount3.scala)
+[WordCount3.scala](../src/main/scala/com/typesafe/sparkworkshop/WordCount3.scala)
 
 This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 
@@ -407,7 +407,7 @@ object WordCount3 {
     val argz = options(args.toList)
 ```
 
-I won't discuss the implementation of [CommandLineOptions.scala](../src/main/scala/spark/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+I won't discuss the implementation of [CommandLineOptions.scala](../src/main/scala/com/typesafe/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
 
 ```
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
@@ -455,7 +455,7 @@ Don't forget the try the exercises at the end of the source file.
 
 ## Matrix4
 
-[Matrix4.scala](../src/main/scala/spark/Matrix4.scala)
+[Matrix4.scala](../src/main/scala/com/typesafe/sparkworkshop/Matrix4.scala)
 
 An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.
 
@@ -537,7 +537,7 @@ The `collect` method is called to convert the RDD to an array, because we're jus
 
 ## Crawl5a
 
-[Crawl5a.scala](../src/main/scala/spark/Crawl5a.scala)
+[Crawl5a.scala](../src/main/scala/com/typesafe/sparkworkshop/Crawl5a.scala)
 
 This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
@@ -565,7 +565,7 @@ The next step has to parse this format.
 
 ## InvertedIndex5b
 
-[InvertedIndex5b.scala](../src/main/scala/spark/InvertedIndex5b.scala)
+[InvertedIndex5b.scala](../src/main/scala/com/typesafe/sparkworkshop/InvertedIndex5b.scala)
 
 Using the crawl data just generated, compute the index of words to documents (emails).
 
@@ -681,7 +681,7 @@ The end goal is to output each record string in the following form: `(word, (doc
 
 ## NGrams6
 
-[NGrams6.scala](../src/main/scala/spark/NGrams6.scala)
+[NGrams6.scala](../src/main/scala/com/typesafe/sparkworkshop/NGrams6.scala)
 
 In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
@@ -801,7 +801,7 @@ The `map` and `reduceByKey` calls are just like we used previously for `WordCoun
 
 ## Joins7
 
-[Joins7.scala](../src/main/scala/spark/Joins7.scala)
+[Joins7.scala](../src/main/scala/com/typesafe/sparkworkshop/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
 
@@ -919,7 +919,7 @@ You can verify that the output file looks like the input KJV file with the book 
 
 ## SparkStreaming8
 
-[SparkStreaming8.scala](../src/main/scala/spark/SparkStreaming8.scala)
+[SparkStreaming8.scala](../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala)
 
 The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command.
 
@@ -981,7 +981,7 @@ A `StreamingContext` is used to wrap the normal `SparkContext`, too.
 
 ## The SparkStreaming8 Code
 
-Here is the code for [SparkStreaming8.scala](../src/main/scala/spark/SparkStreaming8.scala):
+Here is the code for [SparkStreaming8.scala](../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala):
 
 ```
 object SparkStreaming8 {
@@ -1179,13 +1179,15 @@ Now, only `factor2` must be serialized.
 
 ## SparkSQL9
 
-[SparkSQL9.scala](../src/main/scala/spark/SparkSQL9.scala)
+[SparkSQL9.scala](../src/main/scala/com/typesafe/sparkworkshop/SparkSQL9.scala)
 
-The new Spark SQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as an alternative to the regular manipulation methods on the RDD type. There is also a builder DSL for constructing these queries, rather than using a string.
+The new SparkSQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as a supplement to the regular manipulation methods on the RDD type; use the best tool for the job in the same application! There is also a builder DSL for constructing these queries, rather than using a string.
 
-Furthermore, Spark SQL embeds access to a Hive _metastore_, so you can create, modify, and delete tables, query them, etc.
+Furthermore, SparkSQL now supports parsing JSON-formatted records, inferring the schema, and writing RDDs in JSON.
 
-This example treats the King James Bible text, `kjvdat.txt`, as a table with a schema. It runs several queries on the data and writes out data in the [Parquet](http://parquet.io) format, which is growing in popularity in the Hadoop world.
+Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, HiveQL.
+
+This example treats the King James Bible text, `kjvdat.txt`, as a table with a schema. It runs several queries on the data.
 
 As in the previous *Spark Workshop*, command line options can be used to override the defaults. We'll have to use `sbt` from a command window to use this feature (rather than the *Activator UI*), and we'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments.
 
@@ -1194,7 +1196,6 @@ The "\" characters in the following and subsequent command descriptions are used
 ```
 run-main spark.SparkSQL9 [ -h | --help] \
   [-i | --in | --inpath input] \
-  [-o | --out | --outpath output] \
   [-m | --master master] \
   [-q | --quiet]
 ```
@@ -1204,14 +1205,11 @@ Where the options have the following meanings:
 ```
 -h | --help     Show help and exit.
 -i ... input    Read this input source (default: data/kjvdat.txt).
--o ... output   Write to this output location (default: output/verses.parquet).
 -m ... master   local, local[k], etc. as discussed previously.
 -q | --quiet    Suppress some informational output.
 ```
 
 The options work the same as before, except we don't append a timestamp to the output path, because its contents will be read by the next exercise.
-
-**NOTE:** Because we don't append a timestamp to the output path, you'll get a runtime error if the directory already exists. Just delete or rename the existing directory, or specify a different output path.
 
 The codez!
 
@@ -1281,77 +1279,28 @@ Note that the SQL dialect currently supported by the `sql` method is a subset of
 
 Then take the RDD returned by the query and collect all partitions into 1 partition. Otherwise, there are hundreds of partitions output from the last query!
 
-Finally, collect the counts and write them out.
-
-```
-      val out = argz("output-path").toString
-      println(s"Saving 'verses' as a Parquet file to $out.")
-      println("NOTE: You'll get an error if the directory already exists!")
-      verses.saveAsParquetFile(out)
-```
-
-Lastly, write the data to a Parquet file. The implicit conversion from RDD to
-`org.apache.spark.sql.SchemaRDD` is invoked again to call its `saveAsParquetFile` method. Note that a benefit of Parquet is that the data schema is written to the file, too.
-
-That's it! As before, there are suggested exercises at the end of the source file. Some solutions are provided in the `solns` source package.
+That's it. As before, there are suggested exercises at the end of the source file. Some solutions are provided in the `solns` source package.
 
 ## SparkSQLParquet10
 
-[SparkSQLParquet10.scala](../src/main/scala/spark/SparkSQLParquet10.scala)
+[SparkSQLParquet10.sc](../src/main/scala/com/typesafe/sparkworkshop/hadoop/SparkSQLParquet10.sc)
 
-This example continues the use of the Parquet support. It reads the data written by the previous example.
+This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
 
-The command-line options are similar, but there is no output option as all results are printed to the console:
+> NOTE: Running this script requires a Hadoop installation, therefore it won't run in the SBT `console` as configured for the project.
 
-```
-run-main spark.SparkSQLParquet10 [ -h | --help] \
-  [-i | --in | --inpath input] \
-  [-m | --master master] \
-  [-q | --quiet]
-```
+The key SchemaRDD methods are `SchemaRDD.saveAsParquetFile(outpath)` and `SqlContext.parquetFile(inpath)`. The rest of the details are very similar to the previous exercise.
 
-The code is very similar up to the `try {...} finally {...}` expression in the previous example. We'll just discuss the code within the `try` block.
-
-```
-      println("Reading in the Parquet file from output/verses.parquet:")
-      val verses2 = sqlContext.parquetFile("output/verses.parquet")
-      verses2.registerAsTable("verses2")
-      ...
-```
-
-Read the Parquet data back in and register it as a table.
-
-```
-      println("Using the table from Parquet File, select Jesus verses:")
-      val jesusVerses = sql("SELECT * FROM verses2 WHERE text LIKE '%Jesus%';")
-      println("Number of Jesus Verses: "+jesusVerses.count())
-      ...
-```
-
-Run a SQL query like before.
-
-```
-      println("GROUP BY using the LINQ-style query API:")
-      import org.apache.spark.sql.catalyst.expressions.Sum
-
-      verses2.groupBy('book)(Sum('verse) as 'count).orderBy('count.desc)
-        .collect().foreach(println)
-```
-
-Finally, use the [LINQ](http://msdn.microsoft.com/en-us/library/bb397926.aspx)-inspired DSL that's implemented by the same class `SchemaRDD` we saw in the last example.
-
-> Note: it seems like a bug that the `import` statement is required here.
-
+See the script for more details.
 
 ## HiveSQL11
 
-[HiveSQL11.sc](../src/main/scala/spark/HiveSQL11.sc)
+[HiveSQL11.sc](../src/main/scala/com/typesafe/sparkworkshop/hadoop/HiveSQL11.sc)
 
-The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, Spark SQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
+The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
 
-This is actually a script file, to emphasize the idea of using the REPL to do interactive analysis. IT works for the rest of the Spark SQL API, too.
+> NOTE: Running this script requires a Hadoop installation, therefore it won't run in the SBT `console` as configured for the project.
 
-You'll find it most useful to start the `console` in SBT, then copy and paste groups of the statements, so you can see what each one does. Then you can experiment with the API, especially if you already know Hive!
 
 Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
 
@@ -1383,7 +1332,7 @@ hql("""
 
 Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, where we just tell it use data in a particular directory (`LOCATION`).
 
-A few things are necessary to do first or keep in mind:
+While we can't actually run this script, should you try it on a Hadoop installation, here are a few things to do first or to keep in mind:
 
 * You must first copy `data/kjvdat.txt` to an empty `/tmp/kjv` directory, because Hive expects the `LOCATION` to be an *absolute* directory path. Also, Hive (like all Hadoop applications) will expect this path to be a directory and it will read all the files in it. If you are on Windows (and not running Cygwin), pick a suitable location on your hard drive and change the `LOCATION` line to use the correct, absolute path.
 * **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's REPL or scripts, they cause errors here!
@@ -1395,7 +1344,7 @@ To learn more, see the following:
 
 * The Apache Spark [website](http://spark.apache.org/).
 * The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as `RDD` and `SchemaRDD`.
-* The [Spark SQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
+* The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
 * [Talks from Spark Summit 2014](http://spark-summit.org/2014/training).
 * [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).

@@ -6,7 +6,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.sql.SQLContext
 
 /**
- * Example of Spark SQL, using the KJV Bible text.
+ * Example of SparkSQL, using the KJV Bible text.
  * Writes "query" results to the console, rather than a file.
  */
 object SparkSQL9 {
@@ -16,7 +16,6 @@ object SparkSQL9 {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.outputPath("output/verses.parquet"),
       CommandLineOptions.master("local[2]"),
       CommandLineOptions.quiet)
 
@@ -66,15 +65,6 @@ object SparkSQL9 {
       counts
         .collect()        // Convert to a regular in-memory collection.
         .foreach(println) // Print the query results.
-
-      // Let's see how to use the API to read and write Parquet files:
-      val out = argz("output-path").toString
-      println(s"Saving 'verses' as a Parquet file to $out.")
-      println("NOTE: You'll get an error if the directory already exists!")
-      verses.saveAsParquetFile(out)
-
-      // Now read it back and use it as a table:
-      println("Now run SparkSQLParquet10 to test reading the Parquet file from output/verses.parquet:")
 
     } finally {
       sc.stop()
