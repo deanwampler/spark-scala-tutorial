@@ -1,6 +1,6 @@
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
@@ -8,7 +8,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
-/** 
+/**
  * Simulate a web crawl to prep. data for InvertedIndex5b.
  */
 object Crawl5a {
@@ -38,7 +38,7 @@ object Crawl5a {
       // val now = Timestamp.now()
       // val out = s"${args("output-path").toString}-$now"
       val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false) 
+      if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
       sc.makeRDD(names_contents).saveAsTextFile(out)
     } finally {
@@ -46,7 +46,7 @@ object Crawl5a {
     }
   }
 
-  /** 
+  /**
    * Walk the directory tree. Read each file into an RDD, returning a sequence
    * of them. Skip a README, if any, and any "hidden" files (".*") that are
    * returned as directory contents.
@@ -60,9 +60,9 @@ object Crawl5a {
       }
     }
 
-    // A more scalable approach is to use an org.apache.spark.Accumulable 
+    // A more scalable approach is to use an org.apache.spark.Accumulable
     // shared variable. The implementation here is synchronous.
-    def toRDDs(file: File, accum: Seq[(File,RDD[String])]): Seq[(File,RDD[String])] = 
+    def toRDDs(file: File, accum: Seq[(File,RDD[String])]): Seq[(File,RDD[String])] =
       if (file.isDirectory) {
         // Process the directory (recursively) and fold its results in...
         file.listFiles(filter).foldLeft(accum) ( (acc, f) => toRDDs(f, acc) )

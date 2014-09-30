@@ -15,7 +15,7 @@ body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,A
 </style>
 
 </head>
-<body class="normal firstload">
+<body class="normal">
   <div id="wrapper">
       <h1 id="apachespark:anintroductoryworkshop">Apache Spark: An Introductory Workshop</h1>
 
@@ -265,12 +265,12 @@ The shell automatically does these steps for us.</p>
 <p>The reason the output directories have a timestamp in their name is so you can easily rerun the exercises repeatedly. Starting with v1.0.0, Spark follows the Hadoop convention of refusing to overwrite an existing directory. The timestamps keep them unique.</p>
 
 <p>As before, here is the text of the script in sections, with code comments removed:</p>
-<pre><code class="(null)">package spark    // Put the code in a package named &quot;spark&quot;
-import spark.util.Timestamp   // Simple date-time utility
+<pre><code class="(null)">package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._</code></pre>
 
-<p>We use a <code>spark</code> package for the compiled exercises. The <code>Timestamp</code> class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.</p>
+<p>We use a <code>com.typesafe.sparkworkshop</code> package for the compiled exercises. The <code>Timestamp</code> class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.</p>
 
 <blockquote>
 <p>Even though our exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!</p>
@@ -374,8 +374,8 @@ solves a &#8220;group by&#8221; exercise.</p>
 </ul>
 
 <p>Okay, with that out of the way, let&#8217;s walk through the implementation of <code>WordCount3</code>, in sections:</p>
-<pre><code class="(null)">package spark
-import spark.util.{CommandLineOptions, Timestamp}
+<pre><code class="(null)">package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._</code></pre>
 
@@ -445,8 +445,8 @@ import org.apache.spark.SparkContext._</code></pre>
 n   Number of columns (default: 10)</code></pre>
 
 <p>Here is the code:</p>
-<pre><code class="(null)">package spark
-import spark.util.{Matrix, Timestamp}
+<pre><code class="(null)">package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
 import org.apache.spark.SparkContext
 
 object Matrix4 {
@@ -535,9 +535,9 @@ object Matrix4 {
   [-q | --quiet]</code></pre>
 
 <p>Here is the code:</p>
-<pre><code class="(null)">package spark
+<pre><code class="(null)">package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -643,10 +643,10 @@ object InvertedIndex5b {
 -n | --ngrams string  Match string (default &quot;% love % %&quot;). Quote the string!</code></pre>
 
 <p>I&#8217;m in yür codez:</p>
-<pre><code class="(null)">package spark
+<pre><code class="(null)">package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
-import spark.util.CommandLineOptions.Opt
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -1112,7 +1112,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 <pre><code class="(null)">      verses.registerAsTable(&quot;kjv_bible&quot;)
       verses.cache()
 
-      val godVerses = sql(&quot;SELECT * FROM kjv_bible WHERE text LIKE &apos;%God%&apos;;&quot;)
+      val godVerses = sql(&quot;SELECT * FROM kjv_bible WHERE text LIKE &apos;%God%&apos;&quot;)
       println(&quot;Number of verses that mention God: &quot;+godVerses.count())
       godVerses
         .collect()   // convert to a regular in-memory collection
@@ -1124,9 +1124,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 <p>Even though <code>verses</code> is an RDD, an &#8220;implicit&#8221; conversion imported from <code>sqlc</code> (<code>SQLContext</code>) converts it to a The actual method is defined on <code>org.apache.spark.sql.SchemaRDD</code>, which provides the <code>registerAsTable</code> method.</p>
 
 <p>The call to <code>sql</code> was imported from the <code>sqlc</code> (<code>SQLContext</code>) instance. We can write a SQL query and the results are returned as a new RDD! We then <code>collect</code> it into an <code>Array[Verse]</code> and then print each line.</p>
-<pre><code class="(null)">      val counts = sql(&quot;&quot;&quot;
-        |SELECT book, COUNT(*) FROM kjv_bible GROUP BY book;
-        |&quot;&quot;&quot;.stripMargin)
+<pre><code class="(null)">      val counts = sql(&quot;SELECT book, COUNT(*) FROM kjv_bible GROUP BY book&quot;)
         .coalesce(1)
       println(&quot;Verses per book:&quot;)
       counts
@@ -1200,7 +1198,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 <pre><code class="(null)">import org.apache.spark.SparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive.LocalHiveContext
-import spark.util.Verse
+import com.typesafe.sparkworkshop.util.Verse
 val sc = new SparkContext(&quot;local[2]&quot;, &quot;Hive SQL (10)&quot;)
 val hiveContext = new LocalHiveContext(sc)
 import hiveContext._   // Make methods local, like for SQLContext
@@ -1209,17 +1207,16 @@ import hiveContext._   // Make methods local, like for SQLContext
 <p>Analogous to the previous examples, but now we crate a <code>LocalHiveContext</code>.</p>
 <pre><code class="(null)">println(&quot;Create the &apos;external&apos; kjv Hive table:&quot;)
 hql(&quot;&quot;&quot;
-  |CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
-  |  book    STRING,
-  |  chapter INT,
-  |  verse   INT,
-  |  text    STRING)
-  |ROW FORMAT DELIMITED FIELDS TERMINATED BY &apos;|&apos;
-  |LOCATION &apos;/tmp/data&apos;
-  |&quot;&quot;&quot;.stripMargin)
+  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+    book    STRING,
+    chapter INT,
+    verse   INT,
+    text    STRING)
+  ROW FORMAT DELIMITED FIELDS TERMINATED BY &apos;|&apos;
+  LOCATION &apos;/tmp/data&apos;&quot;&quot;&quot;)
 ...</code></pre>
 
-<p>Use HiveQL to create a table. In this case, an <code>EXTERNAL</code> table, where we just tell it use data in a particular directory (<code>LOCATION</code>).</p>
+<p>Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an <code>EXTERNAL</code> table is created, where we just tell it use data in a particular directory (<code>LOCATION</code>).</p>
 
 <p>A few things are necessary to do first or keep in mind:</p>
 

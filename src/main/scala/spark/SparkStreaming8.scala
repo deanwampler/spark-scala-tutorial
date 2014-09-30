@@ -1,25 +1,26 @@
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
-import spark.util.CommandLineOptions.Opt
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.streaming._
+import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.scheduler.{
   StreamingListener, StreamingListenerReceiverError, StreamingListenerReceiverStopped}
 
 /**
- * A demonstration of Spark Streaming with incremental Word Count. 
- * For simplicity, It reads the data from the KJV Bible file, by default, when 
- * you give it no arguments, e.g., when you use the SBT "run" task. 
+ * A demonstration of Spark Streaming with incremental Word Count.
+ * For simplicity, It reads the data from the KJV Bible file, by default, when
+ * you give it no arguments, e.g., when you use the SBT "run" task.
  * However, the example also supports reading text from a socket, if you specify
  * the "--socket server:port" option.
  *
  * For socket I/O, open a new terminal to run NetCat (http://netcat.sourceforge.net/)
  * or NCat that comes with NMap (http://nmap.org/download.html), which is available
  * for more platforms (e.g., Windows). Use one or the other to send data to the
- * Spark Streaming process in *this* terminal window. 
+ * Spark Streaming process in *this* terminal window.
  * Start the NetCat/NCat process first. For NetCat (nc), use this command:
  *   nc -c -l -p 9999
  * Back in the original terminal window, run SparkStreaming8 application with
@@ -43,8 +44,8 @@ object SparkStreaming8 {
 
   val timeout = 5 * 1000   // 5 seconds
 
-  /** 
-   * Use "--socket host:port" to listen for events. 
+  /**
+   * Use "--socket host:port" to listen for events.
    * To read "events" from a directory of files instead, e.g., for testing,
    * use the "--inpath" argument.
    */
@@ -56,8 +57,8 @@ object SparkStreaming8 {
       case ("-s" | "--socket") +: hp +: tail => (("socket", hp), tail)
     })
 
-  /** 
-   * Use "--no-term" to keep this process running "forever" (or until ^C). 
+  /**
+   * Use "--no-term" to keep this process running "forever" (or until ^C).
    */
   def noterm(): Opt = Opt(
     name   = "no-term",
@@ -67,7 +68,7 @@ object SparkStreaming8 {
       case ("-n" | "--no" | "--no-term") +: tail => (("no-term", "true"), tail)
     })
 
-  case class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
+  class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
     override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
       out.println(s"Receiver Error: $error. Stopping...")
       sc.stop()
@@ -77,14 +78,14 @@ object SparkStreaming8 {
       sc.stop()
     }
   }
-    
+
   def main(args: Array[String]) = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
       // We write to "out" instead of to a directory:
-      // CommandLineOptions.outputPath("output/kjv-wc3"),  
+      // CommandLineOptions.outputPath("output/kjv-wc3"),
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[2]"),
       socket(""),  // empty default, so we know the user specified this option.
@@ -103,10 +104,10 @@ object SparkStreaming8 {
     // running 24/7 in case of Spark Streaming applications). Note that any
     // RDD that persists in memory for more than this duration will be
     // cleared as well.
-    // See http://spark.apache.org/docs/1.0.1/configuration.html for more details.
+    // See http://spark.apache.org/docs/1.1.0/configuration.html for more details.
     // Also see http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html
     // for pointers to debug a "BlockManager" problem when streaming. Specifically
-    // for this example, it was necessary to specify 2 cores using 
+    // for this example, it was necessary to specify 2 cores using
     // setMaster("local[2]").
     val conf = new SparkConf()
              .setMaster("local[2]")
@@ -117,11 +118,11 @@ object SparkStreaming8 {
              // .set("spark.executor.memory", "1g")
     val sc  = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
-    ssc.addStreamingListener(EndOfStreamListener(ssc))
+    ssc.addStreamingListener(new EndOfStreamListener(ssc))
 
     try {
 
-      val lines = 
+      val lines =
         if (argz("socket") == "") useDirectory(ssc, argz("input-path"))
         else useSocket(ssc, argz("socket"))
 
@@ -129,7 +130,7 @@ object SparkStreaming8 {
       val words = lines.flatMap(line => line.split("""\W+"""))
 
       val pairs = words.map(word => (word, 1))
-      val wordCounts = pairs.transform(rdd => rdd.reduceByKey(_ + _))
+      val wordCounts = pairs.reduceByKey(_ + _)
 
       wordCounts.print()  // print a few counts...
 
@@ -156,7 +157,7 @@ object SparkStreaming8 {
       out.println(s"Connecting to $server:$port...")
       sc.socketTextStream(server, port.toInt)
     } catch {
-      case th: Throwable => 
+      case th: Throwable =>
         sc.stop()
         throw new RuntimeException(
           s"Failed to initialize host:port socket with host:port string '$serverPort':",

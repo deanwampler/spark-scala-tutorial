@@ -1,6 +1,6 @@
-package spark.util
+package com.typesafe.sparkworkshop.util
 
-/** 
+/**
  * A case class used for the exercises involving SQL APIs. It represents a
  * "record" for a a verse from the King James Version of the Bible, as well as
  * the verses in some of the other sacred texts in the data directory.

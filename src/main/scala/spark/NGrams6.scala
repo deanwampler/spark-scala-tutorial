@@ -1,7 +1,7 @@
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
-import spark.util.CommandLineOptions.Opt
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -21,9 +21,9 @@ object NGrams6 {
       parser = {
         case ("-c" | "--count") +: n +: tail => (("count", n), tail)
       })
-    
-    /** 
-     * The NGram phrase to match, e.g., "I love % %" will find 4-grams that 
+
+    /**
+     * The NGram phrase to match, e.g., "I love % %" will find 4-grams that
      * start with "I love", and "% love %" will find trigrams with "love" as the
      * second word.
      * The "%" are replaced by the regex "\w+" and whitespace runs are replaced
@@ -36,11 +36,11 @@ object NGrams6 {
       parser = {
         case ("-n" | "--ngrams") +: s +: tail => (("ngrams", s), tail)
       })
-    
+
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      // CommandLineOptions.outputPath("output/ngrams"), // just write to the console 
+      // CommandLineOptions.outputPath("output/ngrams"), // just write to the console
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet,
       count("100"),
@@ -57,7 +57,7 @@ object NGrams6 {
     try {
 
       object CountOrdering extends Ordering[(String,Int)] {
-        def compare(a:(String,Int), b:(String,Int)) = 
+        def compare(a:(String,Int), b:(String,Int)) =
           -(a._2 compare b._2)  // - so that it sorts descending
       }
 
@@ -65,7 +65,7 @@ object NGrams6 {
       // supported by this implementation.
 
       val ngramz = sc.textFile(argz("input-path").toString)
-        .flatMap { line => 
+        .flatMap { line =>
             val text = line.toLowerCase.split("\\s*\\|\\s*").last
             ngramsRE.findAllMatchIn(text).map(_.toString)
         }
@@ -88,7 +88,7 @@ object NGrams6 {
     }
 
     // Exercise: Try different ngrams and input texts. Note that you can specify
-    //   a regular expression, e.g., 
+    //   a regular expression, e.g.,
     //     run-main spark.NGrams6 --ngrams "% (lov|hat)ed? % %"
     // Exercise (Hard): Read in many documents and retain the file, so you find
     // ngrams per document.

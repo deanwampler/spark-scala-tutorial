@@ -1,11 +1,11 @@
-package spark.solns
+package com.typesafe.sparkworkshop.solns
 
-import spark.util.{CommandLineOptions, Timestamp}
-import spark.util.CommandLineOptions.Opt
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
-/** 
+/**
  * Joins7 - Perform joins of datasets.
  * Implements the exercise to restore the original order of the verses.
  */
@@ -22,17 +22,17 @@ object Joins7Ordered {
         case ("-a" | "--abbreviations") +: path +: tail => (("abbreviations", path), tail)
       })
 
-    // New: A hard-coded map of the book name abbreviation and its index, 
+    // New: A hard-coded map of the book name abbreviation and its index,
     // counting from 1 (which doesn't matter, as only relative numbers are used).
-    // We will use this to reorder the records correctly after the join "mixes 
+    // We will use this to reorder the records correctly after the join "mixes
     // them up". Note that we could have put this data into a file that's either
     // read "locally" or into an RDD. If you use such a local file in a real
     // cluster, there is a spark argument to copy files like this around the
     // cluster. Finally, if your dataset is split into multiple partitions this
-    // technique will ensure sorting within the partition, but not globally 
+    // technique will ensure sorting within the partition, but not globally
     // across the output files.
     // Note that by hard-coding this map, this version of the app will NOT
-    // work with other texts. In fact, it will through an exception when we call 
+    // work with other texts. In fact, it will through an exception when we call
     // "bookToIndex.get(book)" below if other texts are used.
     val bookToIndex = Map(
       "Gen" -> 1,
@@ -115,22 +115,22 @@ object Joins7Ordered {
     val sc = new SparkContext(argz("master").toString, "Joins (7)")
     try {
       // Load one of the religious texts, don't convert each line to lower case
-      // this time, then extract the fields in the "book|chapter|verse|text" format 
+      // this time, then extract the fields in the "book|chapter|verse|text" format
       // used for each line, creating an RDD. However, note that the logic used
       // to split the line will work reliably even if the delimiters aren't present!
-      // Note also the output nested tuple. Joins only work for RDDs of 
+      // Note also the output nested tuple. Joins only work for RDDs of
       // (key,value) tuples
       val input = sc.textFile(argz("input-path").toString)
-        .map { line => 
+        .map { line =>
           val ary = line.split("\\s*\\|\\s*")
           (ary(0), (ary(1), ary(2), ary(3)))
         }
 
       // The abbreviations file is tab separated, but we only want to split
-      // on the first space (in the unlikely case there are embedded tabs 
+      // on the first space (in the unlikely case there are embedded tabs
       // in the names!)
       val abbrevs = sc.textFile(argz("abbreviations").toString)
-        .map{ line => 
+        .map{ line =>
           val ary = line.split("\\s+", 2)
           (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
         }
@@ -142,7 +142,7 @@ object Joins7Ordered {
       // Join on the key, the first field in the tuples; the book abbreviation.
 
       val verses = input.join(abbrevs)
-      
+
       if (input.count != verses.count) {
         println(s"input count, ${input.count}, doesn't match output count, ${verses.count}")
       }
@@ -150,7 +150,7 @@ object Joins7Ordered {
       // Order the records (again) and project out the final, flattened data
       // we want:
       //   fullBookName|chapter|verse|text
-      // To do the ordering, we first use our map of book abbreviations to 
+      // To do the ordering, we first use our map of book abbreviations to
       // position indices to construct a sortable key, which happens to be a
       // tuple of three integers, BUT ONLY AFTER WE CONVERT the chapter and
       // verse from strings to integers. The text and full book name are the
@@ -158,22 +158,22 @@ object Joins7Ordered {
       // as it's no longer needed.
       val verses2 = verses
         .map {
-          case (book, ((chapter, verse, text), fullBookName)) => 
-            // ====================== Key: =======================, 
-              ((bookToIndex.get(book), chapter.toInt, verse.toInt), 
+          case (book, ((chapter, verse, text), fullBookName)) =>
+            // ====================== Key: =======================,
+              ((bookToIndex.get(book), chapter.toInt, verse.toInt),
             // ====== Value: ======
                (text, fullBookName))
         }
         .sortByKey()
         // Finally, reformat and drop the temporary index:
         .map {
-          case ((index, chapter, verse), (text, fullBookName)) => 
+          case ((index, chapter, verse), (text, fullBookName)) =>
             (fullBookName, chapter, verse, text)
         }
 
       val now = Timestamp.now()
       val out = s"${argz("output-path")}-$now"
-      if (argz("quiet").toBoolean == false) 
+      if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
       verses2.saveAsTextFile(out)
     } finally {
@@ -187,7 +187,7 @@ object Joins7Ordered {
     //   Fix the ordering. Here is one approach:
     //   Compute (in advance??) a map from book names (or abbreviations) to
     //   an index (e.g., Gen -> 1, Exo -> 2, ...). Use this to construct a
-    //   sort key containing the book index, chapter, and verse. Note that 
+    //   sort key containing the book index, chapter, and verse. Note that
     //   the chapter and verse will be strings when extracted from the file,
     //   so you must convert them to integers (i.e., "x.toInt"). Finally,
     //   project out the full book name, chapter, verse, and text.

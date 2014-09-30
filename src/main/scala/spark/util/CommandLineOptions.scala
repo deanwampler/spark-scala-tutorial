@@ -1,8 +1,8 @@
-package spark.util
+package com.typesafe.sparkworkshop.util
 
 import CommandLineOptions.{Opt, NameValue, Parser}
 
-/** 
+/**
  * Handles command-line argument processing for scripts that take
  * help, input, and output arguments.
  */
@@ -10,20 +10,20 @@ case class CommandLineOptions(programName: String, opts: Opt*) {
 
   // Help message
   def helpMsg = s"""
-    |usage: java ... $programName [options] 
+    |usage: java ... $programName [options]
     |where the options are the following:
     |-h | --help  Show this message and quit.
     |""".stripMargin + opts.map(_.help).mkString("\n")
 
-  lazy val matchers: Parser = 
-    (opts foldLeft help) { 
-      (partialfunc, opt) => partialfunc orElse opt.parser 
+  lazy val matchers: Parser =
+    (opts foldLeft help) {
+      (partialfunc, opt) => partialfunc orElse opt.parser
     } orElse noMatch
-  
+
   protected def processOpts(args: Seq[String]): Seq[NameValue] =
     args match {
       case Nil => Nil
-      case _ => 
+      case _ =>
         val (newArg, rest) = matchers(args)
         newArg +: processOpts(rest)
     }
@@ -44,8 +44,8 @@ case class CommandLineOptions(programName: String, opts: Opt*) {
     finalMap
   }
 
-  /** 
-   * Common argument: help 
+  /**
+   * Common argument: help
    * Use T = Any for convenient typing when we string these together.
    */
   val help: Parser = {
@@ -58,7 +58,7 @@ case class CommandLineOptions(programName: String, opts: Opt*) {
       quit(s"Unrecognized argument (or missing second argument): $head", 1)
   }
 
-  def quit(message: String, status: Int): Nothing = { 
+  def quit(message: String, status: Int): Nothing = {
     if (message.length > 0) println(message)
     println(helpMsg)
     sys.exit(status)
@@ -78,7 +78,7 @@ object CommandLineOptions {
     /** Help string displayed if user asks for help. */
     help:  String,
     /** Attempt to parse input words. If successful, return new value, rest of args. */
-    parser: Parser) 
+    parser: Parser)
 
   /** Common argument: The input path */
   def inputPath(value: String): Opt = Opt(

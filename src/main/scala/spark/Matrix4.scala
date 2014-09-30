@@ -1,6 +1,6 @@
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{Matrix, Timestamp}
+import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
 import org.apache.spark.SparkContext
 
 /**
@@ -16,33 +16,33 @@ object Matrix4 {
 
     case class Dimensions(m: Int, n: Int)
 
-    // Process command-line args. differently. 
+    // Process command-line args. differently.
     val dims = args.take(2) match {
       case Array(m, n) => Dimensions(m.toInt, n.toInt)
       case Array(m)    => Dimensions(m.toInt, 10)
       case Array()     => Dimensions(5,       10)
-      case _ => 
+      case _ =>
         println("""Expected optional matrix dimensions, got this: ${args.mkString(" ")}""")
         sys.exit(1)
     }
 
     val sc = new SparkContext("local", "Matrix (4)")
 
-    try { 
+    try {
       // Set up a mxn matrix of numbers.
       val matrix = Matrix(dims.m, dims.n)
 
       // Average rows of the matrix in parallel:
       val sums_avgs = sc.parallelize(1 to dims.m).map { i =>
-        // Matrix indices count from 0. 
+        // Matrix indices count from 0.
         // "_ + _" is the same as "(count1, count2) => count1 + count2".
-        val sum = matrix(i-1) reduce (_ + _) 
+        val sum = matrix(i-1) reduce (_ + _)
         (sum, sum/dims.n)
       }.collect
 
       out.println(s"${dims.m}x${dims.n} Matrix:")
       sums_avgs.zipWithIndex foreach {
-        case ((sum, avg), index) => 
+        case ((sum, avg), index) =>
           out.println(f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d")
       }
     } finally {

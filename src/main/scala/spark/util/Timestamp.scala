@@ -1,4 +1,4 @@
-package spark.util
+package com.typesafe.sparkworkshop.util
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -8,8 +8,8 @@ object Timestamp {
 
   // Simple hack for testing. Not threadsafe, of course...
   var isTest: Boolean = false
-  
-  def now(): String = 
+
+  def now(): String =
     if (isTest) ""
     else fmt.format(new Date())
 }

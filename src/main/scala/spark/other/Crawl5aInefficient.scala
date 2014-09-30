@@ -1,6 +1,6 @@
-package spark.other
+package com.typesafe.sparkworkshop.other
 
-import spark.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
@@ -8,8 +8,8 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
-/** 
- * This is an alternative implementation of Crawl5a. It is more elegant 
+/**
+ * This is an alternative implementation of Crawl5a. It is more elegant
  * in some ways, but it is MUCH less inefficient. It creates a separate output
  * file for each input file, rather than aggregating into a small number of
  * output files. The extra overhead makes this version run considerably slower
@@ -38,7 +38,7 @@ object Crawl5aInefficient {
       // val now = Timestamp.now()
       // val out = s"${argz("output-path").toString}-$now"
       val out = s"${argz("output-path")}"
-      if (argz("quiet").toBoolean == false) 
+      if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
 
       ingestFiles(argz("input-path").toString, sc).saveAsTextFile(out)
@@ -47,7 +47,7 @@ object Crawl5aInefficient {
     }
   }
 
-  /** 
+  /**
    * Walk the directory tree. Return an RDD where each record is the file
    * path and the contents, all on one line.
    * Skip a README, if any, and any "hidden" files (".*") that are
@@ -67,13 +67,13 @@ object Crawl5aInefficient {
       sc.textFile(path)   // RDD[String], where each line is a String
       .map (line => (path, line))  // RDD[(String,String)], prefix the path
       // Reduce over the path and concatenate the lines.
-      .reduceByKey ((line1, line2) => line1 + " " + line2) // RDD[(String,String)]  
+      .reduceByKey ((line1, line2) => line1 + " " + line2) // RDD[(String,String)]
     }
 
-    // A more scalable approach is to use an org.apache.spark.Accumulable 
+    // A more scalable approach is to use an org.apache.spark.Accumulable
     // shared variable. The implementation here is synchronous.
-    def toRDDs(file: File, accum: Seq[RDD[(String,String)]]): Seq[RDD[(String,String)]] = 
-      if (file.isDirectory) 
+    def toRDDs(file: File, accum: Seq[RDD[(String,String)]]): Seq[RDD[(String,String)]] =
+      if (file.isDirectory)
         file.listFiles(filter).foldLeft(accum) ( (acc, f) => toRDDs(f, acc) )
       else fileToRDD(file) +: accum
 

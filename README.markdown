@@ -256,13 +256,13 @@ The reason the output directories have a timestamp in their name is so you can e
 As before, here is the text of the script in sections, with code comments removed:
 
 ```
-package spark    // Put the code in a package named "spark"
-import spark.util.Timestamp   // Simple date-time utility
+package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-We use a `spark` package for the compiled exercises. The `Timestamp` class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.
+We use a `com.typesafe.sparkworkshop` package for the compiled exercises. The `Timestamp` class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.
 
 > Even though our exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!
 
@@ -385,8 +385,8 @@ When you specify an input path for Spark, you can specify `bash`-style "globs" a
 Okay, with that out of the way, let's walk through the implementation of `WordCount3`, in sections:
 
 ```
-package spark
-import spark.util.{CommandLineOptions, Timestamp}
+package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
@@ -477,8 +477,8 @@ n   Number of columns (default: 10)
 Here is the code:
 
 ```
-package spark
-import spark.util.{Matrix, Timestamp}
+package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
 import org.apache.spark.SparkContext
 
 object Matrix4 {
@@ -582,9 +582,9 @@ run-main spark.InvertedIndex5b [ -h | --help] \
 Here is the code:
 
 ```
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -708,10 +708,10 @@ Where
 I'm in yür codez:
 
 ```
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
-import spark.util.CommandLineOptions.Opt
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -1253,7 +1253,7 @@ Defines a regex to extract the fields on each line, separated by "|", and also r
       verses.registerAsTable("kjv_bible")
       verses.cache()
 
-      val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%';")
+      val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
       println("Number of verses that mention God: "+godVerses.count())
       godVerses
         .collect()   // convert to a regular in-memory collection
@@ -1268,9 +1268,7 @@ Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`
 The call to `sql` was imported from the `sqlc` (`SQLContext`) instance. We can write a SQL query and the results are returned as a new RDD! We then `collect` it into an `Array[Verse]` and then print each line.
 
 ```
-      val counts = sql("""
-        |SELECT book, COUNT(*) FROM kjv_bible GROUP BY book;
-        |""".stripMargin)
+      val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
         .coalesce(1)
       println("Verses per book:")
       counts
@@ -1361,7 +1359,7 @@ Note that the Hive "metadata" is stored in a `megastore` directory created in th
 import org.apache.spark.SparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive.LocalHiveContext
-import spark.util.Verse
+import com.typesafe.sparkworkshop.util.Verse
 val sc = new SparkContext("local[2]", "Hive SQL (10)")
 val hiveContext = new LocalHiveContext(sc)
 import hiveContext._   // Make methods local, like for SQLContext
@@ -1373,18 +1371,17 @@ Analogous to the previous examples, but now we crate a `LocalHiveContext`.
 ```
 println("Create the 'external' kjv Hive table:")
 hql("""
-  |CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
-  |  book    STRING,
-  |  chapter INT,
-  |  verse   INT,
-  |  text    STRING)
-  |ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-  |LOCATION '/tmp/data'
-  |""".stripMargin)
+  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+    book    STRING,
+    chapter INT,
+    verse   INT,
+    text    STRING)
+  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+  LOCATION '/tmp/data'""")
 ...
 ```
 
-Use HiveQL to create a table. In this case, an `EXTERNAL` table, where we just tell it use data in a particular directory (`LOCATION`).
+Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, where we just tell it use data in a particular directory (`LOCATION`).
 
 A few things are necessary to do first or keep in mind:
 

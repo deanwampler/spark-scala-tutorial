@@ -1,5 +1,5 @@
-package spark
-import spark.util.Timestamp
+package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.Timestamp
 import org.scalatest.FunSpec
 import java.io.{File, FileOutputStream, PrintStream}
 
@@ -16,7 +16,7 @@ class NGrams6Spec extends FunSpec {
       NGrams6.out = new PrintStream(fileStream, true)
 
       NGrams6.main(Array(
-        "--quiet", "--inpath", "data/kjvdat.txt", 
+        "--quiet", "--inpath", "data/kjvdat.txt",
         "--count", "100", "--ngrams", "% love % %"))
 
       TestUtil.verifyAndClean(out, golden, out)

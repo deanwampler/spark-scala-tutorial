@@ -1,4 +1,4 @@
-package spark.util
+package com.typesafe.sparkworkshop.util
 import org.scalatest.FunSpec
 
 class MatrixSpec extends FunSpec {
@@ -8,7 +8,7 @@ class MatrixSpec extends FunSpec {
       it ("requires positive row and column counts") {
         intercept[java.lang.AssertionError] { Matrix(0,1) }
         intercept[java.lang.AssertionError] { Matrix(1,0) }
-      } 
+      }
 
       it ("constructs an MxN matrix") {
         val m = Matrix(3,5)

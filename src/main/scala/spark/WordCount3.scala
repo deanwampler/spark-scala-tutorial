@@ -1,6 +1,6 @@
-package spark
+package com.typesafe.sparkworkshop
 
-import spark.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -16,7 +16,7 @@ object WordCount3 {
   def main(args: Array[String]) = {
     // I extracted command-line processing code into a separate utility class,
     // an illustration of how it's convenient that we can mix "normal" code
-    // with "big data" processing code. 
+    // with "big data" processing code.
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
@@ -43,7 +43,7 @@ object WordCount3 {
       // Otherwise, you'll use RAM inefficiently.
       input.cache
 
-      // Split on non-alphanumeric sequences of character as before. 
+      // Split on non-alphanumeric sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
       val wc2 = input
@@ -51,28 +51,28 @@ object WordCount3 {
         .countByValue()  // Returns a Map[T, Long]
 
       // Save to a file, but because we no longer have an RDD, we have to use
-      // good 'ol Java File IO. Note that the output specifier is now a file, 
+      // good 'ol Java File IO. Note that the output specifier is now a file,
       // not a directory as before, the format of each line will be different,
-      // and the order of the output will not be the same, either. 
+      // and the order of the output will not be the same, either.
       val now = Timestamp.now()
       val outpath = s"${argz("output-path")}-$now"
-      if (argz("quiet").toBoolean == false) 
+      if (argz("quiet").toBoolean == false)
         println(s"Writing output (${wc2.size} records) to: $outpath")
-        
+
       import java.io._
       val out = new PrintWriter(outpath)
       wc2 foreach {
         case (word, count) => out.println("%20s\t%d".format(word, count))
       }
-      // WARNING: Without this close statement, it appears the output stream is 
+      // WARNING: Without this close statement, it appears the output stream is
       // not completely flushed to disk!
       out.close()
     } finally {
       sc.stop()
     }
 
-    // Exercise: Try different arguments for the input and output. 
+    // Exercise: Try different arguments for the input and output.
     //   NOTE: I've observed 0 output for some small input files!
-    // Exercise: Don't discard the book names. 
+    // Exercise: Don't discard the book names.
   }
 }

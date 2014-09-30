@@ -1,9 +1,9 @@
-package spark.solns
+package com.typesafe.sparkworkshop.solns
 
-import spark.util.Timestamp
+import com.typesafe.sparkworkshop.util.Timestamp
 import org.apache.spark.SparkContext
-// Implicit conversions, such as methods defined in 
-// [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.1/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
+// Implicit conversions, such as methods defined in
+// [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
 import org.apache.spark.SparkContext._
 
 /** First implementation of Word Count */
@@ -13,7 +13,7 @@ object WordCount2GroupBy {
     val sc = new SparkContext("local", "Word Count (2)")
 
     try {
-      // Load the King James Version of the Bible, then convert 
+      // Load the King James Version of the Bible, then convert
       // each line to lower case, creating an RDD.
       val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 
@@ -22,14 +22,14 @@ object WordCount2GroupBy {
       // Otherwise, you'll use RAM inefficiently.
       input.cache
 
-      // Split on non-alphanumeric sequences of characters. Since each single 
-      // line is converted to a sequence of words, we use flatMap to flatten 
+      // Split on non-alphanumeric sequences of characters. Since each single
+      // line is converted to a sequence of words, we use flatMap to flatten
       // the sequence of sequences into a single sequence of words.
-      // These words are then mapped into tuples that add a count of 1 
+      // These words are then mapped into tuples that add a count of 1
       // for the word.
-      // Finally, reduceByKey functions like a SQL "GROUP BY" followed by 
-      // a count of the elements in each group. The words are the keys and 
-      // values are the 1s, which are added together, effectively counting 
+      // Finally, reduceByKey functions like a SQL "GROUP BY" followed by
+      // a count of the elements in each group. The words are the keys and
+      // values are the 1s, which are added together, effectively counting
       // the occurrences of each word.
       val wc = input
         .flatMap(line => line.split("""\W+"""))
@@ -38,10 +38,10 @@ object WordCount2GroupBy {
         .groupBy(tuple => tuple._2)   // group by the counts!
         .sortByKey(true)              // also try descending (false)
 
-      // Save, but it actually writes Hadoop-style output; to a directory, 
-      // with a _SUCCESS marker (empty) file, the data as a "part" file, 
+      // Save, but it actually writes Hadoop-style output; to a directory,
+      // with a _SUCCESS marker (empty) file, the data as a "part" file,
       // and checksum files.
-      // Note that when you look at the output, you'll see some very 
+      // Note that when you look at the output, you'll see some very
       // long lines for the many words that have very low counts (e.g., 1),
       // while very frequent words (counts in the 1000s) usually don't overlap,
       // e.g., "for" has 8971 occurrences, while "unto" has 8997, so they have
@@ -54,25 +54,25 @@ object WordCount2GroupBy {
     } finally {
       sc.stop()
     }
-    
+
     // Exercise: See the Scaladoc page for `OrderedRDDFunctions`:
-    //   http://spark.apache.org/docs/1.0.1/api/core/index.html#org.apache.spark.rdd.OrderedRDDFunctions
+    //   http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.OrderedRDDFunctions
     //   Sort the output by word, try both ascending and descending.
     //   Note this can be expensive!
     // Exercise: Take the output from the previous exercise and count the number
     //   of words that start with each letter of the alphabet and each digit.
-    // Exercise (Hard): Sort the output by count. You can't use the same 
+    // Exercise (Hard): Sort the output by count. You can't use the same
     //   approach as in the previous exercise. Hint: See RDD.keyBy
-    //   (http://spark.apache.org/docs/1.0.1/api/core/index.html#org.apache.spark.rdd.RDD)
+    //   (http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.RDD)
     //   What's the most frequent word that isn't a "stop word".
     // Exercise (Hard): Group the word-count pairs by count. In other words,
     //   All pairs where the count is 1 are together (i.e., just one occurrence
-    //   of those words was found), all pairs where the count is 2, etc. Sort 
-    //   ascending or descending. Hint: Is there a method for grouping? 
+    //   of those words was found), all pairs where the count is 2, etc. Sort
+    //   ascending or descending. Hint: Is there a method for grouping?
     // Exercise (Thought Experiment): Consider the size of each group created
     //   in the previous exercise and the distribution of those sizes vs. counts.
-    //   What characteristics would you expect for this distribution? That is, 
-    //   which words (or kinds of words) would you expect to occur most 
+    //   What characteristics would you expect for this distribution? That is,
+    //   which words (or kinds of words) would you expect to occur most
     //   frequently? What kind of distribution fits the counts (numbers)?
   }
 }

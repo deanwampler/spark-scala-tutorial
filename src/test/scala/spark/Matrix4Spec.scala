@@ -1,5 +1,5 @@
-package spark
-import spark.util.Timestamp
+package com.typesafe.sparkworkshop
+import com.typesafe.sparkworkshop.util.Timestamp
 import org.scalatest.FunSpec
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 
