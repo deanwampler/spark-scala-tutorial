@@ -1,6 +1,6 @@
 # Apache Spark: An Introductory Workshop
 
-![image](http://spark.apache.org/docs/1.0.1/img/spark-logo-100x40px.png)
+![image](http://spark.apache.org/docs/1.1.0/img/spark-logo-100x40px.png)
 
 Dean Wampler, Ph.D.
 [Typesafe](http://typesafe.com)
@@ -13,9 +13,11 @@ This workshop demonstrates how to write and run [Apache Spark](http://spark.apac
 
 [Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level [Apache project](http://spark.apache.org).
 
-We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a *Spark Shell*, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.
+Spark includes support for streaming, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for writing with data sets through SQL queries. It integrates embedded SQL queries and data schemas with the normal Spark API. It also offers Hive integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
 
-> New in Version 2.0, I've added new examples and exercises for [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which integrates structured data and embedded SQL queries with normal Spark code. It even has a Hive integration module so you can query existing Hive tables, even create and delete them.
+We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters.
+
+There also several *Spark Shells*. One is an enhanced version of the Scala REPL (read, eval, print loop shell), for interactive use. SparkSQL adds a SQL-only REPL option. You can use a Python shell, since Spark has a Python API. A Java API is also supported and R support is coming soon.
 
 ## Why Spark?
 
@@ -23,13 +25,13 @@ By 2013, it became increasingly clear that a successor was needed for the venera
 
 Spark was seen as the best, general-purpose alternative, so [Cloudera led the way](http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html) in embracing Spark as a replacement for MapReduce.
 
-Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has not yet announced whether or not they will support Spark natively, but [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.
+Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has recent announced they will support Spark, too. See also [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation for a general discussion about running Spark with different versions of Hadoop. It also discusses other deployment scenarios.
 
 ## Spark Clusters
 
-Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.0.1/cluster-overview.html). Consider the following diagram:
+Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.1.0/cluster-overview.html). Consider the following diagram:
 
-![Spark Cluster](http://spark.apache.org/docs/1.0.1/img/cluster-overview.png)
+![Spark Cluster](http://spark.apache.org/docs/1.1.0/img/cluster-overview.png)
 
 Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, either Spark's own manager or the corresponding management services provided by [Mesos](http://mesos.apache.org/) or [Hadoop's YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html). The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
@@ -39,19 +41,20 @@ When possible, run the driver locally on the cluster to reduce network IO as it 
 
 ## Spark Deployment Options
 
-Spark currently supports [three cluster managers](http://spark.apache.org/docs/1.0.1/cluster-overview.html):
+Spark currently supports [four deployment options](http://spark.apache.org/docs/1.1.0/cluster-overview.html) for clusters:
 
-* [Standalone](http://spark.apache.org/docs/1.0.1/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
-* [Apache Mesos](http://spark.apache.org/docs/1.0.1/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
-* [Hadoop YARN](http://spark.apache.org/docs/1.0.1/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
+* [Standalone](http://spark.apache.org/docs/1.1.0/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
+* [Apache Mesos](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
+* [Hadoop YARN](http://spark.apache.org/docs/1.1.0/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
+* [Amazon Web Services - EC2] - The Spark distribution includes scripts for [launching Spark clusters on EC2](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
 
-Note that you can run Spark on a Hadoop cluster using any of these three approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Standalone and Mesos deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
+You could run Spark processes on the same hardware as a Hadoop cluster using any of these approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Non-YARN deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
 
-For information on using YARN, see [here](http://spark.apache.org/docs/1.0.1/running-on-yarn.html).
+For information on using YARN, see [here](http://spark.apache.org/docs/1.1.0/running-on-yarn.html).
 
-For information on using Mesos, see [here](http://spark.apache.org/docs/1.0.1/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
+For information on using Mesos, see [here](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
 
-Spark also includes [EC2 launch scripts](http://spark.apache.org/docs/1.0.1/ec2-scripts.html) for running clusters on Amazon EC2.
+For information on using EC2, see [here](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
 
 ## Resilient, Distributed Datasets
 
@@ -65,20 +68,20 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ## Spark SQL
 
-A new API in Spark is [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop.
+[Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
 
-Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new engine is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
+Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
-This workshop uses Spark 1.0.1.
+This workshop uses Spark 1.1.0.
 
 The following documentation links provide more information about Spark:
 
-* [Documentation](http://spark.apache.org/docs/1.0.1/).
-* [Scaladocs API](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package).
+* [Documentation](http://spark.apache.org/docs/1.1.0/).
+* [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/1.0.1/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+The [Documentation](http://spark.apache.org/docs/1.1.0/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package) useful for the workshop.
 
 ## Building and Testing
 
@@ -668,7 +671,7 @@ Note that the specified or default `input-path` is a directory with Hadoop-style
 
 See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first "N" lines of the crawl output), then hack on the script to output some of the results from each step.
 
-A few useful [RDD](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
+A few useful [RDD](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
 
 The end goal is to output each record string in the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
 

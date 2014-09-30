@@ -1,6 +1,6 @@
 # Apache Spark: An Introductory Workshop
 
-![image](http://spark.apache.org/docs/1.0.1/img/spark-logo-100x40px.png)
+![image](http://spark.apache.org/docs/1.1.0/img/spark-logo-100x40px.png)
 
 Dean Wampler, Ph.D.
 [Typesafe](http://typesafe.com)
@@ -13,9 +13,11 @@ This workshop demonstrates how to write and run [Apache Spark](http://spark.apac
 
 [Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level [Apache project](http://spark.apache.org).
 
-We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters. There is even a *Spark Shell*, a customized version of the Scala REPL (read, eval, print loop shell), for interactive use.
+Spark includes support for streaming, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for writing with data sets through SQL queries. It integrates embedded SQL queries and data schemas with the normal Spark API. It also offers Hive integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
 
-> New in Version 2.0, I've added new examples and exercises for [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which integrates structured data and embedded SQL queries with normal Spark code. It even has a Hive integration module so you can query existing Hive tables, even create and delete them.
+We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters.
+
+There also several *Spark Shells*. One is an enhanced version of the Scala REPL (read, eval, print loop shell), for interactive use. SparkSQL adds a SQL-only REPL option. You can use a Python shell, since Spark has a Python API. A Java API is also supported and R support is coming soon.
 
 ## Why Spark?
 
@@ -23,13 +25,13 @@ By 2013, it became increasingly clear that a successor was needed for the venera
 
 Spark was seen as the best, general-purpose alternative, so [Cloudera led the way](http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html) in embracing Spark as a replacement for MapReduce.
 
-Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has not yet announced whether or not they will support Spark natively, but [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation discusses general techniques for running Spark with various versions of Hadoop, as well as other deployment scenarios.
+Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has recent announced they will support Spark, too. See also [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation for a general discussion about running Spark with different versions of Hadoop. It also discusses other deployment scenarios.
 
 ## Spark Clusters
 
-Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.0.1/cluster-overview.html). Consider the following diagram:
+Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.1.0/cluster-overview.html). Consider the following diagram:
 
-![Spark Cluster](http://spark.apache.org/docs/1.0.1/img/cluster-overview.png)
+![Spark Cluster](http://spark.apache.org/docs/1.1.0/img/cluster-overview.png)
 
 Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, either Spark's own manager or the corresponding management services provided by [Mesos](http://mesos.apache.org/) or [Hadoop's YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html). The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
@@ -39,19 +41,20 @@ When possible, run the driver locally on the cluster to reduce network IO as it 
 
 ## Spark Deployment Options
 
-Spark currently supports [three cluster managers](http://spark.apache.org/docs/1.0.1/cluster-overview.html):
+Spark currently supports [four deployment options](http://spark.apache.org/docs/1.1.0/cluster-overview.html) for clusters:
 
-* [Standalone](http://spark.apache.org/docs/1.0.1/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
-* [Apache Mesos](http://spark.apache.org/docs/1.0.1/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
-* [Hadoop YARN](http://spark.apache.org/docs/1.0.1/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
+* [Standalone](http://spark.apache.org/docs/1.1.0/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
+* [Apache Mesos](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
+* [Hadoop YARN](http://spark.apache.org/docs/1.1.0/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
+* [Amazon Web Services - EC2] - The Spark distribution includes scripts for [launching Spark clusters on EC2](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
 
-Note that you can run Spark on a Hadoop cluster using any of these three approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Standalone and Mesos deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
+You could run Spark processes on the same hardware as a Hadoop cluster using any of these approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Non-YARN deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
 
-For information on using YARN, see [here](http://spark.apache.org/docs/1.0.1/running-on-yarn.html).
+For information on using YARN, see [here](http://spark.apache.org/docs/1.1.0/running-on-yarn.html).
 
-For information on using Mesos, see [here](http://spark.apache.org/docs/1.0.1/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
+For information on using Mesos, see [here](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
 
-Spark also includes [EC2 launch scripts](http://spark.apache.org/docs/1.0.1/ec2-scripts.html) for running clusters on Amazon EC2.
+For information on using EC2, see [here](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
 
 ## Resilient, Distributed Datasets
 
@@ -65,20 +68,20 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ## Spark SQL
 
-A new API in Spark is [Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html), which adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop.
+[Spark SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
 
-Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new engine is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
+Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. Spark SQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
-This workshop uses Spark 1.0.1.
+This workshop uses Spark 1.1.0.
 
 The following documentation links provide more information about Spark:
 
-* [Documentation](http://spark.apache.org/docs/1.0.1/).
-* [Scaladocs API](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package).
+* [Documentation](http://spark.apache.org/docs/1.1.0/).
+* [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/1.0.1/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+The [Documentation](http://spark.apache.org/docs/1.1.0/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package) useful for the workshop.
 
 ## Building and Testing
 
@@ -121,9 +124,9 @@ Let's now work through these exercises...
 
 ## Intro1
 
-[Intro1.sc](src/main/scala/spark/Intro1.sc)
+[Intro1.sc](../src/main/scala/spark/Intro1.sc)
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.sc](src/main/scala/spark/Intro1.sc).
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.sc](../src/main/scala/spark/Intro1.sc).
 
 The comments in this and the subsequent files try to explain the API calls being made.
 
@@ -142,7 +145,7 @@ sbt
 
 At the `sbt` prompt, type `console`. You'll see a welcome message and a `scala>` prompt.
 
-We're going to paste in the code from [Intro1.sc](src/main/scala/spark/Intro1.sc)
+We're going to paste in the code from [Intro1.sc](../src/main/scala/spark/Intro1.sc)
 . You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
 
 ```
@@ -235,13 +238,13 @@ Before moving on, let's discuss how you would actually run the Spark Shell. When
 
 ## WordCount2
 
-[WordCount2.scala](src/main/scala/spark/WordCount2.scala)
+[WordCount2.scala](../src/main/scala/spark/WordCount2.scala)
 
 The classic, simple *Word Count* algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.
 
 In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "local" counts can be done in parallel.
 
-[WordCount2.scala](src/main/scala/spark/WordCount2.scala)
+[WordCount2.scala](../src/main/scala/spark/WordCount2.scala)
  uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
 
 If using the <a class="shortcut" href="#run">run</a> panel, select `scala.WordCount2` and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.
@@ -322,12 +325,12 @@ In a real cluster with lots of data and lots of concurrent processing, there wou
 
 **Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?
 
-There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](src/main/scala/spark/solns/WordCount2GroupBy.scala)
+There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](../src/main/scala/spark/solns/WordCount2GroupBy.scala)
 solves a "group by" exercise.
 
 ## WordCount3
 
-[WordCount3.scala](src/main/scala/spark/WordCount3.scala)
+[WordCount3.scala](../src/main/scala/spark/WordCount3.scala)
 
 This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 
@@ -404,7 +407,7 @@ object WordCount3 {
     val argz = options(args.toList)
 ```
 
-I won't discuss the implementation of [CommandLineOptions.scala](src/main/scala/spark/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+I won't discuss the implementation of [CommandLineOptions.scala](../src/main/scala/spark/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
 
 ```
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
@@ -452,7 +455,7 @@ Don't forget the try the exercises at the end of the source file.
 
 ## Matrix4
 
-[Matrix4.scala](src/main/scala/spark/Matrix4.scala)
+[Matrix4.scala](../src/main/scala/spark/Matrix4.scala)
 
 An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.
 
@@ -534,7 +537,7 @@ The `collect` method is called to convert the RDD to an array, because we're jus
 
 ## Crawl5a
 
-[Crawl5a.scala](src/main/scala/spark/Crawl5a.scala)
+[Crawl5a.scala](../src/main/scala/spark/Crawl5a.scala)
 
 This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
@@ -562,7 +565,7 @@ The next step has to parse this format.
 
 ## InvertedIndex5b
 
-[InvertedIndex5b.scala](src/main/scala/spark/InvertedIndex5b.scala)
+[InvertedIndex5b.scala](../src/main/scala/spark/InvertedIndex5b.scala)
 
 Using the crawl data just generated, compute the index of words to documents (emails).
 
@@ -668,7 +671,7 @@ Note that the specified or default `input-path` is a directory with Hadoop-style
 
 See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first "N" lines of the crawl output), then hack on the script to output some of the results from each step.
 
-A few useful [RDD](http://spark.apache.org/docs/1.0.1/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
+A few useful [RDD](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
 
 The end goal is to output each record string in the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
 
@@ -678,7 +681,7 @@ The end goal is to output each record string in the following form: `(word, (doc
 
 ## NGrams6
 
-[NGrams6.scala](src/main/scala/spark/NGrams6.scala)
+[NGrams6.scala](../src/main/scala/spark/NGrams6.scala)
 
 In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
@@ -798,7 +801,7 @@ The `map` and `reduceByKey` calls are just like we used previously for `WordCoun
 
 ## Joins7
 
-[Joins7.scala](src/main/scala/spark/Joins7.scala)
+[Joins7.scala](../src/main/scala/spark/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
 
@@ -916,7 +919,7 @@ You can verify that the output file looks like the input KJV file with the book 
 
 ## SparkStreaming8
 
-[SparkStreaming8.scala](src/main/scala/spark/SparkStreaming8.scala)
+[SparkStreaming8.scala](../src/main/scala/spark/SparkStreaming8.scala)
 
 The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command.
 
@@ -978,7 +981,7 @@ A `StreamingContext` is used to wrap the normal `SparkContext`, too.
 
 ## The SparkStreaming8 Code
 
-Here is the code for [SparkStreaming8.scala](src/main/scala/spark/SparkStreaming8.scala):
+Here is the code for [SparkStreaming8.scala](../src/main/scala/spark/SparkStreaming8.scala):
 
 ```
 object SparkStreaming8 {
@@ -1176,7 +1179,7 @@ Now, only `factor2` must be serialized.
 
 ## SparkSQL9
 
-[SparkSQL9.scala](src/main/scala/spark/SparkSQL9.scala)
+[SparkSQL9.scala](../src/main/scala/spark/SparkSQL9.scala)
 
 The new Spark SQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as an alternative to the regular manipulation methods on the RDD type. There is also a builder DSL for constructing these queries, rather than using a string.
 
@@ -1296,7 +1299,7 @@ That's it! As before, there are suggested exercises at the end of the source fil
 
 ## SparkSQLParquet10
 
-[SparkSQLParquet10.scala](src/main/scala/spark/SparkSQLParquet10.scala)
+[SparkSQLParquet10.scala](../src/main/scala/spark/SparkSQLParquet10.scala)
 
 This example continues the use of the Parquet support. It reads the data written by the previous example.
 
@@ -1344,7 +1347,7 @@ Finally, use the [LINQ](http://msdn.microsoft.com/en-us/library/bb397926.aspx)-i
 
 ## HiveSQL11
 
-[HiveSQL11.sc](src/main/scala/spark/HiveSQL11.sc)
+[HiveSQL11.sc](../src/main/scala/spark/HiveSQL11.sc)
 
 The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, Spark SQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
 
