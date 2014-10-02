@@ -26,5 +26,3 @@ addCommandAlias("ex7",  "runMain com.typesafe.sparkworkshop.Joins7")
 addCommandAlias("ex8",  "runMain com.typesafe.sparkworkshop.SparkStreaming8")
 
 addCommandAlias("ex9",  "runMain com.typesafe.sparkworkshop.SparkSQL9")
-
-addCommandAlias("ex10", "runMain com.typesafe.sparkworkshop.SparkSQLParquet10")
