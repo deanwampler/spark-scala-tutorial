@@ -1,6 +1,6 @@
-# Apache Spark: An Introductory Workshop
+# Apache Spark: An Introductory Workshop for Hortonworks Sandbox 2.1
 
-![image](http://spark.apache.org/docs/1.1.0/img/spark-logo-100x40px.png)
+![](http://spark.apache.org/docs/latest/img/spark-logo-100x40px.png)
 
 Dean Wampler, Ph.D.
 [Typesafe](http://typesafe.com)
@@ -9,52 +9,31 @@ Dean Wampler, Ph.D.
 
 ## Introduction
 
-This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications.
+This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications within a special, extended version of the Hortonworks Sandbox 2.1. This version was extended by Hortonworks and Typesafe to add the [Spark 1.1](https://spark.apache.org) distribution and the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted), including an *Activator* template called [Spark Workshop](https://typesafe.com/activator/template/spark-workshop). You are reading the introduction to this workshop.
 
 [Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level [Apache project](http://spark.apache.org).
 
 Spark includes support for streaming, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for writing with data sets through SQL queries. It integrates embedded SQL queries and data schemas with the normal Spark API. It also offers Hive integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
 
-We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters.
+We will build the examples and exercises using [SBT](http://www.scala-sbt.org/), the standard build tool for Scala. Then we'll run them using one of several Spark bash scripts for submitting applications to the "cluster". There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark's Python API. A Java API is also supported and R support is coming soon.
 
-There also several *Spark Shells*. One is an enhanced version of the Scala REPL (read, eval, print loop shell), for interactive use. SparkSQL adds a SQL-only REPL option. You can use a Python shell, since Spark has a Python API. A Java API is also supported and R support is coming soon.
+When you're developing applications, another option is to run the exercises in a "local" mode on your workstation. This is very convenient for learning, development, and "unit" testing. When ready, you can deploy your application to a cluster.
 
 ## Why Spark?
 
 By 2013, it became increasingly clear that a successor was needed for the venerable [Hadoop MapReduce](http://wiki.apache.org/hadoop/MapReduce) compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.
 
-Spark was seen as the best, general-purpose alternative, so [Cloudera led the way](http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html) in embracing Spark as a replacement for MapReduce.
-
-Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has recent announced they will support Spark, too. See also [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation for a general discussion about running Spark with different versions of Hadoop. It also discusses other deployment scenarios.
+Spark was seen as the best, general-purpose alternative, so Hortonworks and other Hadoop vendors announced support for it in their distributions.
 
 ## Spark Clusters
 
-Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.1.0/cluster-overview.html). Consider the following diagram:
+Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/latest/cluster-overview.html). Consider the following diagram:
 
-![Spark Cluster](http://spark.apache.org/docs/1.1.0/img/cluster-overview.png)
+![Spark Cluster](http://spark.apache.org/docs/latest/img/cluster-overview.png)
 
-Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, either Spark's own manager or the corresponding management services provided by [Mesos](http://mesos.apache.org/) or [Hadoop's YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html). The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
+Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, and other options. The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
 Because each application has its own executor process per node, applications can't share data through the *Spark Context*. External storage has to be used (e.g., the file system, a database, a message queue, etc.)
-
-When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.
-
-## Spark Deployment Options
-
-Spark currently supports [four deployment options](http://spark.apache.org/docs/1.1.0/cluster-overview.html) for clusters:
-
-* [Standalone](http://spark.apache.org/docs/1.1.0/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
-* [Apache Mesos](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
-* [Hadoop YARN](http://spark.apache.org/docs/1.1.0/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
-* [Amazon Web Services - EC2] - The Spark distribution includes scripts for [launching Spark clusters on EC2](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
-
-You could run Spark processes on the same hardware as a Hadoop cluster using any of these approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Non-YARN deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
-
-For information on using YARN, see [here](http://spark.apache.org/docs/1.1.0/running-on-yarn.html).
-
-For information on using Mesos, see [here](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
-
-For information on using EC2, see [here](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
 
 ## Resilient, Distributed Datasets
 
@@ -78,47 +57,63 @@ This workshop uses Spark 1.1.0.
 
 The following documentation links provide more information about Spark:
 
-* [Documentation](http://spark.apache.org/docs/1.1.0/).
-* [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package).
+* [Documentation](http://spark.apache.org/docs/latest/).
+* [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/1.1.0/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+
+## Starting Activator
+
+[Typesafe Activator](https://typesafe.com/activator) is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. This Spark Workshop is one example. Activator is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted) installed the directory `/root/activator`.
+
+Start the Sandbox virtual machine. Write down the IP address of the VM that's printed in the final output during bootup.
+
+When you log into the Sandbox, you enter the `root` user's home directory, `/root`. So, to start activator, run the following command.
+
+```
+activator/activator ui
+```
+
+Now open a browser window on your workstation and navigator to `http://ip-address:8888`, where `ip-replace` should be the IP address for the VM that was shown at the end of startup.
+
+
 
 ## Building and Testing
 
-If you're using the [Typesafe Activator UI](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically.
+Log into the Sandbox virtual machine. The user name is `root` and the password is `hadoop`. At the shell prompt, run the following command
 
-If you grabbed this workshop from [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
+```
+activator/ui start
+```
 
-To compile the code and run the tests, either use the Activator UI <a class="shortcut" href="#test">test</a> link or start `sbt` and enter `test` at the prompt.
+It will echo a URL. Open that URL in a browser.
 
-Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the *Spark Streaming* exercise, which uses multiple processes.
+To compile the code and run the tests, use the Activator UI's <a class="shortcut" href="#test">test</a> link. All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. Note that tests are provided for most, but not all of the examples.
 
-## Running the Exercises
+## Running the Examples
 
-Next, let's try running one of the exercises.
+Next, let's try running one of the examples.
 
-In Activator, use the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class", for example `WordCount2`, and click the "Start" button. The "Logs" panel shows some information. Note the `output` directories listed in the output. Use a file browser to find those directories to view the output written in those locations.
+In Activator, select the <a class="shortcut" href="#run">run</a> panel, then select one of the bullet items listed under "Main Class", for example `WordCount2`, and finally click the "Start" button. The "Logs" panel shows some information output as it runs. Note the `output` directories listed in the output. Use your login window to view the those directories.
 
-In `sbt`, enter `run`. It will present the same list of main classes. Enter one of the numbers to select the executable you want to run. Enter the number in the `[...]` brackets corresponding to  **WordCount2** to verify that everything works.
-
-Note that the some exercises have package names with the word `solns`. They are solutions to the exercises. The `other` package has alternative implementations of some examples or exercises, for your consideration.
+Note that the some examples have package names with the word `solns`. They are solutions to the exercises. The `other` package has alternative implementations of some exercises, for your consideration.
 
 ## The Exercises
 
 Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
-* **Intro1:** Actually, this *isn't* listed by the `run` command, because it is a script we'll use with the interactive *Spark Shell*.
+* **Intro1:** The first example is actually run using the interactive `spark-shell`, as we'll see.
 * **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.)
 * **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
-* **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
+* **Matrix4:** Demonstrates using explicit parallelism on a simplistic Matrix application.
 * **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins and this exercise provides a simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
-* **SparkSQLParquet10:** Demonstrates reading Parquet-formatted data, namely the data written in the previous example.
-* **HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
+* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop.
+* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example. This example and the next one are in a `hadoop` subdirectory, because they use features that *explicitly* require a Hadoop cluster to run, where as the previous examples can be run in "local" mode with out a cluster (more details later on).
+* **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
 
@@ -671,7 +666,7 @@ Note that the specified or default `input-path` is a directory with Hadoop-style
 
 See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first "N" lines of the crawl output), then hack on the script to output some of the results from each step.
 
-A few useful [RDD](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
+A few useful [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
 
 The end goal is to output each record string in the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
 

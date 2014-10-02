@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -15,13 +15,12 @@ body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,A
 </style>
 
 </head>
-<body class="normal firstload">
+<body class="normal">
   <div id="wrapper">
-      <h1 id="apachespark:anintroductoryworkshop">Apache Spark: An Introductory Workshop</h1>
+      <h1 id="apachespark:anintroductoryworkshopforhortonworkssandbox2.1">Apache Spark: An Introductory Workshop for Hortonworks Sandbox 2.1</h1>
 
 <figure>
-<img src="http://spark.apache.org/docs/1.1.0/img/spark-logo-100x40px.png" alt="image" />
-<figcaption>image</figcaption>
+<img src="http://spark.apache.org/docs/latest/img/spark-logo-100x40px.png" alt="" />
 </figure>
 
 <p>Dean Wampler, Ph.D.<br/>
@@ -29,61 +28,38 @@ body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,A
 <a href="mailto:dean.wampler@typesafe.com">dean.wampler@typesafe.com</a><br/>
 <a href="https://twitter.com/deanwampler">@deanwampler</a></p>
 
-<h2 id="introduction">Introduction</h2>
+<div><h2 id="introduction">Introduction</h2>
 
-<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications.</p>
+<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications within a special, extended version of the Hortonworks Sandbox 2.1. This version was extended by Hortonworks and Typesafe to add the <a href="https://spark.apache.org">Spark 1.1</a> distribution and the <a href="https://typesafe.com/platform/getstarted">Typesafe Reactive Platform</a>, including an <em>Activator</em> template called <a href="https://typesafe.com/activator/template/spark-workshop">Spark Workshop</a>. You are reading the introduction to this workshop.</p>
 
 <p><a href="http://spark.apache.org">Apache Spark</a> is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level <a href="http://spark.apache.org">Apache project</a>.</p>
 
 <p>Spark includes support for streaming, as well as more traditional batch-mode applications. There is a <a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">SparkSQL</a> module for writing with data sets through SQL queries. It integrates embedded SQL queries and data schemas with the normal Spark API. It also offers Hive integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.</p>
 
-<p>We&#8217;ll run our exercises &#8220;locally&#8221; on our laptops, which is very convenient for learning, development, and &#8220;unit&#8221; testing. However, there are several ways to run Spark clusters.</p>
+<p>We will build the examples and exercises using <a href="http://www.scala-sbt.org/">SBT</a>, the standard build tool for Scala. Then we&#8217;ll run them using one of several Spark bash scripts for submitting applications to the &#8220;cluster&#8221;. There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark&#8217;s Python API. A Java API is also supported and R support is coming soon.</p>
 
-<p>There also several <em>Spark Shells</em>. One is an enhanced version of the Scala REPL (read, eval, print loop shell), for interactive use. SparkSQL adds a SQL-only REPL option. You can use a Python shell, since Spark has a Python API. A Java API is also supported and R support is coming soon.</p>
+<p>When you&#8217;re developing applications, another option is to run the exercises in a &#8220;local&#8221; mode on your workstation. This is very convenient for learning, development, and &#8220;unit&#8221; testing. When ready, you can deploy your application to a cluster.</p>
 
-<h2 id="whyspark">Why Spark?</h2>
+</div><div><h2 id="whyspark">Why Spark?</h2>
 
 <p>By 2013, it became increasingly clear that a successor was needed for the venerable <a href="http://wiki.apache.org/hadoop/MapReduce">Hadoop MapReduce</a> compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can&#8217;t support event-streaming (&#8220;real-time&#8221;) scenarios.</p>
 
-<p>Spark was seen as the best, general-purpose alternative, so <a href="http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html">Cloudera led the way</a> in embracing Spark as a replacement for MapReduce.</p>
+<p>Spark was seen as the best, general-purpose alternative, so Hortonworks and other Hadoop vendors announced support for it in their distributions.</p>
 
-<p>Spark is now officially supported in <a href="http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/">Cloudera CDH5</a> and <a href="http://www.mapr.com/products/apache-spark">MapR&#8217;s distribution</a>. Hortonworks has recent announced they will support Spark, too. See also <a href="http://spark.apache.org/docs/1.0.0/cluster-overview.html">this page</a> in the Spark documentation for a general discussion about running Spark with different versions of Hadoop. It also discusses other deployment scenarios.</p>
+</div><div><h2 id="sparkclusters">Spark Clusters</h2>
 
-<h2 id="sparkclusters">Spark Clusters</h2>
-
-<p>Let&#8217;s briefly discuss the anatomy of a Spark standalone cluster, adapting <a href="http://spark.apache.org/docs/1.1.0/cluster-overview.html">this discussion (and diagram) from the Spark documentation</a>. Consider the following diagram:</p>
+<p>Let&#8217;s briefly discuss the anatomy of a Spark cluster, adapting <a href="http://spark.apache.org/docs/latest/cluster-overview.html">this discussion (and diagram) from the Spark documentation</a>. Consider the following diagram:</p>
 
 <figure>
-<img src="http://spark.apache.org/docs/1.1.0/img/cluster-overview.png" alt="Spark Cluster" />
+<img src="http://spark.apache.org/docs/latest/img/cluster-overview.png" alt="Spark Cluster" />
 <figcaption>Spark Cluster</figcaption>
 </figure>
 
-<p>Each program we&#8217;ll write is a <em>Driver Program</em>. It uses a <em>SparkContext</em> to communicate with the <em>Cluster Manager</em>, either Spark&#8217;s own manager or the corresponding management services provided by <a href="http://mesos.apache.org/">Mesos</a> or <a href="http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html">Hadoop&#8217;s YARN</a>. The <em>Cluster Manager</em> allocates resources. An <em>Executor</em> JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.</p>
+<p>Each program we&#8217;ll write is a <em>Driver Program</em>. It uses a <em>SparkContext</em> to communicate with the <em>Cluster Manager</em>, which is an abstraction over <a href="http://hortonworks.com/hadoop/yarn/">Hadoop YARN</a>, local mode, and other options. The <em>Cluster Manager</em> allocates resources. An <em>Executor</em> JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.</p>
 
 <p>Because each application has its own executor process per node, applications can&#8217;t share data through the <em>Spark Context</em>. External storage has to be used (e.g., the file system, a database, a message queue, etc.)</p>
 
-<p>When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.</p>
-
-<h2 id="sparkdeploymentoptions">Spark Deployment Options</h2>
-
-<p>Spark currently supports <a href="http://spark.apache.org/docs/1.1.0/cluster-overview.html">four deployment options</a> for clusters:</p>
-
-<ul>
-<li><a href="http://spark.apache.org/docs/1.1.0/spark-standalone.html">Standalone</a> – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.</li>
-<li><a href="http://spark.apache.org/docs/1.1.0/running-on-mesos.html">Apache Mesos</a> – <a href="http://mesos.apache.org/">Mesos</a> is a general-purpose cluster management system that can also run <a href="http://hadoop.apache.org">Hadoop</a> and other services.</li>
-<li><a href="http://spark.apache.org/docs/1.1.0/running-on-yarn.html">Hadoop YARN</a> – <a href="http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html">YARN</a> is the <a href="http://hadoop.apache.org">Hadoop</a> v2 resource manager.</li>
-<li>[Amazon Web Services - EC2] - The Spark distribution includes scripts for <a href="http://spark.apache.org/docs/1.1.0/ec2-scripts.html">launching Spark clusters on EC2</a>.</li>
-</ul>
-
-<p>You could run Spark processes on the same hardware as a Hadoop cluster using any of these approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Non-YARN deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.</p>
-
-<p>For information on using YARN, see <a href="http://spark.apache.org/docs/1.1.0/running-on-yarn.html">here</a>.</p>
-
-<p>For information on using Mesos, see <a href="http://spark.apache.org/docs/1.1.0/running-on-mesos.html">here</a> and <a href="http://mesosphere.io/learn/run-spark-on-mesos/">here</a>.</p>
-
-<p>For information on using EC2, see <a href="http://spark.apache.org/docs/1.1.0/ec2-scripts.html">here</a>.</p>
-
-<h2 id="resilientdistributeddatasets">Resilient, Distributed Datasets</h2>
+</div><div><h2 id="resilientdistributeddatasets">Resilient, Distributed Datasets</h2>
 
 <p>The data caching is one of the key reasons that Spark&#8217;s performance is considerably better than the performance of MapReduce. Spark stores the data for the job in <em>Resilient, Distributed Datasets</em> (RDDs), where a logical data set is virtualized over the cluster.</p>
 
@@ -93,67 +69,75 @@ body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,A
 
 <p>The architecture of RDDs is described in the research paper <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a>.</p>
 
-<h2 id="sparksql">SparkSQL</h2>
+</div><div><h2 id="sparksql">SparkSQL</h2>
 
 <p><a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">SparkSQL</a> adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in <a href="http://hive.apache.org">Hive</a>, the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.</p>
 
 <p>Several years ago, the Spark team ported the Hive frontend to Spark, calling it <a href="http://shark.cs.berkeley.edu/">Shark</a>. That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called <a href="http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html">Catalyst</a>.</p>
 
-<h2 id="thesparkversion">The Spark Version</h2>
+</div><div><h2 id="thesparkversion">The Spark Version</h2>
 
 <p>This workshop uses Spark 1.1.0.</p>
 
 <p>The following documentation links provide more information about Spark:</p>
 
 <ul>
-<li><a href="http://spark.apache.org/docs/1.1.0/">Documentation</a>.</li>
-<li><a href="http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package">Scaladocs API</a>.</li>
+<li><a href="http://spark.apache.org/docs/latest/">Documentation</a>.</li>
+<li><a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package">Scaladocs API</a>.</li>
 </ul>
 
-<p>The <a href="http://spark.apache.org/docs/1.1.0/">Documentation</a> includes a getting-started guide and overviews. You&#8217;ll find the <a href="http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package">Scaladocs API</a> useful for the workshop.</p>
+<p>The <a href="http://spark.apache.org/docs/latest/">Documentation</a> includes a getting-started guide and overviews. You&#8217;ll find the <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package">Scaladocs API</a> useful for the workshop.</p>
 
-<h2 id="buildingandtesting">Building and Testing</h2>
+</div><div><h2 id="startingactivator">Starting Activator</h2>
 
-<p>If you&#8217;re using the <a href="http://typesafe.com/activator">Typesafe Activator UI</a>, search for <code>activator-spark</code> and install it in the UI. The code is built automatically.</p>
+<p><a href="https://typesafe.com/activator">Typesafe Activator</a> is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. This Spark Workshop is one example. Activator is part of the <a href="https://typesafe.com/platform/getstarted">Typesafe Reactive Platform</a> installed the directory <code>/root/activator</code>.</p>
 
-<p>If you grabbed this workshop from <a href="https://github.com/deanwampler/activator-spark">Github</a>, you&#8217;ll need to install <code>sbt</code> and use a command line to build and run the applications. In that case, see the <a href="http://www.scala-sbt.org/">sbt website</a> for instructions on installing <code>sbt</code>.</p>
+<p>Start the Sandbox virtual machine. Write down the IP address of the VM that&#8217;s printed in the final output during bootup.</p>
 
-<p>To compile the code and run the tests, either use the Activator UI <a class="shortcut" href="#test">test</a> link or start <code>sbt</code> and enter <code>test</code> at the prompt.</p>
+<p>When you log into the Sandbox, you enter the <code>root</code> user&#8217;s home directory, <code>/root</code>. So, to start activator, run the following command.</p>
+<pre><code class="(null)">activator/activator ui</code></pre>
 
-<p>Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the <em>Spark Streaming</em> exercise, which uses multiple processes.</p>
+<p>Now open a browser window on your workstation and navigator to <code>http://ip-address:8888</code>, where <code>ip-replace</code> should be the IP address for the VM that was shown at the end of startup.</p>
 
-<h2 id="runningtheexercises">Running the Exercises</h2>
+</div><div><h2 id="buildingandtesting">Building and Testing</h2>
 
-<p>Next, let&#8217;s try running one of the exercises.</p>
+<p>Log into the Sandbox virtual machine. The user name is <code>root</code> and the password is <code>hadoop</code>. At the shell prompt, run the following command</p>
+<pre><code class="(null)">activator/ui start</code></pre>
 
-<p>In Activator, use the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under &#8220;Main Class&#8221;, for example <code>WordCount2</code>, and click the &#8220;Start&#8221; button. The &#8220;Logs&#8221; panel shows some information. Note the <code>output</code> directories listed in the output. Use a file browser to find those directories to view the output written in those locations.</p>
+<p>It will echo a URL. Open that URL in a browser.</p>
 
-<p>In <code>sbt</code>, enter <code>run</code>. It will present the same list of main classes. Enter one of the numbers to select the executable you want to run. Enter the number in the <code>[...]</code> brackets corresponding to <strong>WordCount2</strong> to verify that everything works.</p>
+<p>To compile the code and run the tests, use the Activator UI&#8217;s <a class="shortcut" href="#test">test</a> link. All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. Note that tests are provided for most, but not all of the examples.</p>
 
-<p>Note that the some exercises have package names with the word <code>solns</code>. They are solutions to the exercises. The <code>other</code> package has alternative implementations of some examples or exercises, for your consideration.</p>
+</div><div><h2 id="runningtheexamples">Running the Examples</h2>
 
-<h2 id="theexercises">The Exercises</h2>
+<p>Next, let&#8217;s try running one of the examples.</p>
+
+<p>In Activator, select the <a class="shortcut" href="#run">run</a> panel, then select one of the bullet items listed under &#8220;Main Class&#8221;, for example <code>WordCount2</code>, and finally click the &#8220;Start&#8221; button. The &#8220;Logs&#8221; panel shows some information output as it runs. Note the <code>output</code> directories listed in the output. Use your login window to view the those directories.</p>
+
+<p>Note that the some examples have package names with the word <code>solns</code>. They are solutions to the exercises. The <code>other</code> package has alternative implementations of some exercises, for your consideration.</p>
+
+</div><div><h2 id="theexercises">The Exercises</h2>
 
 <p>Here is a list of the exercises. In subsequent sections, we&#8217;ll dive into the details for each one. Note that each name ends with a number, indicating the order in which we&#8217;ll discuss and try them:</p>
 
 <ul>
-<li><strong>Intro1:</strong> Actually, this <em>isn&#8217;t</em> listed by the <code>run</code> command, because it is a script we&#8217;ll use with the interactive <em>Spark Shell</em>.</li>
+<li><strong>Intro1:</strong> The first example is actually run using the interactive <code>spark-shell</code>, as we&#8217;ll see.</li>
 <li><strong>WordCount2:</strong> The <em>Word Count</em> algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The <code>data</code> directory has a <a href="../data/README.html">README</a> that discusses the sources of the data files.)</li>
 <li><strong>WordCount3:</strong> An alternative implementation of <em>Word Count</em> that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</li>
-<li><strong>Matrix4:</strong> Demonstrates Spark&#8217;s Matrix API, useful for many machine learning algorithms.</li>
+<li><strong>Matrix4:</strong> Demonstrates using explicit parallelism on a simplistic Matrix application.</li>
 <li><strong>Crawl5a:</strong> Simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines. The documents &#8220;crawled&#8221; are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.</li>
 <li><strong>InvertedIndex5b:</strong> Using the crawl data, compute the index of words to documents (emails).</li>
 <li><strong>NGrams6:</strong> Find all N-word (&#8220;NGram&#8221;) occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
 <li><strong>Joins7:</strong> Spark supports SQL-style joins and this exercise provides a simple example.</li>
 <li><strong>SparkStreaming8:</strong> The streaming capability is relatively new and this exercise shows how it works to construct a simple &#8220;echo&#8221; server. Running it is a little more involved. See below.</li>
-<li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The <code>data</code> directory has a <a href="../data/README.html">README</a> that discusses the sources of the data files.) This script ends by writing data in the de-facto standard <a href="http://parquet.io">Parquet</a> format that is increasingly popular in <em>Big Data</em> applications.</li>
-<li><strong>SparkSQLParquet10:</strong> Demonstrates reading Parquet-formatted data, namely the data written in the previous example.</li>
-<li><strong>HiveSQL11:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
+<li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop.</li>
+<li><strong>hadoop/SparkSQLParquet10:</strong> Demonstrates writing and reading <a href="http://parquet.io">Parquet</a>-formatted data, namely the data written in the previous example. This example and the next one are in a <code>hadoop</code> subdirectory, because they use features that <em>explicitly</em> require a Hadoop cluster to run, where as the previous examples can be run in &#8220;local&#8221; mode with out a cluster (more details later on).</li>
+<li><strong>hadoop/HiveSQL11:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
 </ul>
 
 <p>Let&#8217;s now work through these exercises&#8230;</p>
 
-<h2 id="intro1">Intro1</h2>
+</div><div><h2 id="intro1">Intro1</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc">Intro1.sc</a></p>
 
@@ -247,7 +231,7 @@ The shell automatically does these steps for us.</p>
 
 <p>Before moving on, let&#8217;s discuss how you would actually run the Spark Shell. When you <a href="TODO">download a full Spark distribution</a>, it includes a <code>bin</code> directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command <code>bin/spark-shell</code> (assuming your working directory is the root of the distribution).</p>
 
-<h2 id="wordcount2">WordCount2</h2>
+</div><div><h2 id="wordcount2">WordCount2</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala">WordCount2.scala</a></p>
 
@@ -329,7 +313,7 @@ total 328
 <p>There are exercises described in the source file. Solutions for some of them are implemented in the <code>solns</code> package. For example, <a href="../src/main/scala/com/typesafe/sparkworkshop/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a><br/>
 solves a &#8220;group by&#8221; exercise.</p>
 
-<h2 id="wordcount3">WordCount3</h2>
+</div><div><h2 id="wordcount3">WordCount3</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/WordCount3.scala">WordCount3.scala</a></p>
 
@@ -429,7 +413,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
 <p>Don&#8217;t forget the try the exercises at the end of the source file.</p>
 
-<h2 id="matrix4">Matrix4</h2>
+</div><div><h2 id="matrix4">Matrix4</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/Matrix4.scala">Matrix4.scala</a></p>
 
@@ -499,7 +483,7 @@ object Matrix4 {
 
 <p>The <code>collect</code> method is called to convert the RDD to an array, because we&#8217;re just going to print results to the console. The expression <code>sums_avgs.zipWithIndex</code> creates a tuple with each <code>sums_avgs</code> value and it&#8217;s index into the collection. We use that to print the row index.</p>
 
-<h2 id="crawl5a">Crawl5a</h2>
+</div><div><h2 id="crawl5a">Crawl5a</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/Crawl5a.scala">Crawl5a.scala</a></p>
 
@@ -521,7 +505,7 @@ object Matrix4 {
 
 <p>The next step has to parse this format.</p>
 
-<h2 id="invertedindex5b">InvertedIndex5b</h2>
+</div><div><h2 id="invertedindex5b">InvertedIndex5b</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/InvertedIndex5b.scala">InvertedIndex5b.scala</a></p>
 
@@ -617,12 +601,12 @@ object InvertedIndex5b {
 
 <p>See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first &#8220;N&#8221; lines of the crawl output), then hack on the script to output some of the results from each step.</p>
 
-<p>A few useful <a href="http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> methods include <code>RDD.sample</code> or <code>RDD.take</code>, to select a subset of elements. Use <code>RDD.saveAsTextFile</code> to write to a file or use <code>RDD.collect</code> to convert the RDD data into a &#8220;normal&#8221; collection and then use one of the <code>print*</code> methods to dump the contents.</p>
+<p>A few useful <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> methods include <code>RDD.sample</code> or <code>RDD.take</code>, to select a subset of elements. Use <code>RDD.saveAsTextFile</code> to write to a file or use <code>RDD.collect</code> to convert the RDD data into a &#8220;normal&#8221; collection and then use one of the <code>print*</code> methods to dump the contents.</p>
 
 <p>The end goal is to output each record string in the following form: <code>(word, (doc1, n1), (doc2, n2), ...)</code>. For example, the word &#8220;ability&#8221; appears twice in one email and once in another (both SPAM):</p>
 <pre><code class="(null)">(ability,(0018.2003-12-18.GP.spam.txt,2), (0020.2001-07-28.SA_and_HP.spam.txt,1))</code></pre>
 
-<h2 id="ngrams6">NGrams6</h2>
+</div><div><h2 id="ngrams6">NGrams6</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/NGrams6.scala">NGrams6.scala</a></p>
 
@@ -730,7 +714,7 @@ We read the data as before, but note that because of our line orientation, we <e
 
 <p>The <code>map</code> and <code>reduceByKey</code> calls are just like we used previously for <code>WordCount2</code>, but now we&#8217;re counting found NGrams. The final <code>takeOrdered</code> call combines sorting with taking the top <code>n</code> found. This is more efficient than separate sort, then take operations. As a rule, when you see a method that does two things like this, it&#8217;s usually there for efficiency reasons!</p>
 
-<h2 id="joins7">Joins7</h2>
+</div><div><h2 id="joins7">Joins7</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/Joins7.scala">Joins7.scala</a></p>
 
@@ -827,7 +811,7 @@ We read the data as before, but note that because of our line orientation, we <e
 
 <p>You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not in the correct order! (See the exercises in the source file.)</p>
 
-<h2 id="sparkstreaming8">SparkStreaming8</h2>
+</div><div><h2 id="sparkstreaming8">SparkStreaming8</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala">SparkStreaming8.scala</a></p>
 
@@ -870,13 +854,13 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>Where the default is <code>--inpath data/kjvdat.txt</code>.</p>
 
-<h2 id="howsparkstreamingworks">How Spark Streaming Works</h2>
+</div><div><h2 id="howsparkstreamingworks">How Spark Streaming Works</h2>
 
 <p>Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on <em>deltas</em> of data, say all the events received within 1-second intervals (which is what we used here). Those deltas are <code>RDDs</code> encapsulated in a <code>DStream</code> (&#8220;Discretized Stream&#8221;).</p>
 
 <p>A <code>StreamingContext</code> is used to wrap the normal <code>SparkContext</code>, too.</p>
 
-<h2 id="thesparkstreaming8code">The SparkStreaming8 Code</h2>
+</div><div><h2 id="thesparkstreaming8code">The SparkStreaming8 Code</h2>
 
 <p>Here is the code for <a href="../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala">SparkStreaming8.scala</a>:</p>
 <pre><code class="(null)">object SparkStreaming8 {
@@ -1019,7 +1003,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>This is just the tip of the iceberg for Streaming. See the <a href="http://spark.apache.org/docs/1.0.0/streaming-programming-guide.html">Streaming Programming Guide</a> for more information.</p>
 
-<h2 id="bestpracticestipsandtricks">Best Practices, Tips, and Tricks</h2>
+</div><div><h2 id="bestpracticestipsandtricks">Best Practices, Tips, and Tricks</h2>
 
 <h3 id="safeclosures">Safe Closures</h3>
 
@@ -1050,7 +1034,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>Now, only <code>factor2</code> must be serialized.</p>
 
-<h2 id="sparksql9">SparkSQL9</h2>
+</div><div><h2 id="sparksql9">SparkSQL9</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/SparkSQL9.scala">SparkSQL9.scala</a></p>
 
@@ -1136,7 +1120,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>That&#8217;s it. As before, there are suggested exercises at the end of the source file. Some solutions are provided in the <code>solns</code> source package.</p>
 
-<h2 id="sparksqlparquet10">SparkSQLParquet10</h2>
+</div><div><h2 id="sparksqlparquet10">SparkSQLParquet10</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/hadoop/SparkSQLParquet10.sc">SparkSQLParquet10.sc</a></p>
 
@@ -1150,7 +1134,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>See the script for more details.</p>
 
-<h2 id="hivesql11">HiveSQL11</h2>
+</div><div><h2 id="hivesql11">HiveSQL11</h2>
 
 <p><a href="../src/main/scala/com/typesafe/sparkworkshop/hadoop/HiveSQL11.sc">HiveSQL11.sc</a></p>
 
@@ -1192,7 +1176,7 @@ hql(&quot;&quot;&quot;
 <li>The query results are returned in an RDD. To dump to the console, we use <code>collect.foreach(println)</code>, which converts the RDD to an in-memory array, then loops over each record and prints the results.</li>
 </ul>
 
-<h2 id="goingforwardfromhere">Going Forward from Here</h2>
+</div><div><h2 id="goingforwardfromhere">Going Forward from Here</h2>
 
 <p>To learn more, see the following:</p>
 
@@ -1219,12 +1203,13 @@ hql(&quot;&quot;&quot;
 <li><a href="https://github.com/freeman-lab/thunder">Thunder - Large-scale neural data analysis with Spark</a>.</li>
 </ul>
 
-<h2 id="formoreabouttypesafe:">For more about Typesafe:</h2>
+</div><div><h2 id="formoreabouttypesafe:">For more about Typesafe:</h2>
 
 <ul>
 <li>See <a href="http://typesafe.com/activator">Typesafe Activator</a> to find other Activator templates.</li>
 <li>See <a href="http://typesafe.com">Typesafe</a> for more information about our products and services.</li>
 </ul>
+</div>
 <!-- ##END MARKED WRAPPER## -->
     </div>
 </body>
