@@ -146,9 +146,9 @@ body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,A
 <li><strong>NGrams6:</strong> Find all N-word (&#8220;NGram&#8221;) occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form <code>% love % %</code>, where the <code>%</code> are wild cards. In other words, all 4-grams are found with <code>love</code> as the second word. The <code>%</code> are conveniences; the NGram Phrase can also be a regular expression, e.g., <code>% (hat|lov)ed? % %</code> finds all the phrases with <code>love</code>, <code>loved</code>, <code>hate</code>, and <code>hated</code>.</li>
 <li><strong>Joins7:</strong> Spark supports SQL-style joins and this exercise provides a simple example.</li>
 <li><strong>SparkStreaming8:</strong> The streaming capability is relatively new and this exercise shows how it works to construct a simple &#8220;echo&#8221; server. Running it is a little more involved. See below.</li>
-<li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The <code>data</code> directory has a <a href="../data/README.html">README</a> that discusses the sources of the data files.) This script ends by writing data in the de-facto standard <a href="http://parquet.io">Parquet</a> format that is increasingly popular in <em>Big Data</em> applications.</li>
-<li><strong>SparkSQLParquet10:</strong> Demonstrates reading Parquet-formatted data, namely the data written in the previous example.</li>
-<li><strong>HiveSQL11:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
+<li><strong>SparkSQL9:</strong> Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop.</li>
+<li><strong>hadoop/SparkSQLParquet10:</strong> Demonstrates writing and reading <a href="http://parquet.io">Parquet</a>-formatted data, namely the data written in the previous example. This example and the next one are in a <code>hadoop</code> subdirectory, because they uses features that require a Hadoop cluster (more details later on).</li>
+<li><strong>hadoop/HiveSQL11:</strong> A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!</li>
 </ul>
 
 <p>Let&#8217;s now work through these exercises&#8230;</p>

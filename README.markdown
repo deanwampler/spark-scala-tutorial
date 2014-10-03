@@ -116,9 +116,9 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins and this exercise provides a simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
-* **SparkSQLParquet10:** Demonstrates reading Parquet-formatted data, namely the data written in the previous example.
-* **HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
+* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop.
+* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example. This example and the next one are in a `hadoop` subdirectory, because they uses features that require a Hadoop cluster (more details later on).
+* **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
 
@@ -1248,7 +1248,7 @@ Here is the contents of the `try` block:
 Defines a regex to extract the fields on each line, separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
 
 ```
-      verses.registerAsTable("kjv_bible")
+      verses.registerTempTable("kjv_bible")
       verses.cache()
 
       val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
@@ -1261,7 +1261,7 @@ Defines a regex to extract the fields on each line, separated by "|", and also r
 
 Registers the RDD as a temporary table in the Hive metadata store. A single process [Derby SQL](http://db.apache.org/derby/) database is used. It writes its data to a `metastore` directory in the current directory. The data is also cached in memory.
 
-Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`SQLContext`) converts it to a The actual method is defined on `org.apache.spark.sql.SchemaRDD`, which provides the `registerAsTable` method.
+Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`SQLContext`) converts it to a The actual method is defined on `org.apache.spark.sql.SchemaRDD`, which provides the `registerTempTable` method.
 
 The call to `sql` was imported from the `sqlc` (`SQLContext`) instance. We can write a SQL query and the results are returned as a new RDD! We then `collect` it into an `Array[Verse]` and then print each line.
 

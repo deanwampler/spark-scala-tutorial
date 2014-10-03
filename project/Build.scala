@@ -70,6 +70,7 @@ object ActivatorSparkBuild extends Build {
       // runScriptSetting,
       resolvers := allResolvers,
       libraryDependencies ++= Dependencies.activatorspark,
+      excludeFilter in unmanagedSources := (HiddenFileFilter || "Intro1*" || "HiveSQL*" || "SparkSQLParquet*"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
       // Must run Spark tests sequentially because they compete for port 4040!
