@@ -23,6 +23,8 @@ import org.apache.spark.streaming.scheduler.{
  * Spark Streaming process in *this* terminal window.
  * Start the NetCat/NCat process first. For NetCat (nc), use this command:
  *   nc -c -l -p 9999
+ * or if you get an error that "-c" isn't a valid option, just try this:
+ *   nc -l 9999
  * Back in the original terminal window, run SparkStreaming8 application with
  * the following option:
  *   --socket localhost:9999
