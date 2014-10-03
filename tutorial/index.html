@@ -139,9 +139,9 @@ body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,A
 
 </div><div><h2 id="intro1">Intro1</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc">Intro1.sc</a></p>
+<p><a href="#code/src/main/sparkworkshop/Intro1.scala">Intro1.scala</a></p>
 
-<p>Our first exercise demonstrates the useful <em>Spark Shell</em>, which is a customized version of Scala&#8217;s REPL (read, eval, print, loop). We&#8217;ll copy and paste some commands from the file <a href="../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc">Intro1.sc</a>.</p>
+<p>Our first exercise demonstrates the useful <em>Spark Shell</em>, which is a customized version of Scala&#8217;s REPL (read, eval, print, loop). We&#8217;ll copy and paste some commands from the file <a href="#code/src/main/sparkworkshop/Intro1.scala">Intro1.scala</a>.</p>
 
 <p>The comments in this and the subsequent files try to explain the API calls being made.</p>
 
@@ -157,7 +157,7 @@ sbt</code></pre>
 
 <p>At the <code>sbt</code> prompt, type <code>console</code>. You&#8217;ll see a welcome message and a <code>scala&gt;</code> prompt.</p>
 
-<p>We&#8217;re going to paste in the code from <a href="../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc">Intro1.sc</a><br/>
+<p>We&#8217;re going to paste in the code from <a href="#code/src/main/sparkworkshop/Intro1.scala">Intro1.scala</a><br/>
 . You could do it all at once, but we&#8217;ll do it a few lines at a time and discuss each one. (It&#8217;s harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:</p>
 <pre><code class="(null)">import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -219,7 +219,7 @@ if (output.exists == false) output.mkdir</code></pre>
 <p>Now, if we actually used the Spark Shell for this exercise, we would have omitted the two <code>import</code> statements and the statement where we created the <code>ScalaContext</code> value <code>sc</code>.<br/>
 The shell automatically does these steps for us.</p>
 
-<p>There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the <code>src/main/scala/com/typesafe/sparkworkshop/solns</code> directory. Solutions aren&#8217;t provided for all the suggested exercises, but I accept pull requests. ;)</p>
+<p>There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the <code>src/main/sparkworkshop/solns</code> directory. Solutions aren&#8217;t provided for all the suggested exercises, but I accept pull requests. ;)</p>
 
 <p>All the solutions provided for the rest of the exercises are compiled by <code>activator</code> or <code>sbt</code>, so you&#8217;ll be able to run them the same way.</p>
 
@@ -233,13 +233,13 @@ The shell automatically does these steps for us.</p>
 
 </div><div><h2 id="wordcount2">WordCount2</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala">WordCount2.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/WordCount2.scala">WordCount2.scala</a></p>
 
 <p>The classic, simple <em>Word Count</em> algorithm is easy to understand and it&#8217;s suitable for parallel computation, so it&#8217;s a good vehicle when first learning a Big Data API.</p>
 
 <p>In <em>Word Count</em>, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and &#8220;local&#8221; counts can be done in parallel.</p>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala">WordCount2.scala</a><br/>
+<p><a href="#code/src/main/sparkworkshop/WordCount2.scala">WordCount2.scala</a><br/>
  uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)</p>
 
 <p>If using the <a class="shortcut" href="#run">run</a> panel, select <code>scala.WordCount2</code> and click the &#8220;Start&#8221; button. The &#8220;Logs&#8221; panel shows some information. Note the &#8220;output&#8221; directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.</p>
@@ -310,12 +310,12 @@ total 328
 
 <p><strong>Quiz:</strong> If you look at the (unsorted) data, you&#8217;ll find a lot of entries where the word is a number. (Try &#8220;grepping&#8221; to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?</p>
 
-<p>There are exercises described in the source file. Solutions for some of them are implemented in the <code>solns</code> package. For example, <a href="../src/main/scala/com/typesafe/sparkworkshop/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a><br/>
+<p>There are exercises described in the source file. Solutions for some of them are implemented in the <code>solns</code> package. For example, <a href="#code/src/main/sparkworkshop/solns/WordCount2GroupBy.scala">solns/WordCount2GroupBy.scala</a><br/>
 solves a &#8220;group by&#8221; exercise.</p>
 
 </div><div><h2 id="wordcount3">WordCount3</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/WordCount3.scala">WordCount3.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/WordCount3.scala">WordCount3.scala</a></p>
 
 <p>This exercise also implements <em>Word Count</em>, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.</p>
 
@@ -376,7 +376,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
     val argz = options(args.toList)</code></pre>
 
-<p>I won&#8217;t discuss the implementation of <a href="../src/main/scala/com/typesafe/sparkworkshop/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an <code>Opt</code> type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., <code>CommandLineOptions.inputPath(&quot;data/kjvdat.txt&quot;)</code>) specifies the default value for that option.</p>
+<p>I won&#8217;t discuss the implementation of <a href="#code/src/main/sparkworkshop/util/CommandLineOptions.scala">CommandLineOptions.scala</a> except to say that it defines some methods that create instances of an <code>Opt</code> type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., <code>CommandLineOptions.inputPath(&quot;data/kjvdat.txt&quot;)</code>) specifies the default value for that option.</p>
 <pre><code class="(null)">    val sc = new SparkContext(argz(&quot;master&quot;).toString, &quot;Word Count (3)&quot;)
 
     try {
@@ -415,7 +415,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
 </div><div><h2 id="matrix4">Matrix4</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/Matrix4.scala">Matrix4.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/Matrix4.scala">Matrix4.scala</a></p>
 
 <p>An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.</p>
 
@@ -485,7 +485,7 @@ object Matrix4 {
 
 </div><div><h2 id="crawl5a">Crawl5a</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/Crawl5a.scala">Crawl5a.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/Crawl5a.scala">Crawl5a.scala</a></p>
 
 <p>This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the <em>inverse index</em> used by search engines, from words to documents. The documents &#8220;crawled&#8221; are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.</p>
 
@@ -507,7 +507,7 @@ object Matrix4 {
 
 </div><div><h2 id="invertedindex5b">InvertedIndex5b</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/InvertedIndex5b.scala">InvertedIndex5b.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/InvertedIndex5b.scala">InvertedIndex5b.scala</a></p>
 
 <p>Using the crawl data just generated, compute the index of words to documents (emails).</p>
 
@@ -608,7 +608,7 @@ object InvertedIndex5b {
 
 </div><div><h2 id="ngrams6">NGrams6</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/NGrams6.scala">NGrams6.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/NGrams6.scala">NGrams6.scala</a></p>
 
 <p>In <em>Natural Language Processing</em>, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or <em>NGrams</em>. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3&#8211;5 appears to provide the best balance.</p>
 
@@ -716,7 +716,7 @@ We read the data as before, but note that because of our line orientation, we <e
 
 </div><div><h2 id="joins7">Joins7</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/Joins7.scala">Joins7.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/Joins7.scala">Joins7.scala</a></p>
 
 <p>Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won&#8217;t discuss the details here, but it&#8217;s worth reading how joins are implemented in various <em>Big Data</em> systems, such as <a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization">this discussion for Hive joins</a> and the <strong>Joins</strong> section of <a href="http://shop.oreilly.com/product/0636920021773.do">Hadoop: The Definitive Guide</a>.</p>
 
@@ -813,7 +813,7 @@ We read the data as before, but note that because of our line orientation, we <e
 
 </div><div><h2 id="sparkstreaming8">SparkStreaming8</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala">SparkStreaming8.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/SparkStreaming8.scala">SparkStreaming8.scala</a></p>
 
 <p>The streaming capability is relatively new and our last exercise shows how it works to construct a simple &#8220;echo&#8221; server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the &#8220;run&#8221; command.</p>
 
@@ -862,7 +862,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 </div><div><h2 id="thesparkstreaming8code">The SparkStreaming8 Code</h2>
 
-<p>Here is the code for <a href="../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala">SparkStreaming8.scala</a>:</p>
+<p>Here is the code for <a href="#code/src/main/sparkworkshop/SparkStreaming8.scala">SparkStreaming8.scala</a>:</p>
 <pre><code class="(null)">object SparkStreaming8 {
   // Override for tests, etc.
   var out = Console.out
@@ -1036,7 +1036,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 </div><div><h2 id="sparksql9">SparkSQL9</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/SparkSQL9.scala">SparkSQL9.scala</a></p>
+<p><a href="#code/src/main/sparkworkshop/SparkSQL9.scala">SparkSQL9.scala</a></p>
 
 <p>The new SparkSQL API extends RDDs with a &#8220;schema&#8221; for records, defined using a Scala <em>case class</em>, and allows you to embed queries using a subset of SQL in strings, as a supplement to the regular manipulation methods on the RDD type; use the best tool for the job in the same application! There is also a builder DSL for constructing these queries, rather than using a string.</p>
 
@@ -1091,7 +1091,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
       ...</code></pre>
 
 <p>Defines a regex to extract the fields on each line, separated by &#8220;|&#8221;, and also removes the trailing &#8220;~&#8221; unique to this file. Then it invokes <code>flatMap</code> over the file lines (each considered a record) to extract each &#8220;good&#8221; lines and convert them into a <code>Verse</code> instances. <code>Verse</code> is defined in the <code>util</code> package. If a line is bad, a log message is written and an empty sequence is returned. Using <code>flatMap</code> and sequences means we&#8217;ll effectively remove the bad lines.</p>
-<pre><code class="(null)">      verses.registerAsTable(&quot;kjv_bible&quot;)
+<pre><code class="(null)">      verses.registerTempTable(&quot;kjv_bible&quot;)
       verses.cache()
 
       val godVerses = sql(&quot;SELECT * FROM kjv_bible WHERE text LIKE &apos;%God%&apos;&quot;)
@@ -1103,7 +1103,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 <p>Registers the RDD as a temporary table in the Hive metadata store. A single process <a href="http://db.apache.org/derby/">Derby SQL</a> database is used. It writes its data to a <code>metastore</code> directory in the current directory. The data is also cached in memory.</p>
 
-<p>Even though <code>verses</code> is an RDD, an &#8220;implicit&#8221; conversion imported from <code>sqlc</code> (<code>SQLContext</code>) converts it to a The actual method is defined on <code>org.apache.spark.sql.SchemaRDD</code>, which provides the <code>registerAsTable</code> method.</p>
+<p>Even though <code>verses</code> is an RDD, an &#8220;implicit&#8221; conversion imported from <code>sqlc</code> (<code>SQLContext</code>) converts it to a The actual method is defined on <code>org.apache.spark.sql.SchemaRDD</code>, which provides the <code>registerTempTable</code> method.</p>
 
 <p>The call to <code>sql</code> was imported from the <code>sqlc</code> (<code>SQLContext</code>) instance. We can write a SQL query and the results are returned as a new RDD! We then <code>collect</code> it into an <code>Array[Verse]</code> and then print each line.</p>
 <pre><code class="(null)">      val counts = sql(&quot;SELECT book, COUNT(*) FROM kjv_bible GROUP BY book&quot;)
@@ -1122,7 +1122,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 </div><div><h2 id="sparksqlparquet10">SparkSQLParquet10</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/hadoop/SparkSQLParquet10.sc">SparkSQLParquet10.sc</a></p>
+<p><a href="#code/src/main/sparkworkshop/hadoop/SparkSQLParquet10.scala">SparkSQLParquet10.scala</a></p>
 
 <p>This script demonstrates the methods for reading and writing files in the <a href="http://parquet.io">Parquet</a> format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.</p>
 
@@ -1136,7 +1136,7 @@ will shutdown when the socket drops. However, by default, Spark Streaming will a
 
 </div><div><h2 id="hivesql11">HiveSQL11</h2>
 
-<p><a href="../src/main/scala/com/typesafe/sparkworkshop/hadoop/HiveSQL11.sc">HiveSQL11.sc</a></p>
+<p><a href="#code/src/main/sparkworkshop/hadoop/HiveSQL11.scala">HiveSQL11.scala</a></p>
 
 <p>The previous examples used the new <a href="http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html">Catalyst</a> query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we&#8217;re not using the Catalyst SQL library, but Hive&#8217;s.</p>
 

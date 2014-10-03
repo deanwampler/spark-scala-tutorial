@@ -1,5 +1,7 @@
 import sbt._
 import sbt.Keys._
+import sbtassembly.Plugin._
+import AssemblyKeys._
 
 object BuildSettings {
 
@@ -66,14 +68,22 @@ object ActivatorSparkBuild extends Build {
   lazy val activatorspark = Project(
     id = "Activator-Spark",
     base = file("."),
-    settings = buildSettings ++ Seq(
+    settings = buildSettings ++ assemblySettings ++ Seq(
       // runScriptSetting,
       resolvers := allResolvers,
       libraryDependencies ++= Dependencies.activatorspark,
+      excludeFilter in unmanagedSources := (HiddenFileFilter || "Intro1*" || "HiveSQL*" || "SparkSQLParquet*"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
       // Must run Spark tests sequentially because they compete for port 4040!
-      parallelExecution in Test := false))
+      parallelExecution in Test := false,
+      mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
+        {
+          case "META-INF/MANIFEST.MF" => MergeStrategy.discard
+          case x => MergeStrategy.first
+        }
+      }
+      ))
 }
 
 

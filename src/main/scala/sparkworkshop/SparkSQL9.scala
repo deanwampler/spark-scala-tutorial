@@ -43,7 +43,7 @@ object SparkSQL9 {
       // methods that we imported through sqlc._ The actual method is
       // defined on org.apache.spark.sql.SchemaRDDLike, which also has a method
       // "saveAsParquetFile" to write a schema-preserving Parquet file.
-      verses.registerAsTable("kjv_bible")
+      verses.registerTempTable("kjv_bible")
       verses.cache()
 
       val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")

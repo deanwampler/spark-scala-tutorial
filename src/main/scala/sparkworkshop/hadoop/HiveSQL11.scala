@@ -1,5 +1,10 @@
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
+// HiveSQL11.scala - A Scala script will use interactively in the Spark Shell.
+// Script files can't be compiled in the same way as normal code files, so
+// the SBT build is configured to ignore this file.
+
+// Not needed when using spark-shell or our sbt console setup:
+// import org.apache.spark.SparkContext
+// import org.apache.spark.SparkContext._
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive.LocalHiveContext
 import com.typesafe.sparkworkshop.util.Verse
@@ -76,8 +81,9 @@ hql("SELECT * FROM kjv WHERE text LIKE '%God%'").collect().foreach(println)
 println("Drop the table.")
 hql("DROP TABLE kjv").collect().foreach(println)
 
-// Don't forget this when you're done (but not now...):
-sc.stop()
+// Not needed if you're using the actual Spark Shell and our configured sbt
+// console command.
+// sc.stop()
 
 // Exercise: Repeat some of the exercises we did for SparkSQL9:
 //  1. Sort the output by the words. How much overhead does this add?

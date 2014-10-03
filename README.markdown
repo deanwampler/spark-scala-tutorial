@@ -124,9 +124,9 @@ Let's now work through these exercises...
 
 ## Intro1
 
-[Intro1.sc](../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc)
+[Intro1.scala](src/main/sparkworkshop/Intro1.scala)
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.sc](../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc).
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.scala](src/main/sparkworkshop/Intro1.scala).
 
 The comments in this and the subsequent files try to explain the API calls being made.
 
@@ -145,7 +145,7 @@ sbt
 
 At the `sbt` prompt, type `console`. You'll see a welcome message and a `scala>` prompt.
 
-We're going to paste in the code from [Intro1.sc](../src/main/scala/com/typesafe/sparkworkshop/Intro1.sc)
+We're going to paste in the code from [Intro1.scala](src/main/sparkworkshop/Intro1.scala)
 . You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
 
 ```
@@ -226,7 +226,7 @@ if (output.exists == false) output.mkdir
 Now, if we actually used the Spark Shell for this exercise, we would have omitted the two `import` statements and the statement where we created the `ScalaContext` value `sc`.
 The shell automatically does these steps for us.
 
-There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/scala/com/typesafe/sparkworkshop/solns` directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;)
+There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/sparkworkshop/solns` directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;)
 
 All the solutions provided for the rest of the exercises are compiled by `activator` or `sbt`, so you'll be able to run them the same way.
 
@@ -238,13 +238,13 @@ Before moving on, let's discuss how you would actually run the Spark Shell. When
 
 ## WordCount2
 
-[WordCount2.scala](../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala)
+[WordCount2.scala](src/main/sparkworkshop/WordCount2.scala)
 
 The classic, simple *Word Count* algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.
 
 In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "local" counts can be done in parallel.
 
-[WordCount2.scala](../src/main/scala/com/typesafe/sparkworkshop/WordCount2.scala)
+[WordCount2.scala](src/main/sparkworkshop/WordCount2.scala)
  uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
 
 If using the <a class="shortcut" href="#run">run</a> panel, select `scala.WordCount2` and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.
@@ -325,12 +325,12 @@ In a real cluster with lots of data and lots of concurrent processing, there wou
 
 **Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?
 
-There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](../src/main/scala/com/typesafe/sparkworkshop/solns/WordCount2GroupBy.scala)
+There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](src/main/sparkworkshop/solns/WordCount2GroupBy.scala)
 solves a "group by" exercise.
 
 ## WordCount3
 
-[WordCount3.scala](../src/main/scala/com/typesafe/sparkworkshop/WordCount3.scala)
+[WordCount3.scala](src/main/sparkworkshop/WordCount3.scala)
 
 This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 
@@ -407,7 +407,7 @@ object WordCount3 {
     val argz = options(args.toList)
 ```
 
-I won't discuss the implementation of [CommandLineOptions.scala](../src/main/scala/com/typesafe/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+I won't discuss the implementation of [CommandLineOptions.scala](src/main/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
 
 ```
     val sc = new SparkContext(argz("master").toString, "Word Count (3)")
@@ -455,7 +455,7 @@ Don't forget the try the exercises at the end of the source file.
 
 ## Matrix4
 
-[Matrix4.scala](../src/main/scala/com/typesafe/sparkworkshop/Matrix4.scala)
+[Matrix4.scala](src/main/sparkworkshop/Matrix4.scala)
 
 An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.
 
@@ -537,7 +537,7 @@ The `collect` method is called to convert the RDD to an array, because we're jus
 
 ## Crawl5a
 
-[Crawl5a.scala](../src/main/scala/com/typesafe/sparkworkshop/Crawl5a.scala)
+[Crawl5a.scala](src/main/sparkworkshop/Crawl5a.scala)
 
 This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
@@ -565,7 +565,7 @@ The next step has to parse this format.
 
 ## InvertedIndex5b
 
-[InvertedIndex5b.scala](../src/main/scala/com/typesafe/sparkworkshop/InvertedIndex5b.scala)
+[InvertedIndex5b.scala](src/main/sparkworkshop/InvertedIndex5b.scala)
 
 Using the crawl data just generated, compute the index of words to documents (emails).
 
@@ -681,7 +681,7 @@ The end goal is to output each record string in the following form: `(word, (doc
 
 ## NGrams6
 
-[NGrams6.scala](../src/main/scala/com/typesafe/sparkworkshop/NGrams6.scala)
+[NGrams6.scala](src/main/sparkworkshop/NGrams6.scala)
 
 In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
@@ -801,7 +801,7 @@ The `map` and `reduceByKey` calls are just like we used previously for `WordCoun
 
 ## Joins7
 
-[Joins7.scala](../src/main/scala/com/typesafe/sparkworkshop/Joins7.scala)
+[Joins7.scala](src/main/sparkworkshop/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
 
@@ -919,7 +919,7 @@ You can verify that the output file looks like the input KJV file with the book 
 
 ## SparkStreaming8
 
-[SparkStreaming8.scala](../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala)
+[SparkStreaming8.scala](src/main/sparkworkshop/SparkStreaming8.scala)
 
 The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command.
 
@@ -981,7 +981,7 @@ A `StreamingContext` is used to wrap the normal `SparkContext`, too.
 
 ## The SparkStreaming8 Code
 
-Here is the code for [SparkStreaming8.scala](../src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala):
+Here is the code for [SparkStreaming8.scala](src/main/sparkworkshop/SparkStreaming8.scala):
 
 ```
 object SparkStreaming8 {
@@ -1179,7 +1179,7 @@ Now, only `factor2` must be serialized.
 
 ## SparkSQL9
 
-[SparkSQL9.scala](../src/main/scala/com/typesafe/sparkworkshop/SparkSQL9.scala)
+[SparkSQL9.scala](src/main/sparkworkshop/SparkSQL9.scala)
 
 The new SparkSQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as a supplement to the regular manipulation methods on the RDD type; use the best tool for the job in the same application! There is also a builder DSL for constructing these queries, rather than using a string.
 
@@ -1248,7 +1248,7 @@ Here is the contents of the `try` block:
 Defines a regex to extract the fields on each line, separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
 
 ```
-      verses.registerAsTable("kjv_bible")
+      verses.registerTempTable("kjv_bible")
       verses.cache()
 
       val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
@@ -1261,7 +1261,7 @@ Defines a regex to extract the fields on each line, separated by "|", and also r
 
 Registers the RDD as a temporary table in the Hive metadata store. A single process [Derby SQL](http://db.apache.org/derby/) database is used. It writes its data to a `metastore` directory in the current directory. The data is also cached in memory.
 
-Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`SQLContext`) converts it to a The actual method is defined on `org.apache.spark.sql.SchemaRDD`, which provides the `registerAsTable` method.
+Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`SQLContext`) converts it to a The actual method is defined on `org.apache.spark.sql.SchemaRDD`, which provides the `registerTempTable` method.
 
 The call to `sql` was imported from the `sqlc` (`SQLContext`) instance. We can write a SQL query and the results are returned as a new RDD! We then `collect` it into an `Array[Verse]` and then print each line.
 
@@ -1283,7 +1283,7 @@ That's it. As before, there are suggested exercises at the end of the source fil
 
 ## SparkSQLParquet10
 
-[SparkSQLParquet10.sc](../src/main/scala/com/typesafe/sparkworkshop/hadoop/SparkSQLParquet10.sc)
+[SparkSQLParquet10.scala](src/main/sparkworkshop/hadoop/SparkSQLParquet10.scala)
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
 
@@ -1295,7 +1295,7 @@ See the script for more details.
 
 ## HiveSQL11
 
-[HiveSQL11.sc](../src/main/scala/com/typesafe/sparkworkshop/hadoop/HiveSQL11.sc)
+[HiveSQL11.scala](src/main/sparkworkshop/hadoop/HiveSQL11.scala)
 
 The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
 
