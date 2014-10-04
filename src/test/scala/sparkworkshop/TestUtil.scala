@@ -6,14 +6,18 @@ object TestUtil {
 
   def verifyAndClean(actualFile: String, expectedFile: String, dirToDelete: String) =
     try {
-      val actual   = Source.fromFile(actualFile)
-      val expected = Source.fromFile(expectedFile)
-      (actual zip expected).zipWithIndex foreach {
-        case ((a, e), i) => assert(a == e, s"$a != $e at line $i")
-      }
+      verify(actualFile, expectedFile)
     } finally {
       rmrf(dirToDelete)
     }
+
+  def verify(actualFile: String, expectedFile: String) = {
+    val actual   = Source.fromFile(actualFile)
+    val expected = Source.fromFile(expectedFile)
+    (actual zip expected).zipWithIndex foreach {
+      case ((a, e), i) => assert(a == e, s"$a != $e at line $i")
+    }
+  }
 
   def rmrf(root: String): Unit = rmrf(new File(root))
 
