@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
@@ -89,7 +89,14 @@ object SparkStreaming8 {
       noterm(),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
     // Use a configuration object this time, in part because Streaming requires
     // the TTL to be set:
@@ -132,9 +139,7 @@ object SparkStreaming8 {
       wordCounts.print()  // print a few counts...
 
       // Generates a separate subdirectory for each interval!!
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
       wordCounts.saveAsTextFiles(out, "out")
 
       ssc.start()

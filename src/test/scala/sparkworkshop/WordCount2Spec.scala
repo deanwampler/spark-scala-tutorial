@@ -1,4 +1,5 @@
 import org.scalatest.FunSpec
+import com.typesafe.sparkworkshop.util.FileUtil
 
 // Run in local mode and local data.
 class WordCount2Spec extends FunSpec {
@@ -8,7 +9,7 @@ class WordCount2Spec extends FunSpec {
       val out    = "output/kjv-wc2"
       val out2   = s"$out/part-00000"
       val golden = "golden/kjv-wc2/part-00000"
-      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
+      FileUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       WordCount2.main(Array.empty[String])
 

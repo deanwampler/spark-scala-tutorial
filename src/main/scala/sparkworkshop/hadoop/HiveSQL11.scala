@@ -18,9 +18,23 @@ import com.typesafe.sparkworkshop.util.Verse
  * Instead, use Spark's "spark-submit" script instead.
  */
 
-val master = "yarn-cluster"
+// Logic to determine the user name from the system environment.
+val user = sys.env.get("USER") match {
+  case Some(user) => user
+  case None =>
+    println("ERROR: USER environment variable isn't defined. Using root!")
+    "root"
+}
 
-val sc = new SparkContext(master, "Hive SQL (11)")
+def hql2(title: String, query: String): Unit = {
+  println(title)
+  println(s"Running query: $query")
+  hql(query).collect.foreach(println)
+}
+
+// Not needed with spark-shell:
+// val master = "yarn-client"
+// val sc = new SparkContext(master, "Hive SQL (11)")
 
 // The analog of SQLContext we used in the previous exercise is Hive context
 // that starts up an instance of Hive where metadata is stored locally in
@@ -39,11 +53,8 @@ import hiveContext._   // Make methods local, as for SQLContext
 // from the location we specify.
 //
 // NOTES ('cause the API is quirky!):
-// 1. You must first copy "data/kjvdat.txt" to an empty "/tmp/kjv" directory,
-//    because Hive will expect the LOCATION below to be an absolute directory
-//    path and it will read all the files in it.
-//    If you are on Windows and not running Cygwin, pick a suitable location
-//    and change the LOCATION line to the correct absolute path.
+// 1. Make sure the directory is correct for the location of the data in HDFS.
+//    It must be an absolute path.
 // 2. Omit the trailing "/" in the LOCATION path.
 // 3. Omit semicolons at the end of the HQL (Hive SQL) string.
 // 4. The query results are in an RDD; use collect.print*...
@@ -56,30 +67,25 @@ hql("""
     verse   INT,
     text    STRING)
   ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-  LOCATION '/tmp/data'""")
+  LOCATION '/user/$user/data'""")
 
-println("How many records?")
-hql("SELECT COUNT(*) FROM kjv").collect.foreach(println)
+hql2("How many records?", "SELECT COUNT(*) FROM kjv")
 
-println("Print the first few records:")
-hql("SELECT * FROM kjv LIMIT 10").collect.foreach(println)
+hql2("Print the first few records:", "SELECT * FROM kjv LIMIT 10")
 
-println("Run the same GROUP BY we ran before:")
-hql("""
+hql2("Run the same GROUP BY we ran before:", """
   SELECT * FROM (
     SELECT book, COUNT(*) AS count FROM kjv GROUP BY book) bc
   WHERE bc.book != ''""")
-.collect.foreach(println)
 
-println("Run the 'God' query we ran before:")
-hql("SELECT * FROM kjv WHERE text LIKE '%God%'").collect().foreach(println)
+hql2("Run the 'God' query we ran before:",
+  "SELECT * FROM kjv WHERE text LIKE '%God%'")
 
 // Drop the table. We're using Hive's embedded Derby SQL "database" for the
 // "metastore" (Table metadata, etc.) See the "metastore" subdirectory you
 // now have! Because the table is EXTERNAL, we only delete the metadata, but
 // not the table data itself.
-println("Drop the table.")
-hql("DROP TABLE kjv").collect().foreach(println)
+hql2("Drop the table.", "DROP TABLE kjv")
 
 // Not needed if you're using the actual Spark Shell and our configured sbt
 // console command.

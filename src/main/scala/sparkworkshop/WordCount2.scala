@@ -1,5 +1,6 @@
 // package com.foo.bar    // You could put the code in a package...
 
+import com.typesafe.sparkworkshop.util.FileUtil
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in
 // org.apache.spark.rdd.PairRDDFunctions
@@ -26,6 +27,11 @@ object WordCount2 {
     // Put the "stop" inside a finally clause, so it's invoked even when
     // something fails that forces an abnormal termination.
     try {
+
+      val out = "output/kjv-wc2"
+      // Deleting old output (if any)
+      FileUtil.rmrf(out)
+
       // Load the King James Version of the Bible, then convert
       // each line to lower case, creating an RDD.
       val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
@@ -52,7 +58,6 @@ object WordCount2 {
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,
       // and checksum files.
-      val out = "output/kjv-wc2"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

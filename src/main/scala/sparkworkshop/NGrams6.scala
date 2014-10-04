@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -41,9 +41,16 @@ object NGrams6 {
       count("100"),
       ngrams("% love % %"))
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
-    val sc = new SparkContext(argz("master").toString, "NGrams (6)")
+    val sc = new SparkContext(master, "NGrams (6)")
     val ngramsStr = argz("ngrams").toString.toLowerCase
     // Note that the replacement strings use Scala's triple quotes; necessary
     // to ensure that the final string is "\w+" and "\s+" for the reges.
@@ -79,9 +86,7 @@ object NGrams6 {
       }
 
       val output = sc.makeRDD(outputLines)  // convert back to an RDD
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
       output.saveAsTextFile(out)
 
     } finally {

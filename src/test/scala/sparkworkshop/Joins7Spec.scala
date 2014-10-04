@@ -1,4 +1,5 @@
 import org.scalatest.FunSpec
+import com.typesafe.sparkworkshop.util.FileUtil
 
 // Run in local mode and local data.
 class Joins7Spec extends FunSpec {
@@ -7,7 +8,7 @@ class Joins7Spec extends FunSpec {
     it ("computes the join of the bible book abbreviations with their full names") {
       val out     = "output/kjv-joins"
       val golden  = "golden/kjv-joins/part-00000"
-      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
+      FileUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       Joins7.main(Array(
         "--master", "local", "--quiet", "--inpath", "data/kjvdat.txt",

@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -13,9 +13,16 @@ object InvertedIndex5b {
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
-    val sc = new SparkContext(argz("master").toString, "Inverted Index (5b)")
+    val sc = new SparkContext(master, "Inverted Index (5b)")
 
     try {
       // Load the input "crawl" data, where each line has the format:
@@ -34,9 +41,7 @@ object InvertedIndex5b {
           ("", "")
       }
 
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
 
       // Split on non-alphanumeric sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values

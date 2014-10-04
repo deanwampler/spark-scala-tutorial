@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -22,9 +22,16 @@ object WordCount3 {
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
-    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
+    val sc = new SparkContext(master, "Word Count (3)")
 
     try {
       // Load the input text, convert each line to lower case, then split
@@ -55,9 +62,7 @@ object WordCount3 {
       val wc2b = wc2a.map(key_value => s"${key_value._1},${key_value._2}").toSeq
       val wc2 = sc.makeRDD(wc2b, 1)
 
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
       wc2.saveAsTextFile(out)
 
     } finally {

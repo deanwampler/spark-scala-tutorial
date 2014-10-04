@@ -26,3 +26,23 @@ addCommandAlias("ex7",  "runMain Joins7")
 addCommandAlias("ex8",  "runMain SparkStreaming8")
 
 addCommandAlias("ex9",  "runMain SparkSQL9")
+
+// Command aliases for the Hadoop drivers:
+
+addCommandAlias("hex2",  "runMain HWordCount2")
+
+addCommandAlias("hex3",  "runMain HWordCount3")
+
+addCommandAlias("hex4",  "runMain HMatrix4")
+
+addCommandAlias("hex5a", "runMain HCrawl5a")
+
+addCommandAlias("hex5b", "runMain HInvertedIndex5b")
+
+addCommandAlias("hex6",  "runMain HNGrams6")
+
+addCommandAlias("hex7",  "runMain HJoins7")
+
+addCommandAlias("hex8",  "runMain HSparkStreaming8")
+
+addCommandAlias("hex9",  "runMain HSparkSQL9")

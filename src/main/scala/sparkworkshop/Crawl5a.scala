@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
@@ -19,9 +19,16 @@ object Crawl5a {
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
-    val sc = new SparkContext(argz("master").toString, "Crawl (5a)")
+    val sc = new SparkContext(master, "Crawl (5a)")
 
     try {
       val files_rdds = ingestFiles(argz("input-path").toString, sc)
@@ -31,9 +38,7 @@ object Crawl5a {
         case (file, rdd) => (file.getName, rdd.fold("")(_ + " " + _))
       }
 
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
       sc.makeRDD(names_contents).saveAsTextFile(out)
 
     } finally {

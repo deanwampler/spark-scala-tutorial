@@ -16,7 +16,8 @@ EOF
 
 master="yarn"
 deploy_mode="cluster"
-jars="$HOME/spark-workshop/target/scala-2.10/activator-spark_2.10-2.1.0.jar"
+project_jar=$(echo $HOME/spark-workshop/target/scala-2.*/activator-spark_*.jar)
+jars="$project_jar"
 while [ $# -gt 0 ]
 do
   case $1 in

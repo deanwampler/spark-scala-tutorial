@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -108,9 +108,16 @@ object Joins7Ordered {
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
-    val sc = new SparkContext(argz("master").toString, "Joins (7)")
+    val sc = new SparkContext(master, "Joins (7)")
     try {
       // Load one of the religious texts, don't convert each line to lower case
       // this time, then extract the fields in the "book|chapter|verse|text" format
@@ -169,9 +176,7 @@ object Joins7Ordered {
             (fullBookName, chapter, verse, text)
         }
 
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
       verses2.saveAsTextFile(out)
     } finally {
       sc.stop()

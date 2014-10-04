@@ -1,3 +1,4 @@
+import com.typesafe.sparkworkshop.util.FileUtil
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
@@ -13,6 +14,11 @@ object WordCount2SortByCount {
     val sc = new SparkContext("local", "Word Count (2)")
 
     try {
+
+      val out = s"output/kjv-wc2-sort-by-count"
+      println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+
       // Load the King James Version of the Bible, then convert
       // each line to lower case, creating an RDD.
       val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
@@ -44,7 +50,6 @@ object WordCount2SortByCount {
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,
       // and checksum files.
-      val out = s"output/kjv-wc2-sort-by-count"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

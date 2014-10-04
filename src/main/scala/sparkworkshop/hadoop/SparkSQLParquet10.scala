@@ -18,9 +18,11 @@ import com.typesafe.sparkworkshop.util.Verse
 
 val inputDir   = "data/kjvdat.txt"
 val parquetDir = "output/parquet"
-val master = "yarn-cluster"
 
-val sc = new SparkContext(master, "Spark SQL Parquet (10)")
+// Not needed with spark-shell:
+// val master = "yarn-client"
+// val sc = new SparkContext(master, "Spark SQL Parquet (10)")
+
 val sqlContext = new SQLContext(sc)
 import sqlContext._    // Make its methods accessible.
 

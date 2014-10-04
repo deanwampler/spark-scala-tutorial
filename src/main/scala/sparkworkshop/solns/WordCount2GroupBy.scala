@@ -1,3 +1,4 @@
+import com.typesafe.sparkworkshop.util.FileUtil
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
@@ -10,6 +11,11 @@ object WordCount2GroupBy {
     val sc = new SparkContext("local", "Word Count (2)")
 
     try {
+
+      val out = "output/kjv-wc2-group-by-count"
+      println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+
       // Load the King James Version of the Bible, then convert
       // each line to lower case, creating an RDD.
       val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
@@ -44,7 +50,6 @@ object WordCount2GroupBy {
       // e.g., "for" has 8971 occurrences, while "unto" has 8997, so they have
       // nearly the same frequency, but not the exact same, so they aren't
       // grouped together.
-      val out = "output/kjv-wc2-group-by-count"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

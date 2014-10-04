@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Verse}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, Verse}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.sql.SQLContext
@@ -26,8 +26,20 @@ object SparkSQL9 {
       CommandLineOptions.master("local[2]"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
-    val out = argz("output-path").toString
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    val outgv  = s"$out-god-verses"
+    val outvpb = s"$out-verses-per-book"
+    if (master.startsWith("local")) {
+      if (!quiet) {
+        println(s" **** Deleting old output (if any), $outgv:")
+        println(s" **** Deleting old output (if any), $outvpb:")
+      }
+      FileUtil.rmrf(outgv)
+      FileUtil.rmrf(outvpb)
+    }
 
     val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
     val sqlc = new SQLContext(sc)
@@ -57,9 +69,7 @@ object SparkSQL9 {
       val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
       println("Number of verses that mention God: "+godVerses.count())
 
-      val outgv = s"$out-god-verses"
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing verses that mention God to: $outgv")
+      if (!quiet) println(s"Writing verses that mention God to: $outgv")
       godVerses.saveAsTextFile(outgv)
 
       // NOTE: The basic SQL dialect currently supported doesn't permit
@@ -71,9 +81,7 @@ object SparkSQL9 {
         // output from the last query!
         .coalesce(1)
 
-      val outvpb = s"$out-verses-per-book"
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing count of verses per book to: $outvpb")
+      if (!quiet) println(s"Writing count of verses per book to: $outvpb")
       counts.saveAsTextFile(outvpb)
 
     } finally {

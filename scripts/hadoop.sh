@@ -63,9 +63,10 @@ dir=$(dirname $0)
 # See below, where once the output directories exist, we correctly find them.
 hadoop fs -rm -r -f $output
 
+project_jar=$(echo $HOME/spark-workshop/target/scala-2.*/activator-spark_*.jar)
+
 echo running: $HOME/spark/bin/spark-submit --master $master --class $main \
-  $HOME/spark-workshop/target/scala-2.10/activator-spark_2.10-2.1.0.jar \
-  --out $output $@
+  $project_jar --out $output $@
 echo ""
 
 # use NOOP=x scripts/hadoop.sh ... to suppress execution. You'll just see the
@@ -73,8 +74,7 @@ echo ""
 if [[ -z $NOOP ]]
 then
   $HOME/spark/bin/spark-submit --master $master --class $main \
-    $HOME/spark-workshop/target/scala-2.10/activator-spark_2.10-2.1.0.jar \
-    --out $output $@
+  $project_jar --out $output $@
 fi
 
 echo ""

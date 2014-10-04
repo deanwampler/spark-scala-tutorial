@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
@@ -23,14 +23,19 @@ object Crawl5aInefficient {
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 
     val sc = new SparkContext(argz("master").toString, "Crawl (5a - inefficient)")
 
     try {
-      val out = argz("output-path").toString
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+      if (!quiet) println(s"Writing output to: $out")
       ingestFiles(argz("input-path").toString, sc).saveAsTextFile(out)
 
     } finally {

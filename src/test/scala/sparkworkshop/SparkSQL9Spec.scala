@@ -1,4 +1,5 @@
 import org.scalatest.FunSpec
+import com.typesafe.sparkworkshop.util.FileUtil
 
 // Run in local mode and local data.
 class SparkSQL9Spec extends FunSpec {
@@ -11,8 +12,8 @@ class SparkSQL9Spec extends FunSpec {
       val goldenvpb = "golden/kjv-spark-sql-verses-per-book/part-00000"
       val goldengv0 = "golden/kjv-spark-sql-god-verses/part-00000"
       val goldengv1 = "golden/kjv-spark-sql-god-verses/part-00001"
-      TestUtil.rmrf(outvpb)  // Delete previous runs, if necessary.
-      TestUtil.rmrf(outgv)   // Delete previous runs, if necessary.
+      FileUtil.rmrf(outvpb)  // Delete previous runs, if necessary.
+      FileUtil.rmrf(outgv)   // Delete previous runs, if necessary.
 
       SparkSQL9.main(Array(
         "--master", "local[2]", "--quiet", "--inpath", "data/kjvdat.txt",
@@ -23,7 +24,7 @@ class SparkSQL9Spec extends FunSpec {
         TestUtil.verify(s"$outgv/part-00000", goldengv0)
         TestUtil.verify(s"$outgv/part-00001", goldengv1)
       } finally {
-        TestUtil.rmrf(outgv)
+        FileUtil.rmrf(outgv)
       }
     }
   }

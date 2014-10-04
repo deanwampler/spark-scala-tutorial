@@ -1,5 +1,6 @@
 import org.scalatest.FunSpec
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
+import com.typesafe.sparkworkshop.util.FileUtil
 
 // Run in local mode and local data.
 class Matrix4Spec extends FunSpec {
@@ -8,7 +9,7 @@ class Matrix4Spec extends FunSpec {
     it ("computes the sums of the rows in parallel.") {
       val out     = "output/matrix-math"
       val golden  = "golden/matrix-math/part-00000"
-      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
+      FileUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       Matrix4.main(Array("--master", "local", "--quiet", "--dims", "5x10", "--out", out))
 
