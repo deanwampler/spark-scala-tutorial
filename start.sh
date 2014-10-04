@@ -21,7 +21,7 @@ case $1 in
     ;;
 esac
 
-ip=$(scripts/get_ip.sh)
+ip=$(scripts/getip.sh)
 
 echo "================================================================"
 echo ""

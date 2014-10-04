@@ -16,10 +16,6 @@ help() {
 EOF
 }
 
-getip() {
-  ip addr show scope global | grep inet | sed -e 's/\s*inet //' | cut -d/ -f 1
-}
-
 master="yarn-client"
 main=""
 while [ $# -gt 0 ]
@@ -63,6 +59,8 @@ fi
 
 dir=$(dirname $0)
 
+# TODO: This only works if $output is really the output directory, not a prefix.
+# See below, where once the output directories exist, we correctly find them.
 hadoop fs -rm -r -f $output
 
 echo running: $HOME/spark/bin/spark-submit --master $master --class $main \
@@ -80,9 +78,30 @@ then
 fi
 
 echo ""
-echo "Contents of $output:"
-hadoop fs -ls $output
+outputs=($output)
+hadoop fs -test -d $output
+if [ $? -eq 0 ]
+then
+  echo "Contents of output directory:"
+else
+  echo "Contents of the output directories:"
+  output2=$(dirname $output)
+  outputs=($(hadoop fs -ls $output2 | grep $output | sed -e "s?.*\($output.*\)?\1?"))
+fi
 
+for o in ${outputs[@]}
+do
+  echo " **** $o:"
+  hadoop fs -ls $o
+  echo ""
+done
+
+ip=$($dir/getip.sh)
 echo ""
-echo " **** To see the output, open the following URL:"
-echo "      http://$(getip):8000/filebrowser/view/$output"
+echo " **** To see the contents, open the following URL(s):"
+echo ""
+for o in ${outputs[@]}
+do
+  echo "      http://$ip:8000/filebrowser/view/$o"
+done
+echo ""

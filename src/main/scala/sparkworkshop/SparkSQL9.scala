@@ -22,7 +22,7 @@ object SparkSQL9 {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.outputPath("output/spark-sql"),
+      CommandLineOptions.outputPath("output/kjv-spark-sql"),
       CommandLineOptions.master("local[2]"),
       CommandLineOptions.quiet)
 

@@ -19,15 +19,16 @@ import org.apache.spark.streaming.scheduler.{
  * or NCat that comes with NMap (http://nmap.org/download.html), which is available
  * for more platforms (e.g., Windows). Use one or the other to send data to the
  * Spark Streaming process in *this* terminal window.
- * Start the NetCat/NCat process first. For NetCat (nc), use this command:
- *   nc -c -l -p 9999
+ * Start the NetCat/NCat process first. For NetCat (nc), use this command,
+ * where you can choose a different port if you want:
+ *   nc -c -l -p 9900
  * or if you get an error that "-c" isn't a valid option, just try this:
- *   nc -l 9999
+ *   nc -l 9900
  * Back in the original terminal window, run SparkStreaming8 application with
- * the following option:
- *   --socket localhost:9999
+ * the following option, using the same port:
+ *   --socket localhost:9900
  * For example, at the SBT prompt:
- *   run-main spark.SparkStreaming8 --socket localhost:9999
+ *   run-main SparkStreaming8 --socket localhost:9900
  * (You can use any server and port combination you want for these two processes):
  *
  * Spark Streaming assumes long-running processes. For this example, we hard-wire
@@ -67,11 +68,11 @@ object SparkStreaming8 {
 
   class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
     override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
-      out.println(s"Receiver Error: $error. Stopping...")
+      println(s"Receiver Error: $error. Stopping...")
       sc.stop()
     }
     override def onReceiverStopped(stopped: StreamingListenerReceiverStopped):Unit = {
-      out.println(s"Receiver Stopped: $stopped. Stopping...")
+      println(s"Receiver Stopped: $stopped. Stopping...")
       sc.stop()
     }
   }
@@ -134,14 +135,14 @@ object SparkStreaming8 {
       val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
-      wordCounts.saveAsTextFile(out)
+      wordCounts.saveAsTextFiles(out, "out")
 
       ssc.start()
       if (argz("no-term").toString == "") ssc.awaitTermination(timeout)
       else  ssc.awaitTermination()
     } finally {
       // Having the ssc.stop here is only needed when we use the timeout.
-      out.println("+++++++++++++ Stopping! +++++++++++++")
+      println("+++++++++++++ Stopping! +++++++++++++")
       ssc.stop()
     }
   }
@@ -150,7 +151,7 @@ object SparkStreaming8 {
     try {
       // Pattern match to extract the 0th, 1st array elements after the split.
       val Array(server, port) = serverPort.split(":")
-      out.println(s"Connecting to $server:$port...")
+      println(s"Connecting to $server:$port...")
       sc.socketTextStream(server, port.toInt)
     } catch {
       case th: Throwable =>
@@ -163,7 +164,7 @@ object SparkStreaming8 {
 
   // Hadoop text file compatible.
   private def useDirectory(sc: StreamingContext, dirName: String): DStream[String] = {
-    out.println(s"Reading 'events' from directory $dirName")
+    println(s"Reading 'events' from directory $dirName")
     sc.textFileStream(dirName)
   }
 }
