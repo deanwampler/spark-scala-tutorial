@@ -1,3 +1,5 @@
+import com.typesafe.sparkworkshop.util.CommandLineOptions
+import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import com.typesafe.sparkworkshop.util.Matrix
 import org.apache.spark.SparkContext
 
@@ -7,50 +9,63 @@ import org.apache.spark.SparkContext
  */
 object Matrix4 {
 
-  // Override for tests.
-  var out = Console.out
+  case class Dimensions(m: Int, n: Int)
 
   def main(args: Array[String]) = {
 
-    case class Dimensions(m: Int, n: Int)
+    /** A function to generate an Opt for handling the matrix dimensions. */
+    def dims(value: String): Opt = Opt(
+      name   = "dims",
+      value  = value,
+      help   = s"-d | --dims  nxm     The number of rows (n) and columns (m) (default: $value)",
+      parser = {
+        case ("-d" | "--dims") +: nxm +: tail => (("dims", nxm), tail)
+      })
 
-    // Process command-line args. differently.
-    val (master, index) = if (args(0) == "--master") {
-      (args(1), 2)
-    } else {
-      ("local", 0)
-    }
-    println(s"Using master: $master")
+    val options = CommandLineOptions(
+      this.getClass.getSimpleName,
+      CommandLineOptions.outputPath("output/matrix-math"),
+      CommandLineOptions.master("local"),
+      CommandLineOptions.quiet,
+      dims("5x10"))
 
-    val dims = args.drop(index) match {
-      case Array(m, n) => Dimensions(m.toInt, n.toInt)
-      case Array(m)    => Dimensions(m.toInt, 10)
-      case Array()     => Dimensions(5,       10)
-      case _ =>
-        println("""Expected optional matrix dimensions, got this: ${args.mkString(" ")}""")
+    val argz = options(args.toList)
+
+    val dimsRE = """(\d+)\s*x\s*(\d+)""".r
+    val dimensions = argz("dims").toString match {
+      case dimsRE(m, n) => Dimensions(m.toInt, n.toInt)
+      case s =>
+        println("""Expected matrix dimensions 'NxM', but got this: $s""")
         sys.exit(1)
     }
 
-    val sc = new SparkContext("local", "Matrix (4)")
+    val sc = new SparkContext(argz("master").toString, "Matrix (4)")
 
     try {
       // Set up a mxn matrix of numbers.
-      val matrix = Matrix(dims.m, dims.n)
+      val matrix = Matrix(dimensions.m, dimensions.n)
 
       // Average rows of the matrix in parallel:
-      val sums_avgs = sc.parallelize(1 to dims.m).map { i =>
+      val sums_avgs = sc.parallelize(1 to dimensions.m).map { i =>
         // Matrix indices count from 0.
         // "_ + _" is the same as "(count1, count2) => count1 + count2".
         val sum = matrix(i-1) reduce (_ + _)
-        (sum, sum/dims.n)
-      }.collect
-      // }.coalesce    // Reduce to one partition in preparation for output.
+        (sum, sum/dimensions.n)
+      }.collect    // convert to an array
 
-      out.println(s"${dims.m}x${dims.n} Matrix:")
-      sums_avgs.zipWithIndex foreach {
+      // Make a new sequence of strings with the formatted output, then we'll
+      // dump to the output location.
+      val outputLines = Vector(          // Scala's Vector, not MLlib's version!
+        s"${dimensions.m}x${dimensions.n} Matrix:") ++ sums_avgs.zipWithIndex.map {
         case ((sum, avg), index) =>
-          out.println(f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d")
+          f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d"
       }
+      val output = sc.makeRDD(outputLines)  // convert back to an RDD
+      val out = argz("output-path").toString
+      if (argz("quiet").toBoolean == false)
+        println(s"Writing output to: $out")
+      output.saveAsTextFile(out)
+
     } finally {
       sc.stop()
     }

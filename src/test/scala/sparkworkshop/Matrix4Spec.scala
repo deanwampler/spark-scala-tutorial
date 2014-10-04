@@ -6,19 +6,13 @@ class Matrix4Spec extends FunSpec {
 
   describe ("Matrix4") {
     it ("computes the sums of the rows in parallel.") {
-      // Redirect from stdout:
-      val byteStream = new ByteArrayOutputStream(512)
-      Matrix4.out = new PrintStream(byteStream, true)
-      val golden = """5x10 Matrix:
-        |Row # 0: Sum =   45, Avg =   4
-        |Row # 1: Sum =  145, Avg =  14
-        |Row # 2: Sum =  245, Avg =  24
-        |Row # 3: Sum =  345, Avg =  34
-        |Row # 4: Sum =  445, Avg =  44
-        |""".stripMargin
+      val out     = "output/matrix-math"
+      val golden  = "golden/matrix-math/part-00000"
+      TestUtil.rmrf(out)  // Delete previous runs, if necessary.
 
-      Matrix4.main(Array("--master", "local", "5", "10"))
-      assert(byteStream.toString === golden)
+      Matrix4.main(Array("--master", "local", "--quiet", "--dims", "5x10", "--out", out))
+
+      TestUtil.verifyAndClean(s"$out/part-00000", golden, out)
     }
   }
 }

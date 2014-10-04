@@ -6,9 +6,6 @@ import org.apache.spark.SparkContext._
 /** NGrams6 - Find the ngrams in a corpus */
 object NGrams6 {
 
-  // Override for tests.
-  var out = Console.out
-
   def main(args: Array[String]) = {
 
     /** A function to generate an Opt for handling the count argument. */
@@ -74,13 +71,19 @@ object NGrams6 {
         // .take(n)           // "LIMIT n"
         .takeOrdered(n)(CountOrdering)
 
-      // Write to the console, but because we no longer have an RDD,
-      // we have to use good 'ol Java File IO. Note that the output
-      // specifier is now interpreted as a file, not a directory as before.
-      out.println(s"Found ${ngramz.size} ngrams:")
-      ngramz foreach {
-        case (ngram, count) => out.println("%30s\t%d".format(ngram, count))
+      // Format the output as a sequence of strings, then convert back to
+      // an RDD for output.
+      val outputLines = Vector(
+        s"Found ${ngramz.size} ngrams:") ++ ngramz.map {
+        case (ngram, count) => "%30s\t%d".format(ngram, count)
       }
+
+      val output = sc.makeRDD(outputLines)  // convert back to an RDD
+      val out = argz("output-path").toString
+      if (argz("quiet").toBoolean == false)
+        println(s"Writing output to: $out")
+      output.saveAsTextFile(out)
+
     } finally {
       sc.stop()
     }
