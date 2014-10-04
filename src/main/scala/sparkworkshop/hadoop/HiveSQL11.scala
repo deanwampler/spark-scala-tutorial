@@ -18,7 +18,7 @@ import com.typesafe.sparkworkshop.util.Verse
  * Instead, use Spark's "spark-submit" script instead.
  */
 
-val master = "local[2]"
+val master = "yarn-cluster"
 
 val sc = new SparkContext(master, "Hive SQL (11)")
 

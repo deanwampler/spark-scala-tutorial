@@ -18,7 +18,7 @@ import com.typesafe.sparkworkshop.util.Verse
 
 val inputDir   = "data/kjvdat.txt"
 val parquetDir = "output/parquet"
-val master = "local[2]"
+val master = "yarn-cluster"
 
 val sc = new SparkContext(master, "Spark SQL Parquet (10)")
 val sqlContext = new SQLContext(sc)

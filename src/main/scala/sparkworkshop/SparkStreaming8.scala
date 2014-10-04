@@ -39,9 +39,6 @@ import org.apache.spark.streaming.scheduler.{
  */
 object SparkStreaming8 {
 
-  // Override for tests, etc.
-  var out = Console.out
-
   val timeout = 5 * 1000   // 5 seconds
 
   /**
@@ -84,8 +81,7 @@ object SparkStreaming8 {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      // We write to "out" instead of to a directory:
-      // CommandLineOptions.outputPath("output/kjv-wc3"),
+      CommandLineOptions.outputPath("output/kjv-wc-streaming"),
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[2]"),
       socket(""),  // empty default, so we know the user specified this option.
@@ -110,7 +106,7 @@ object SparkStreaming8 {
     // for this example, it was necessary to specify 2 cores using
     // setMaster("local[2]").
     val conf = new SparkConf()
-             .setMaster("local[2]")
+             .setMaster(argz("master").toString)
              .setAppName("Spark Streaming (8)")
              .set("spark.cleaner.ttl", "60")
              .set("spark.files.overwrite", "true")
@@ -135,12 +131,13 @@ object SparkStreaming8 {
       wordCounts.print()  // print a few counts...
 
       // Generates a separate subdirectory for each interval!!
-      // val out = "output/streaming/kjv-wc-streaming"
-      // println(s"Writing output to: $out")
-      // wordCounts.saveAsTextFiles(out, "txt")
+      val out = argz("output-path").toString
+      if (argz("quiet").toBoolean == false)
+        println(s"Writing output to: $out")
+      wordCounts.saveAsTextFile(out)
 
       ssc.start()
-      if (argz("no-term") == "") ssc.awaitTermination(timeout)
+      if (argz("no-term").toString == "") ssc.awaitTermination(timeout)
       else  ssc.awaitTermination()
     } finally {
       // Having the ssc.stop here is only needed when we use the timeout.
