@@ -68,8 +68,13 @@ object ActivatorSparkBuild extends Build {
     id = "Activator-Spark",
     base = file("."),
     settings = buildSettings ++ Seq(
+      shellPrompt := { state => "(%s)> ".format(Project.extract(state).currentProject.id) },
       // runScriptSetting,
       resolvers := allResolvers,
+      exportJars := true,
+      // For the Hadoop variants to work, we must rebuild the package before
+      // running, so we make it a dependency of run.
+      (run in Compile) <<= (run in Compile) dependsOn (packageBin in Compile),
       libraryDependencies ++= Dependencies.activatorspark,
       excludeFilter in unmanagedSources := (HiddenFileFilter || "Intro1*" || "HiveSQL*" || "SparkSQLParquet*"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
