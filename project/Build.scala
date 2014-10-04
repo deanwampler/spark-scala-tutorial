@@ -65,6 +65,7 @@ object ActivatorSparkBuild extends Build {
   import Dependencies._
   import BuildSettings._
 
+  val excludeSigFilesRE = """META-INF/.*\.(SF|DSA|RSA)""".r
   lazy val activatorspark = Project(
     id = "Activator-Spark",
     base = file("."),
@@ -79,6 +80,8 @@ object ActivatorSparkBuild extends Build {
       parallelExecution in Test := false,
       mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
         {
+          // Trips up loading due to security errors:
+          case excludeSigFilesRE(toss) => MergeStrategy.discard
           case "META-INF/MANIFEST.MF" => MergeStrategy.discard
           case x => MergeStrategy.first
         }

@@ -1,6 +1,3 @@
-package com.typesafe.sparkworkshop.solns
-
-import com.typesafe.sparkworkshop.util.Timestamp
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
@@ -47,8 +44,7 @@ object WordCount2GroupBy {
       // e.g., "for" has 8971 occurrences, while "unto" has 8997, so they have
       // nearly the same frequency, but not the exact same, so they aren't
       // grouped together.
-      val now = Timestamp.now()
-      val out = s"output/kjv-wc2-group-by-count-$now"
+      val out = "output/kjv-wc2-group-by-count"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

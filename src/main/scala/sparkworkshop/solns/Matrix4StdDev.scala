@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop.solns
-
-import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
+import com.typesafe.sparkworkshop.util.Matrix
 import org.apache.spark.SparkContext
 
 /**
@@ -14,7 +12,15 @@ object Matrix4StdDev {
 
     case class Dimensions(m: Int, n: Int)
 
-    val dims = args match {
+    // Process command-line args. differently.
+    val (master, index) = if (args(0) == "--master") {
+      (args(1), 2)
+    } else {
+      ("local", 0)
+    }
+    println(s"Using master: $master")
+
+    val dims = args.drop(index) match {
       case Array(m, n) => Dimensions(m.toInt, n.toInt)
       case Array(m)    => Dimensions(m.toInt, 10)
       case Array()     => Dimensions(5,       10)

@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -40,7 +38,7 @@ object NGrams6 {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      // CommandLineOptions.outputPath("output/ngrams"), // just write to the console
+      CommandLineOptions.outputPath("output/ngrams"),
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet,
       count("100"),

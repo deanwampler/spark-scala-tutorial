@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
@@ -137,8 +135,7 @@ object SparkStreaming8 {
       wordCounts.print()  // print a few counts...
 
       // Generates a separate subdirectory for each interval!!
-      // val now = Timestamp.now()
-      // val out = s"output/streaming/kjv-wc-$now"
+      // val out = "output/streaming/kjv-wc-streaming"
       // println(s"Writing output to: $out")
       // wordCounts.saveAsTextFiles(out, "txt")
 

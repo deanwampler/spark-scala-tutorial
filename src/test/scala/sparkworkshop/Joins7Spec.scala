@@ -1,22 +1,19 @@
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.Timestamp
 import org.scalatest.FunSpec
 
+// Run in local mode and local data.
 class Joins7Spec extends FunSpec {
 
   describe ("Joins7") {
     it ("computes the join of the bible book abbreviations with their full names") {
-      Timestamp.isTest = true
       val out     = "output/kjv-joins"
-      val out2    = out+"-"
       val golden  = "golden/kjv-joins/part-00000"
       TestUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       Joins7.main(Array(
-        "--quiet", "--inpath", "data/kjvdat.txt",
+        "--master", "local", "--quiet", "--inpath", "data/kjvdat.txt",
         "--abbreviations", "data/abbrevs-to-names.tsv", "--outpath", out))
 
-      TestUtil.verifyAndClean(s"$out2/part-00000", golden, out2)
+      TestUtil.verifyAndClean(s"$out/part-00000", golden, out)
     }
   }
 }

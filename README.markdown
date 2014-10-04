@@ -256,13 +256,11 @@ The reason the output directories have a timestamp in their name is so you can e
 As before, here is the text of the script in sections, with code comments removed:
 
 ```
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-We use a `com.typesafe.sparkworkshop` package for the compiled exercises. The `Timestamp` class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.
+We use the Java default package for the compiled exercises, but you would normally organize your applications in packages, in the usual way.
 
 > Even though our exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!
 

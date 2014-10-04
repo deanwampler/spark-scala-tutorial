@@ -49,7 +49,7 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
 
-Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
+Several years ago, the Spark team ported the Hive query engine to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
@@ -62,33 +62,27 @@ The following documentation links provide more information about Spark:
 
 The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
 
+## Starting the Hortonworks Sandbox Virtual Machine
+
+Import the Sandbox `.ova` file into VMWare or VirtualBox and start it. It may take a while to boot up and start all the services.
+
 ## Starting Activator
 
-[Typesafe Activator](https://typesafe.com/activator) is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. This Spark Workshop is one example. Activator is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted) installed the directory `/root/activator`.
+[Typesafe Activator](https://typesafe.com/activator) is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example. We have already installed Activator and loaded this workshop for you. Activator is installed the directory `/root/activator`. This Spark Workshop is installed in `/root/spark-workshop`.
 
-Start the Sandbox virtual machine. Write down the IP address of the VM that's printed in the final output during bootup.
-
-When you log into the Sandbox, you enter the `root` user's home directory, `/root`. So, to start activator, run the following command.
+Log into the virtual machine as `root` (password: `hadoop`), then run this command:
 
 ```
-activator/activator ui
+spark-workshop/start.sh
 ```
 
-Now open a browser window on your workstation and navigator to `http://ip-address:8888`, where `ip-replace` should be the IP address for the VM that was shown at the end of startup.
+You'll see messages telling you to open your browser to a particular IP address and port 9999. That is, navigate to `http://ip-address:8888`, where `ip-replace` is the IP address for the VM that's printed by `start.sh`.
 
-
+You should see a user interface that resembles an IDE or editor. It will say *activator-spark* in the upper left-hand corner.
 
 ## Building and Testing
 
-Log into the Sandbox virtual machine. The user name is `root` and the password is `hadoop`. At the shell prompt, run the following command
-
-```
-activator/ui start
-```
-
-It will echo a URL. Open that URL in a browser.
-
-To compile the code and run the tests, use the Activator UI's <a class="shortcut" href="#test">test</a> link. All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. Note that tests are provided for most, but not all of the examples.
+To ensure that the basic environment is working, compile the code and run the tests; use the Activator UI's <a class="shortcut" href="#test">test</a> link. All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. Note that tests are provided for most, but not all of the examples. Also, they run Spark in *local mode*, in a single JVM process without using Hadoop. This is a convenient way to develop and test the logic of your applications before testing and deploying them in a cluster.
 
 ## Running the Examples
 
@@ -101,6 +95,12 @@ Note that the some examples have package names with the word `solns`. They are s
 http://spark.apache.org/docs/latest/running-on-yarn.html
 
 There are two deploy modes that can be used to launch Spark applications on YARN. In yarn-cluster mode, the Spark driver runs inside an application master process which is managed by YARN on the cluster, and the client can go away after initiating the application. In yarn-client mode, the driver runs in the client process, and the application master is only used for requesting resources from YARN.
+
+hadoop fs -put data /user/$USER/data
+hadoop fs -mkdir /user/root/output
+
+$HOME/spark/bin/spark-submit --master yarn-client --class Crawl5a spark-workshop/target/scala-2.10/activator-spark_2.10-2.1.0.
+
 
 ## The Exercises
 
@@ -255,13 +255,11 @@ The reason the output directories have a timestamp in their name is so you can e
 As before, here is the text of the script in sections, with code comments removed:
 
 ```
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-We use a `com.typesafe.sparkworkshop` package for the compiled exercises. The `Timestamp` class is a simple utility class we implemented to create the timestamps we embed in put output file and directory names.
+We use the Java default package for the compiled exercises, but you would normally organize your applications in packages, in the usual way.
 
 > Even though our exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!
 
@@ -295,8 +293,7 @@ val wc = input
   .map(word => (word, 1))
   .reduceByKey((count1, count2) => count1 + count2)
 
-val now = Timestamp.now()
-val out = s"output/kjv-wc2-$now"
+val out = "output/kjv-wc2"
 println(s"Writing output to: $out")
 wc.saveAsTextFile(out)
 ```
@@ -385,12 +382,12 @@ Okay, with that out of the way, let's walk through the implementation of `WordCo
 
 ```
 package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-As before, but with our new `CommandLineOptions` and `Timestamp` utilities. (Note how Scala provides a concise syntax for selectively importing a few types in a package.)
+As before, but with our new `CommandLineOptions` utilities.
 
 ```
 object WordCount3 {
@@ -428,8 +425,7 @@ It starts out much like `WordCount2`, but it splits each line into fields, where
 Take input and split on non-alphanumeric sequences of character as we did in `WordCount2`, but rather than map to `(word, 1)` tuples and use `reduceByKey`, we simply treat the words as values and call `countByValue` to count the unique occurrences. Hence, a simpler (and probably more efficient) approach.
 
 ```
-      val now = Timestamp.now()
-      val outpath = s"${argz("output-path")}-$now"
+      val outpath = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output (${wc2.size} records) to: $outpath")
 
@@ -477,7 +473,7 @@ Here is the code:
 
 ```
 package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
+import com.typesafe.sparkworkshop.util.Matrix
 import org.apache.spark.SparkContext
 
 object Matrix4 {
@@ -583,7 +579,7 @@ Here is the code:
 ```
 package com.typesafe.sparkworkshop
 
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -629,8 +625,7 @@ We have two `case` match clauses, one for when the regular expression successful
 Note that the specified or default `input-path` is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.
 
 ```
-      val now = Timestamp.now()
-      val out = s"${argz("output-path")}-$now"
+      val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
 
@@ -709,7 +704,7 @@ I'm in yür codez:
 ```
 package com.typesafe.sparkworkshop
 
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -900,8 +895,7 @@ The schema of `verses` is this: `(key, (value1, value2))`, where `value` is `(ch
 Lastly, we write the output:
 
 ```
-      val now = Timestamp.now()
-      val out = s"${argz("output-path")}-$now"
+      val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
       verses2.saveAsTextFile(out)
@@ -1089,8 +1083,7 @@ Now we implement an incremental word count:
       wordCounts.print()  // print a few counts...
 
       // Generates a separate directory inside "out" each interval!!
-      // val now = Timestamp.now()
-      // val out = s"output/streaming/kjv-wc-$now"
+      // val out = "output/streaming/kjv-wc-streaming"
       // println(s"Writing output to: $out")
       // wordCounts.saveAsTextFiles(out, "txt")
 

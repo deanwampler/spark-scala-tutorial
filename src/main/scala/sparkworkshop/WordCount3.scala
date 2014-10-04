@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -46,27 +44,22 @@ object WordCount3 {
       // Split on non-alphanumeric sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
-      val wc2 = input
+      val wc2a = input
         .flatMap(line => line.split("""\W+"""))
         .countByValue()  // Returns a Map[T, Long]
 
-      // Save to a file, but because we no longer have an RDD, we have to use
-      // good 'ol Java File IO. Note that the output specifier is now a file,
-      // not a directory as before, the format of each line will be different,
-      // and the order of the output will not be the same, either.
-      val now = Timestamp.now()
-      val outpath = s"${argz("output-path")}-$now"
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output (${wc2.size} records) to: $outpath")
+      // ... and convert back to an RDD for output, with one "slice".
+      // First, convert to a comma-separated string. When you call "map" on
+      // a Map, you get 2-tuples for the key-value pairs. You extract the
+      // first and second elements with the "_1" and "_2" methods, respectively.
+      val wc2b = wc2a.map(key_value => s"${key_value._1},${key_value._2}").toSeq
+      val wc2 = sc.makeRDD(wc2b, 1)
 
-      import java.io._
-      val out = new PrintWriter(outpath)
-      wc2 foreach {
-        case (word, count) => out.println("%20s\t%d".format(word, count))
-      }
-      // WARNING: Without this close statement, it appears the output stream is
-      // not completely flushed to disk!
-      out.close()
+      val out = argz("output-path").toString
+      if (argz("quiet").toBoolean == false)
+        println(s"Writing output to: $out")
+      wc2.saveAsTextFile(out)
+
     } finally {
       sc.stop()
     }

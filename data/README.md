@@ -1,5 +1,15 @@
 # README for the data directory
 
+When you download this example from GitHub, you'll need to copy the data to HDFS. Use the following command. Note that last argument; the examples in this tutorial assume the data is located in the location shown. Change it as you see fit, but you'll have to pass arguments to the programs to specify the new location:
+
+```
+hadoop fs -put data /user/$USER/data
+```
+
+This step has already been done for prepackaged Hadoop distribution virtual machines.
+
+Hence, the following discussion applies to both data locations.
+
 ## Sacred Texts
 
 The following ancient, sacred texts are from [www.sacred-texts.com/bib/osrc/](http://www.sacred-texts.com/bib/osrc/). All are copyright-free texts, where each verse is on a separate line, prefixed by the book name, chapter, number, and verse number, all "|" separated.
@@ -27,19 +37,19 @@ CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
   verse   INT,
   text    STRING)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-LOCATION 'hdfs://server/data/kjvdat';
+LOCATION 'hdfs://server/user/<USER>/data/kjvdat';
 ```
 
-Actually the `hdfs://server` prefix can be omitted. Hive will infer the correct file system type based on its configuration.
+Actually the `hdfs://server` prefix can be omitted. Hive will infer the correct file system type based on its configuration. The `<USER>` must be replaced with the actual user name.
 
-The same DDL can be used for the other files mentioned above, except for the name map file. `abbrevs-to-names.tsv`. Here is a DDL statement for the latter, assuming the file is copied to a directory `hdfs://server/data/abbrevs_to_names` in HDFS. 
+The same DDL can be used for the other files mentioned above, except for the name map file. `abbrevs-to-names.tsv`. Here is a DDL statement for the latter, assuming the file is copied to a directory `hdfs://server/data/abbrevs_to_names` in HDFS.
 
 ```
 CREATE EXTERNAL TABLE IF NOT EXISTS abbrevs_to_names (
   abbrev  STRING,
   book    STRING)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-LOCATION 'hdfs://server/data/abbrevs_to_names';
+LOCATION 'hdfs://server/user/<USER>/data/abbrevs_to_names';
 ```
 
 Note that the field delimiter is tab, not "|".
@@ -60,10 +70,10 @@ CREATE EXTERNAL TABLE IF NOT EXISTS mail (line STRING)
 PARTITIONED BY (is_spam BOOLEAN);
 
 ALTER TABLE mail ADD PARTITION(is_spam = true)
-LOCATION 'hdfs://server/data/enron-spam-ham/spam100';
+LOCATION 'hdfs://server/data/user/<USER>/enron-spam-ham/spam100';
 
 ALTER TABLE mail ADD PARTITION(is_spam = false)
-LOCATION 'hdfs://server/data/enron-spam-ham/ham100';
+LOCATION 'hdfs://server/data/user/<USER>/enron-spam-ham/ham100';
 ```
 
 Note that you could reformat the files into structured records to do more sophisticated processing of emails, such as separating out the headers, the "to:", "cc:", "bcc:", and the body. For example, the headers could stored in a Hive `MAP` and the recipients could be stored in `ARRAYs`.
@@ -80,7 +90,7 @@ To use from Hive as a source of unstructured text:
 
 ```
 CREATE EXTERNAL TABLE IF NOT EXISTS shakespeare (line STRING)
-LOCATION 'hdfs://server/data/shakespeare';
+LOCATION 'hdfs://server/user/<USER>/data/shakespeare';
 ```
 
 [Return](../tutorial/index.html) to the project [tutorial](../tutorial/index.html).

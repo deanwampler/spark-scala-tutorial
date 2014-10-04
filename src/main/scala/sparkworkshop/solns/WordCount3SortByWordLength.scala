@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop.solns
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
@@ -18,7 +16,7 @@ object WordCount3SortByWordLength {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.outputPath("output/kjv-wc3-word-length.txt"),
+      CommandLineOptions.outputPath("output/kjv-wc3-word-length"),
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
@@ -44,7 +42,7 @@ object WordCount3SortByWordLength {
       // collection on one node, after which we do further processing.
       // Try redoing it with the WordCount3 "reduceByKey" approach. What
       // changes are required to the rest of the script?
-      val wc2 = input
+      val wc2a = input
         .flatMap(line => line.split("""\W+"""))
         .countByValue()  // Returns a Map[T, Long]
         .toVector        // Extract into a sequence that can be sorted.
@@ -52,22 +50,18 @@ object WordCount3SortByWordLength {
         .sortBy{ case (_, length, _) => -length }  // sort descending, ignore
                                                    // 1st, 3rd tuple elements!
 
-      // Save to a file, but because we no longer have an RDD, we have to use
-      // good 'ol Java File IO. Note that the output specifier is now a file,
-      // not a directory as before, the format of each line will be diffierent,
-      val now = Timestamp.now()
-      val outpath = s"${argz("output-path")}-$now"
+      // ... and convert back to an RDD for output, with one "slice".
+      // First, convert to a comma-separated string. When you call "map" on
+      // a Map, you get 2-tuples for the key-value pairs. You extract the
+      // first and second elements with the "_1" and "_2" methods, respectively.
+      val wc2b = wc2a.map(key_value => s"${key_value._1},${key_value._2}").toSeq
+      val wc2 = sc.makeRDD(wc2b, 1)
+
+      val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
-        println(s"Writing output (${wc2.size} records) to: $outpath")
-      import java.io._
-      val out = new PrintWriter(outpath)
-      wc2 foreach {
-        case (word, length, count) =>
-          out.println("%20s\t%3d\t%d".format(word, length, count))
-      }
-      // WARNING: Without this close statement, it appears the output stream is
-      // not completely flushed to disk!
-      out.close()
+        println(s"Writing output to: $out")
+      wc2.saveAsTextFile(out)
+
     } finally {
       // Stop (shut down) the context.
       sc.stop()

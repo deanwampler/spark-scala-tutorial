@@ -1,7 +1,7 @@
-package com.typesafe.sparkworkshop
 import java.io._
 import scala.io.Source
 
+// Run in local mode and local data.
 object TestUtil {
 
   def verifyAndClean(actualFile: String, expectedFile: String, dirToDelete: String) =

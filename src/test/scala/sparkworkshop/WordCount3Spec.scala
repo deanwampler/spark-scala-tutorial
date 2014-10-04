@@ -1,19 +1,17 @@
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.Timestamp
 import org.scalatest.FunSpec
 
+// Run in local mode and local data.
 class WordCount3Spec extends FunSpec {
 
   describe ("WordCount3") {
     it ("computes the word count of the input corpus with options") {
-      Timestamp.isTest = true
       val out    = "output/kjv-wc3"
-      val out2   = out+"-"
-      val golden = "golden/kjv-wc3/data.txt"
+      val out2   = s"$out/part-00000"
+      val golden = "golden/kjv-wc3/part-00000"
       TestUtil.rmrf(out)  // Delete previous runs, if necessary.
 
       WordCount3.main(Array(
-        "--quiet", "--inpath", "data/kjvdat.txt", "--outpath", out))
+        "--master", "local", "--quiet", "--inpath", "data/kjvdat.txt", "--outpath", out))
 
       TestUtil.verifyAndClean(out2, golden, out2)
     }

@@ -1,6 +1,5 @@
-package com.typesafe.sparkworkshop    // Put the code in a package named "spark"
+// package com.foo.bar    // You could put the code in a package...
 
-import com.typesafe.sparkworkshop.util.Timestamp   // Simple date-time utility
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in
 // org.apache.spark.rdd.PairRDDFunctions
@@ -8,7 +7,9 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
 /**
- * First implementation of Word Count.
+ * First implementation of Word Count. We'll run this one locally, to get a
+ * sense for the development process outside Hadoop. The subsequent exercises
+ * will run in Hadoop.
  * Scala makes the Singleton Design Pattern "first class". The "object" keyword
  * declares an class with a single instance that the runtime will create itself.
  * You put definitions in objects that would be declared static in Java, like
@@ -51,10 +52,7 @@ object WordCount2 {
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,
       // and checksum files.
-      // We append a timestamp, because Spark, like Hadoop, won't let us
-      // overwrite an existing directory, e.g., from a prior run.
-      val now = Timestamp.now()
-      val out = s"output/kjv-wc2-$now"
+      val out = "output/kjv-wc2"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {

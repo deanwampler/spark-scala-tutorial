@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop.other
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
@@ -30,18 +28,11 @@ object Crawl5aInefficient {
     val sc = new SparkContext(argz("master").toString, "Crawl (5a - inefficient)")
 
     try {
-      // Because we want to read this output with the InvertedIndex script, we
-      // don't append a timestamp. That means if you run this script repeatedly,
-      // you'll need to delete the output directory from the previous run first.
-      // HOWEVER, if you run the InvertedIndex script on this output, you will
-      // have to specify the different output directory used here:
-      // val now = Timestamp.now()
-      // val out = s"${argz("output-path").toString}-$now"
-      val out = s"${argz("output-path")}"
+      val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
-
       ingestFiles(argz("input-path").toString, sc).saveAsTextFile(out)
+
     } finally {
       sc.stop()
     }

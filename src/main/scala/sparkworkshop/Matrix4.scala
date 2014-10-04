@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
+import com.typesafe.sparkworkshop.util.Matrix
 import org.apache.spark.SparkContext
 
 /**
@@ -17,7 +15,14 @@ object Matrix4 {
     case class Dimensions(m: Int, n: Int)
 
     // Process command-line args. differently.
-    val dims = args.take(2) match {
+    val (master, index) = if (args(0) == "--master") {
+      (args(1), 2)
+    } else {
+      ("local", 0)
+    }
+    println(s"Using master: $master")
+
+    val dims = args.drop(index) match {
       case Array(m, n) => Dimensions(m.toInt, n.toInt)
       case Array(m)    => Dimensions(m.toInt, 10)
       case Array()     => Dimensions(5,       10)
@@ -39,6 +44,7 @@ object Matrix4 {
         val sum = matrix(i-1) reduce (_ + _)
         (sum, sum/dims.n)
       }.collect
+      // }.coalesce    // Reduce to one partition in preparation for output.
 
       out.println(s"${dims.m}x${dims.n} Matrix:")
       sums_avgs.zipWithIndex foreach {

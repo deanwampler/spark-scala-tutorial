@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
@@ -75,8 +73,7 @@ object Joins7 {
           (fullBookName, chapter, verse, text)
       }
 
-      val now = Timestamp.now()
-      val out = s"${argz("output-path")}-$now"
+      val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
       verses2.saveAsTextFile(out)

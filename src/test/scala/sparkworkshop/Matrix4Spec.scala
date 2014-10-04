@@ -1,13 +1,11 @@
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.Timestamp
 import org.scalatest.FunSpec
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 
+// Run in local mode and local data.
 class Matrix4Spec extends FunSpec {
 
   describe ("Matrix4") {
     it ("computes the sums of the rows in parallel.") {
-      Timestamp.isTest = true
       // Redirect from stdout:
       val byteStream = new ByteArrayOutputStream(512)
       Matrix4.out = new PrintStream(byteStream, true)
@@ -19,7 +17,7 @@ class Matrix4Spec extends FunSpec {
         |Row # 4: Sum =  445, Avg =  44
         |""".stripMargin
 
-      Matrix4.main(Array("5", "10"))
+      Matrix4.main(Array("--master", "local", "5", "10"))
       assert(byteStream.toString === golden)
     }
   }

@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp, Verse}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, Verse}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.sql.SQLContext

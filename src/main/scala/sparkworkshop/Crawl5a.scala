@@ -1,6 +1,4 @@
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.CommandLineOptions
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
@@ -32,15 +30,12 @@ object Crawl5a {
         // keyBy to generate a new RDD with schema (file_name, file_contents)
         case (file, rdd) => (file.getName, rdd.fold("")(_ + " " + _))
       }
-      // Because we want to read this output with the InvertedIndex script, we
-      // don't append a timestamp. That means if you run this script repeatedly,
-      // you'll need to delete the output directory from the previous run first.
-      // val now = Timestamp.now()
-      // val out = s"${args("output-path").toString}-$now"
+
       val out = argz("output-path").toString
       if (argz("quiet").toBoolean == false)
         println(s"Writing output to: $out")
       sc.makeRDD(names_contents).saveAsTextFile(out)
+
     } finally {
       sc.stop()
     }

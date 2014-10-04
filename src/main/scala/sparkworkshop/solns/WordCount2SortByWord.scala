@@ -1,6 +1,3 @@
-package com.typesafe.sparkworkshop.solns
-
-import com.typesafe.sparkworkshop.util.Timestamp
 import org.apache.spark.SparkContext
 // Implicit conversions, such as methods defined in
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.1.0/api/core/index.html#org.apache.spark.rdd.PairRDDFunctions)
@@ -44,8 +41,7 @@ object WordCount2SortByWord {
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,
       // and checksum files.
-      val now = Timestamp.now()
-      val out = s"output/kjv-wc2-sort-by-word-$now"
+      val out = s"output/kjv-wc2-sort-by-word"
       println(s"Writing output to: $out")
       wc.saveAsTextFile(out)
     } finally {
