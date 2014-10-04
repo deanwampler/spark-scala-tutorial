@@ -71,6 +71,7 @@ echo ""
 
 # use NOOP=x scripts/hadoop.sh ... to suppress execution. You'll just see the
 # previous echo output.
+NOOP=x
 if [[ -z $NOOP ]]
 then
   $HOME/spark/bin/spark-submit --master $master --class $main \
