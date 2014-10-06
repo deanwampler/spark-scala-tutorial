@@ -48,24 +48,29 @@ object InvertedIndex5b {
       // and count the unique occurrences.
       input
         .flatMap {
+          // all lines are two-tuples; extract the path and text into variables
+          // named "path" and "text".
           case (path, text) =>
             // If we don't trim leading whitespace, the regex split creates
             // an undesired leading "" word!
             text.trim.split("""\W+""") map (word => (word, path))
         }
         .map {
+          // We're going to use the (word, path) tuple as a key for counting
+          // all of them that are the same. So, create a new tuple with the
+          // pair as the key and an initial count of "1".
           case (word, path) => ((word, path), 1)
         }
-        .reduceByKey{
+        .reduceByKey{    // Count the equal (word, path) pairs, as before
           case (count1, count2) => count1 + count2
         }
-        .map {
+        .map {           // Rearrange the tuples; word is now the key we want.
           case ((word, path), n) => (word, (path, n))
         }
-        .groupBy {
+        .groupBy {       // Group the same words together
           case (word, (path, n)) => word
         }
-        .map {
+        .map {           // reformat the output; make string of the groups.
           case (word, seq) =>
             val seq2 = seq map {
               case (redundantWord, (path, n)) => (path, n)

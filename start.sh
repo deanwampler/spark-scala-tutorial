@@ -8,7 +8,7 @@ help() {
 
 case $1 in
   ui|shell) mode=$1    ;;
-  sbt)      mode=shell ;;
+  sbt)      mode=shell; echo "Using shell mode" ;;
   "")       mode=ui    ;;
   -h|--h*)
     help
@@ -21,14 +21,27 @@ case $1 in
     ;;
 esac
 
-ip=$(scripts/getip.sh)
+dir=$(dirname $0)
+ip=$($dir/scripts/getip.sh)
 
-echo "================================================================"
-echo ""
-echo "    Starting the Spark Workshop in Activator using $mode mode..."
-echo "    Open your web browser to $ip:9999"
-echo ""
-echo "================================================================"
+if [[ $mode = ui ]]
+then
+  umode=$(echo $mode | tr '[a-z]' '[A-Z]')
 
-sleep 2
-$HOME/activator/activator -Dhttp.address=0.0.0.0 -Dhttp.port=9999 $mode
+  echo "=================================================================="
+  echo
+  echo "    Starting the Spark Workshop in Activator using $umode mode..."
+  echo "    Open your web browser to:"
+  echo
+  echo "        http://$ip:9999"
+  echo
+  echo "    (Ignore the message that will say 'http://0.0.0.0:9999')"
+  echo
+  echo "=================================================================="
+
+  sleep 2
+fi
+
+# Invoke with NOOP=x start.sh to suppress execution:
+echo $HOME/activator/activator -Dhttp.address=0.0.0.0 -Dhttp.port=9999 $mode
+[[ -z $NOOP ]] && $HOME/activator/activator -Dhttp.address=0.0.0.0 -Dhttp.port=9999 $mode

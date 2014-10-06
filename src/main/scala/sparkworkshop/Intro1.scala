@@ -43,9 +43,6 @@ val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 // console command.
 // sc.stop()
 
-// Prep for subsequent exercises; create an "output" directory
-val output = new java.io.File("output")
-if (output.exists == false) output.mkdir
 
 // Exercise: Try different filters. The filter function could match on a
 //   regular expression, for example. Note also the line format in the input

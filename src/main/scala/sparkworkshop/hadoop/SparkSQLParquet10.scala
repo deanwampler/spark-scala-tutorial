@@ -58,8 +58,8 @@ println("GROUP BY using the LINQ-style query API:")
 // Seems like a bug that you have to import this explicitly:
 import org.apache.spark.sql.catalyst.expressions.Sum
 
-verses2.groupBy('book)(Sum('verse) as 'count).orderBy('count.desc)
-  .collect().foreach(println)
+verses2.groupBy('book)(Sum('verse) as 'count).orderBy(
+  'count.desc).collect().foreach(println)
 
 // Not needed if you're using the actual Spark Shell and our configured sbt
 // console command.

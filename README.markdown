@@ -1,60 +1,41 @@
-# Apache Spark: An Introductory Workshop
+## Apache Spark Workshop
 
-![image](http://spark.apache.org/docs/1.1.0/img/spark-logo-100x40px.png)
+![](http://spark.apache.org/docs/latest/img/spark-logo-100x40px.png)
 
 Dean Wampler, Ph.D.
 [Typesafe](http://typesafe.com)
 [dean.wampler@typesafe.com](mailto:dean.wampler@typesafe.com)
 [@deanwampler](https://twitter.com/deanwampler)
 
-## Introduction
+This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications within a special, extended version of the Hortonworks Sandbox, version 2.1. This version was extended by Hortonworks and Typesafe to add the [Spark 1.1](https://spark.apache.org) distribution and the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted), including an *Activator* template called [Spark Workshop](https://typesafe.com/activator/template/spark-workshop). You are reading the introduction to this workshop.
 
-This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications.
+For more advanced Spark training and services from Typesafe, please visit [typesafe.com/reactive-big-data](http://www.typesafe.com/platform/reactive-big-data/spark).
 
-[Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala and developed initially as a UC Berkeley research project for distributed data programming. It has grown in capabilities and it recently became a top-level [Apache project](http://spark.apache.org).
+## Introduction: What Is Spark?
 
-Spark includes support for streaming, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for writing with data sets through SQL queries. It integrates embedded SQL queries and data schemas with the normal Spark API. It also offers Hive integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
+[Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming.
 
-We'll run our exercises "locally" on our laptops, which is very convenient for learning, development, and "unit" testing. However, there are several ways to run Spark clusters.
+Spark includes support for event stream processing, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for working with data sets through SQL queries. It integrates the core Spark API with embedded SQL queries with defined schemas. It also offers [Hive](http://hive.apache.org) integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
 
-There also several *Spark Shells*. One is an enhanced version of the Scala REPL (read, eval, print loop shell), for interactive use. SparkSQL adds a SQL-only REPL option. You can use a Python shell, since Spark has a Python API. A Java API is also supported and R support is coming soon.
+We will build the examples and exercises using [Activator](http://typesafe.com/activator), an environment for browsing and using code template, with a built-in build tool called [SBT](http://www.scala-sbt.org/), the standard build tool for Scala. We'll work with our applications both in *local mode*, where we can quickly edit, test, and run our applications using the local file system, then we'll run them in the mini Hadoop cluster in this VM.
+
+There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark's Python API. A Java API is also supported and R support is under development.
 
 ## Why Spark?
 
 By 2013, it became increasingly clear that a successor was needed for the venerable [Hadoop MapReduce](http://wiki.apache.org/hadoop/MapReduce) compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.
 
-Spark was seen as the best, general-purpose alternative, so [Cloudera led the way](http://databricks.com/blog/2013/10/28/databricks-and-cloudera-partner-to-support-spark.html) in embracing Spark as a replacement for MapReduce.
-
-Spark is now officially supported in [Cloudera CDH5](http://blog.cloudera.com/blog/2014/04/how-to-run-a-simple-apache-spark-app-in-cdh-5/) and [MapR's distribution](http://www.mapr.com/products/apache-spark). Hortonworks has recent announced they will support Spark, too. See also [this page](http://spark.apache.org/docs/1.0.0/cluster-overview.html) in the Spark documentation for a general discussion about running Spark with different versions of Hadoop. It also discusses other deployment scenarios.
+Spark was seen as the best, general-purpose alternative, so Hortonworks and other Hadoop vendors announced support for it in their distributions.
 
 ## Spark Clusters
 
-Let's briefly discuss the anatomy of a Spark standalone cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/1.1.0/cluster-overview.html). Consider the following diagram:
+Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/latest/cluster-overview.html). Consider the following diagram:
 
-![Spark Cluster](http://spark.apache.org/docs/1.1.0/img/cluster-overview.png)
+![](http://spark.apache.org/docs/latest/img/cluster-overview.png)
 
-Each program we'll write is a *Driver Program*. It uses a *SparkContext* to communicate with the *Cluster Manager*, either Spark's own manager or the corresponding management services provided by [Mesos](http://mesos.apache.org/) or [Hadoop's YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html). The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
+Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, and other options. The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
 Because each application has its own executor process per node, applications can't share data through the *Spark Context*. External storage has to be used (e.g., the file system, a database, a message queue, etc.)
-
-When possible, run the driver locally on the cluster to reduce network IO as it creates and manages tasks.
-
-## Spark Deployment Options
-
-Spark currently supports [four deployment options](http://spark.apache.org/docs/1.1.0/cluster-overview.html) for clusters:
-
-* [Standalone](http://spark.apache.org/docs/1.1.0/spark-standalone.html) – A simple manager bundled with Spark for manual deployment and management of a cluster. It has some high-availability support, such as Zookeeper-based leader election of redundant master processes.
-* [Apache Mesos](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) – [Mesos](http://mesos.apache.org/) is a general-purpose cluster management system that can also run [Hadoop](http://hadoop.apache.org) and other services.
-* [Hadoop YARN](http://spark.apache.org/docs/1.1.0/running-on-yarn.html) – [YARN](http://hadoop.apache.org/docs/r2.3.0/hadoop-yarn/hadoop-yarn-site/YARN.html) is the [Hadoop](http://hadoop.apache.org) v2 resource manager.
-* [Amazon Web Services - EC2] - The Spark distribution includes scripts for [launching Spark clusters on EC2](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
-
-You could run Spark processes on the same hardware as a Hadoop cluster using any of these approaches, but only YARN deployments truly integrate resource management between Spark and Hadoop jobs. Non-YARN deployments within a Hadoop cluster require that you statically configure some resources for Spark and some for Hadoop, because Spark and Hadoop are unaware of each other in these configurations.
-
-For information on using YARN, see [here](http://spark.apache.org/docs/1.1.0/running-on-yarn.html).
-
-For information on using Mesos, see [here](http://spark.apache.org/docs/1.1.0/running-on-mesos.html) and [here](http://mesosphere.io/learn/run-spark-on-mesos/).
-
-For information on using EC2, see [here](http://spark.apache.org/docs/1.1.0/ec2-scripts.html).
 
 ## Resilient, Distributed Datasets
 
@@ -70,7 +51,7 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
 
-Several years ago, the Spark team ported the Hive frontend to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
+Several years ago, the Spark team ported the Hive query engine to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
@@ -78,104 +59,152 @@ This workshop uses Spark 1.1.0.
 
 The following documentation links provide more information about Spark:
 
-* [Documentation](http://spark.apache.org/docs/1.1.0/).
-* [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package).
+* [Documentation](http://spark.apache.org/docs/latest/).
+* [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/1.1.0/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+
+## Starting the Sandbox
+
+Import the Hortonworks Sandbox Virtual Machine `.ova` file into VMWare or VirtualBox and start it. It may take a while to boot up and start all the services.
+
+## Starting Activator
+
+[Typesafe Activator](https://typesafe.com/activator) is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example.
+
+We have already installed Activator and loaded this workshop for you. Activator is installed the directory `/root/activator`. This Spark Workshop is installed in `/root/spark-workshop`.
+
+Log into the virtual machine as `root` (password: `hadoop`). While you can do this with the boot-up window for your VM, it's more useful to log in using an `ssh` client like [PuTTY](http://putty.org) for Windows or the `ssh` command for MacOS, Cygwin, and Linux. You'll need to open several terminal windows for some of the exercises anyway.
+
+Once you're logged in, run the following command to launch Activator and its web console:
+
+```
+spark-workshop/start.sh
+```
+
+If you are familiar with SBT commands and you prefer to use the command-line interface, use the `shell` option instead:
+
+```
+spark-workshop/start.sh shell
+```
+
+Assuming you're using the web console, you'll see messages telling you to open your browser to a particular IP address and port 9999. That is, navigate to `http://ip-address:9999`, where `ip-address` is the IP address for the VM that's printed by `start.sh`.
 
 ## Building and Testing
 
-If you're using the [Typesafe Activator UI](http://typesafe.com/activator), search for `activator-spark` and install it in the UI. The code is built automatically.
+To ensure that the basic environment is working, compile the code and run the tests; use the Activator UI's <a class="shortcut" href="#test">test</a> link (or, if you're using the shell commands, run the `test` task). All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. (We've noticed that sometimes a timeout of some kind prevents the tests from completing successfully, but running the tests again works.)
 
-If you grabbed this workshop from [Github](https://github.com/deanwampler/activator-spark), you'll need to install `sbt` and use a command line to build and run the applications. In that case, see the [sbt website](http://www.scala-sbt.org/) for instructions on installing `sbt`.
+Note that tests are provided for most, but not all of the examples. Also, they run Spark in *local mode*, in a single JVM process without using Hadoop. This is a convenient way to develop and test the logic of your applications before testing and deploying them in a cluster.
 
-To compile the code and run the tests, either use the Activator UI <a class="shortcut" href="#test">test</a> link or start `sbt` and enter `test` at the prompt.
+## Running the Examples
 
-Either way, the code is compiled and the tests are executed. They should pass without error. Note that tests are provided for all the exercises, except the *Spark Streaming* exercise, which uses multiple processes.
+Next, let's run one of the examples both locally and with Hadoop to further confirm that everything is working.
 
-## Running the Exercises
+## Running a Local-mode Example
 
-Next, let's try running one of the exercises.
+In Activator, select the <a class="shortcut" href="#run">run</a> panel. Find the bullet item under *Main Class* for `WordCount3` and select it. (Unfortunately, they are not listed in alphabetical order.)
 
-In Activator, use the <a class="shortcut" href="#run">run</a> panel, select one of the bullet items under "Main Class", for example `WordCount2`, and click the "Start" button. The "Logs" panel shows some information. Note the `output` directories listed in the output. Use a file browser to find those directories to view the output written in those locations.
+Click the *Start* button. The *Logs* panel shows the output as it runs. (If you're using the shell prompt, invoke `run-main WordCount3`.)
 
-In `sbt`, enter `run`. It will present the same list of main classes. Enter one of the numbers to select the executable you want to run. Enter the number in the `[...]` brackets corresponding to  **WordCount2** to verify that everything works.
+Note the `output` directory listed in the log messages. Use your login window (or create another one) to view the output in the directory, which will be `/root/spark-workshop/output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data.
 
-Note that the some exercises have package names with the word `solns`. They are solutions to the exercises. The `other` package has alternative implementations of some examples or exercises, for your consideration.
+## Running a Hadoop Example
+
+Now try the same program using Spark running in Hadoop. This time, select `hadoop.HWordCount3` in the *run* panel and click the *Start* button. There will be more log messages and it will take longer to run.
+
+The log messages end with a URL where you can view the output in HDFS. If your VM's IP address is 192.168.64.100, for example, the URL will be `http://192.168.64.100:8000/filebrowser/#/user/root/output/kjv-wc3`. (Once you've opened this file browser, it will be easy to navigate to the outputs for the rest of the examples we'll run.) The same `_SUCCESS` and `part-00000` files will be found, although the lines in the latter might not be in the same order as for the *local* run.
+
+Assuming you encountered no problems, everything is working!
+
+> NOTE: The normal Hadoop and Spark convention is to never overwrite existing data. However, that would force us to manually delete old data before rerunning programs. So, to make the workshop easier, the programs delete existing data first.
+
+## Naming Conventions
+
+We're using a few conventions for the package structure and `main` class names:
+
+* `AbcN` - The `Abc` program and the N^th^ example. With a few exceptions, it can be executed locally and in Hadoop. It defaults to local execution.
+* `hadoop/HAbcN` - A driver program to run `AbcN` in Hadoop. These small classes use a Scala library API for managining operating system "processes". In this case, they invoke one or more shell scripts in the `scripts` directory, which in turn call the Spark driver program `$HOME/spark/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
+* `solns/AbcNFooBarBaz` - The solution to the "foo bar baz" exercise that's built on `AbcN`. These programs can also be invoked from the *Run* panel.
+* `other/AbcNFooBarBaz` - Alternative implementations for certain algorithms for your reference.
+
+Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* panel.
+
 
 ## The Exercises
 
 Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
-* **Intro1:** Actually, this *isn't* listed by the `run` command, because it is a script we'll use with the interactive *Spark Shell*.
-* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.)
-* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
-* **Matrix4:** Demonstrates Spark's Matrix API, useful for many machine learning algorithms.
+* **Intro1:** The first example is actually run using the interactive `spark-shell`, as we'll see.
+* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, this example uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a `README` that discusses the sources of the data files.) This example hard-codes various information, so we'll only run it in local mode.
+* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a small library to handle input command-line arguments, which we won't discuss in detail. This example and all subsequent examples run locally and in Hadoop.
+* **Matrix4:** Demonstrates using explicit parallelism on a simplistic Matrix application.
 * **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
-* **Joins7:** Spark supports SQL-style joins and this exercise provides a simple example.
+* **Joins7:** Spark supports SQL-style joins as shown in this simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.) This script ends by writing data in the de-facto standard [Parquet](http://parquet.io) format that is increasingly popular in *Big Data* applications.
-* **SparkSQLParquet10:** Demonstrates reading Parquet-formatted data, namely the data written in the previous example.
-* **HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
+* **SparkSQL9:** Uses the SparkSQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in previous exercises.
+* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, a popular file format with good performance. This example and the next one are in a `hadoop` package, because they use features that are difficult to run without a build of Spark for a specific Hadoop cluster. In contrast, the previous examples work in "local" mode, as well.
+* **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
 
 ## Intro1
 
-[Intro1.scala](src/main/sparkworkshop/Intro1.scala)
+[Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala)
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.scala](src/main/sparkworkshop/Intro1.scala).
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala).
 
 The comments in this and the subsequent files try to explain the API calls being made.
 
-You'll note that the extension is `.sc`, not `.scala`. This is my convention to prevent the build from compiling this file, which won't compile because it's missing some definitions that the Spark Shell will define automatically.
+> NOTE: while the extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. (The build is configured to not compile this file.)
 
-Actually, we're _not_ going to use the _actual_ Spark Shell, because we just pull down the Spark JAR files as dependencies and not a full distribution. So, instead we'll just use the Scala REPL via the `sbt console` task. We'll discuss the differences of this approach.
+## Hadoop Execution
 
-You'll have to use a command window and `sbt` for this part of the workshop. If you're just interested in using Activator and not using `sbt`, then read through this section, but you can safely skip doing the exercise.
-
-Change your working directory to where you installed this workshop and type `sbt`:
+Log into the VM as `root` so you can run a shell script we've provided. In the `root` user's home folder `/root` and run the following command:
 
 ```
-cd where_you_installed_the_workshop
-sbt
+spark-workshop/scripts/sparkshell.sh
 ```
 
-At the `sbt` prompt, type `console`. You'll see a welcome message and a `scala>` prompt.
+This script calls the actual Spark Shell script, `$HOME/spark/bin/spark-shell` and passes a `--jars` argument with the package of the workshop code, as well as any additional arguments you pass to the script. (Try the `--help` option to see the full list.)
 
-We're going to paste in the code from [Intro1.scala](src/main/sparkworkshop/Intro1.scala)
-. You could do it all at once, but we'll do it a few lines at a time and discuss each one. (It's harmless to paste comments from the source file.) Here is the content of the script without the comments, but broken into sections with discussions:
+You'll see a lot of log messages, ending with the Scala REPL prompt `scala>`.
+
+We're going to paste in the code from [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala). Click the link to view it.
+
+We'll paste a few lines at a time so we can discuss them. (It's harmless to paste comments from the source file.)
+
+First, there are some commented lines that every Spark program needs, but the Spark Shell does automatically for you:
 
 ```
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-val sc = new SparkContext("local", "Intro (1)")
+// import org.apache.spark.SparkContext
+// import org.apache.spark.SparkContext._
+// val sc = new SparkContext("local", "Intro (1)")
 ```
-Import the `SparkContext` that drives everything.
 
-Why are there two, very similar `import` statements? The first one imports the `SparkContext` type so we don't have to use a fully-qualified name in the `new SparkContext` statement. The second is analogous to a `static import` in Java, where we make some methods and values visible in the current scope, again without requiring qualification.
+The [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) drives everything else. Why are there two, very similar `import` statements? The first one imports the `SparkContext` type so it wouldn't be necessary to use a fully-qualified name in the `new SparkContext` statement. The second import statement is analogous to a `static import` in Java, where we make some methods and values visible in the current scope, again without requiring qualification.
 
-When you construct a `SparkContext`, there are several constructors you can use. This one takes a string for the "master" and a job name. The master must be one of the following:
+When a `SparkContext` is constructed, there are several constructors that can be used. This one takes a string for the "master" and a job name. The master must be one of the following:
 
 * `local`: Start the Spark job standalone and use a single thread to run the job.
 * `local[k]`: Use `k` threads instead. Should be less than the number of cores.
 * `mesos://host:port`: Connect to a running, Mesos-managed Spark cluster.
 * `spark://host:port`: Connect to a running, standalone Spark cluster.
-
-You can also run Spark under Hadoop YARN, which we'll discuss at the end of the workshop.
+* `yarn-client` or `yarn-cluster`: Connect to a YARN cluster.
 
 ```
 val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 input.cache
 ```
 
-Define a read-only variable `input` of type RDD (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case.
+Define a read-only variable `input` of type [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case.
 
-> The `data` directory has a [README](../data/README.html) that discusses the files present and where they came from.
+> The `data` directory has a `README` that discusses the files present and where they came from.
 
-Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides dramatic performance improvements.
+Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides performance improvements.
+
+Next, let's work with the data:
 
 ```
 val sins = input.filter(line => line.contains("sin"))
@@ -184,87 +213,78 @@ val array = sins.collect()       // Convert the RDD into a collection (array)
 array.take(20) foreach println   // Take the first 20, and print them 1/line.
 ```
 
-Filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many found, convert the RDD to a collection. (What is the actual type??) and finally print the first twenty lines.
+Filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many were found, convert the RDD to a Scala collection (in the memory for the driver process JVM). Finally, loop through the first twenty lines, printing each one.
 
 Note: in Scala, the `()` in method calls are actually optional for no-argument methods.
+
+You can define *functions* as *values*:
 
 ```
 val filterFunc: String => Boolean =
     (s:String) => s.contains("god") || s.contains("christ")
 ```
 
-An alternative approach; create a separate filter _function value_ instead and pass it as an argument to the filter method. Specifically, `filterFunc` is a value that's a function of type `String` to `Boolean`.
+An alternative approach; create a separate filter function instead and pass it as an argument to the filter method. Specifically, `filterFunc` is a value that's a function of type `String` to `Boolean`.
 
-Actually, the following more concise form is equivalent, due to type inference:
+The following more concise form is equivalent, due to *type inference*:
 
 ```
 val filterFunc: String => Boolean =
     s => s.contains("god") || s.contains("christ")
 ```
 
+Now use the filter to find all the `sins` verses that mention God or Christ, then count them. (Note that we dropped the parentheses after "count" in this case.)
+
 ```
 val sinsPlusGodOrChrist  = sins filter filterFunc
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 ```
 
-Now use `filterFunc` with filter to find all the `sins` verses that mention God or Christ.
-Then, count how many were found. Note that we dropped the parentheses after "count" in this case.
+A non-script program should gracefully shutdown, but we don't need to do so here.
 
 ```
-sc.stop()
+// sc.stop()
 ```
 
-Stop the session. If you exit the REPL immediately, this will happen implicitly, but as we'll see, it's a good practice to always do this in your scripts. You'll also don't typically do this when running the actual Spark Shell, as you'll usually want the context alive until you're finished completely.
+If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`.
 
-Lastly, we need to run some unrelated code to setup the rest of the exercises. Namely, we need to create an `output` directory we'll use:
+There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some exercises are provided in the `src/main/scala/sparkworkshop/solns` directory.
 
-```
-val output = new java.io.File("output")
-if (output.exists == false) output.mkdir
-```
+You can exit the shell now. Type `:quit` or use `^d` (control-d).
 
-Now, if we actually used the Spark Shell for this exercise, we would have omitted the two `import` statements and the statement where we created the `ScalaContext` value `sc`.
-The shell automatically does these steps for us.
+## Local Mode Execution
 
-There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some of them are provided in the `src/main/sparkworkshop/solns` directory. Solutions aren't provided for all the suggested exercises, but I accept pull requests. ;)
+For local mode, you can use Activator's `console` task, because we've configured it to work similarly to Spark's shell. If you're running the Activator shell, you might try repeating the previous session, but this time you'll be running in local mode. Otherwise, skip to the next section.
 
-All the solutions provided for the rest of the exercises are compiled by `activator` or `sbt`, so you'll be able to run them the same way.
-
-> Note: If you don't want to modify the original code when working on an exercise, just copy and edit the file, and give the `object` (a *singleton* class) a new name.
-
-You can exit the Scala "console" now. Type `:quit` or use `^d` (control-d). You'll be back at the `sbt` prompt.
-
-Before moving on, let's discuss how you would actually run the Spark Shell. When you [download a full Spark distribution](TODO), it includes a `bin` directory with several Bach shell and Windows scripts. All you need to do from a command window is invoke the command `bin/spark-shell` (assuming your working directory is the root of the distribution).
+In the Activator shell, type `console`. You'll see fewer log messages this time, ending with the same `scala>` prompt.  Try pasting in the same code snippets from `Intro1.scala`.
 
 ## WordCount2
 
-[WordCount2.scala](src/main/sparkworkshop/WordCount2.scala)
+[WordCount2.scala](#code/src/main/scala/sparkworkshop/WordCount2.scala)
 
 The classic, simple *Word Count* algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.
 
-In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "local" counts can be done in parallel.
+In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally. The initial reading, tokenization, and "sub-counts" can be done in parallel.
 
-[WordCount2.scala](src/main/sparkworkshop/WordCount2.scala)
- uses the same King James Version (KJV) of the Bible file we used in the first exercise. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
+Now we'll return to the Activator UI (or shell).
 
-If using the <a class="shortcut" href="#run">run</a> panel, select `scala.WordCount2` and click the "Start" button. The "Logs" panel shows some information. Note the "output" directories listed in the output. Use a file browser to find those directories (which have a timestamp) to view the output written in there.
+[WordCount2.scala](#code/src/main/scala/sparkworkshop/WordCount2.scala) uses the KJV Bible text again. (Subsequent exercises will add the ability to override defaults with command-line arguments.)
 
-If using `sbt`, enter `run` and then the number shown to the left to `scala.WordCount2`.
-
-The reason the output directories have a timestamp in their name is so you can easily rerun the exercises repeatedly. Starting with v1.0.0, Spark follows the Hadoop convention of refusing to overwrite an existing directory. The timestamps keep them unique.
+If using the <a class="shortcut" href="#run">run</a> panel, select `WordCount2` and click the "Start" button. The messages in the "Logs" panel lists the "output" directory, which is in the *local* file system, not HDFS. In another terminal window, you can view the files in this directory, an empty `_SUCCESS` file that marks completion and a `part-00000` file that contains the data.
 
 As before, here is the text of the script in sections, with code comments removed:
 
 ```
+import com.typesafe.sparkworkshop.util.FileUtil
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-We use the Java default package for the compiled exercises, but you would normally organize your applications in packages, in the usual way.
+We use the Java default package for the compiled exercises, but you would normally organize your applications in packages, in the usual way. We start by importing a `FileUtil` class we use for "housekeeping". Then we use the same two `SparkContext` imports we discussed previously.
 
-> Even though our exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!
+> Even though most of the examples and exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when debugging and experimenting!
 
-First, here is the outline of the script, demonstrating a pattern we'll use throughout.
+Here is the outline of the rest of the program, demonstrating a pattern we'll use throughout.
 
 ```
 object WordCount2 {
@@ -286,6 +306,10 @@ In case the script fails with an exception, putting the `SparkContext.stop()` in
 The content of the `try` clause is the following:
 
 ```
+val out = "output/kjv-wc2"
+// Deleting old output (if any)
+FileUtil.rmrf(out)
+
 val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 input.cache
 
@@ -294,45 +318,58 @@ val wc = input
   .map(word => (word, 1))
   .reduceByKey((count1, count2) => count1 + count2)
 
-val now = Timestamp.now()
-val out = s"output/kjv-wc2-$now"
 println(s"Writing output to: $out")
 wc.saveAsTextFile(out)
 ```
 
-After the same loading and cache of the data we saw previously, we setup a pipeline of operations to perform the word count.
+Because Spark follows Hadoop conventions that it won't overwrite existing data, we delete any previous output, if any. Of course, *you should not do this* in most of your production scripts!
 
-First the line is split into words using as the separator any run of characters that isn't alphanumeric (e.g., whitespace and punctuation). This also conveniently removes the trailing `~` characters at the end of each line (for some reason). `input.flatMap(line => line.split(...))` maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The `flat` part flattens those nested collections into a single, "flat" collection of words.
+Next we load and cache the data like we did in the first example.
 
-The next two lines convert the single word "records" into tuples with the word and a count of `1`. In Shark, the first field in a tuple will be used as the default key for joins, group-bys, and the `reduceByKey` we use next. It effectively groups all the tuples together with the same word (the key) and then "reduces" the values using the passed in function. In this case, the two counts are added together.
+Now we setup a pipeline of operations to perform the word count.
 
-The last sequence of statements creates a timestamp that can be used in a file or directory name, constructs the output path, and finally uses the `saveAsTextFile` method to write the final RDD to that location.
+First the line is split into words using as the separator any run of characters that isn't alphanumeric (e.g., whitespace and punctuation). This also conveniently removes the trailing `~` characters at the end of each line that exist in the file for some reason. `input.flatMap(line => line.split(...))` maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The `flat` part flattens those nested collections into a single, "flat" collection of words.
 
-Spark follows Hadoop conventions. The `out` path is actually interpreted as a directory name. Here is its contents (for a run at a particular time...):
+The next two lines convert the single word "records" into tuples with the word and a count of `1`. In Shark, the first field in a tuple will be used as the default key for joins, group-bys, and the `reduceByKey` we use next.
+
+The `reduceByKey` step effectively groups all the tuples together with the same word (the key) and then "reduces" the values using the passed in function. In this case, the two counts are added together.
+
+Finally, we invoke `saveAsTextFile` to write the final RDD to the output location.
+
+Note that the input and output locations will be relative to the local file system, when running in local mode, and relative to user's home directory in HDFS (e.g., `/user/$USER`), when the program runs in Hadoop.
+
+Spark also follows another Hadoop convention for file I/O; the `out` path is actually interpreted as a directory name. Here is its contents after running in local mode (the default):
 
 ```
-$ ls -Al output/kjv-wc2-2014.05.02-06.40.55
+$ ls -l output/kjv-wc2
 total 328
--rw-r--r--  1 deanwampler  staff       8 May  3 09:40 ._SUCCESS.crc
--rw-r--r--  1 deanwampler  staff    1248 May  3 09:40 .part-00000.crc
 -rwxrwxrwx  1 deanwampler  staff       0 May  3 09:40 _SUCCESS
 -rwxrwxrwx  1 deanwampler  staff  158620 May  3 09:40 part-00000
 ```
 
-In a real cluster with lots of data and lots of concurrent processing, there would be many `part-NNNNN` files. They contain the actual data. The `_SUCCESS` file is a useful convention that signals the end of processing. It's useful because tools that are watching for the data to be written so they can perform subsequent processing will know the files are complete when they see this marker file. Finally, there are "hidden" CRC files for these other two files.
+In a real cluster with lots of data and lots of concurrent tasks (JVM processes), there would be many `part-NNNNN` files. They contain the actual data. The `_SUCCESS` file is a useful convention that signals the end of processing. It's useful because tools that are watching for the data to be written so they can perform subsequent processing will know the files are complete when they see this marker file.
 
-**Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from?
+**Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from? Look at the original file for clues.
 
-There are exercises described in the source file. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](src/main/sparkworkshop/solns/WordCount2GroupBy.scala)
+
+## Exercises
+
+At the end of each example source file, you'll find exercises you can try. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](#code/src/main/scala/sparkworkshop/solns/WordCount2GroupBy.scala)
 solves a "group by" exercise.
+
+You'll need to edit the source code on the VM somehow. One way is to simply use `vi` to edit the code, then use the Activator UI to run it. (The *Run* command compiles the changes first.) Another approach is to use the secure copy command, `scp`, to copy the sources to your workstation, edit them there, then copy them back.
+
+The best approach is to share one or more directories between your workstation and the VM Linux instance. This will allow you to edit the code in your workstation environment with the changes immediately available in the VM. See the documentation for your VM runner for details.
 
 ## WordCount3
 
-[WordCount3.scala](src/main/sparkworkshop/WordCount3.scala)
+[WordCount3.scala](#code/src/main/scala/sparkworkshop/WordCount3.scala)
 
-This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
+This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library we added to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code too much.
 
-Finally, it does some data cleansing to improve the results. The sacred text files included in the `data` directory, such as `kjvdat.txt` are actually formatted records of the form:
+We'll run this example in both local mode and in Hadoop (YARN).
+
+This version also does some data cleansing to improve the results. The sacred text files included in the `data` directory, such as `kjvdat.txt` are actually formatted records of the form:
 
 ```
 book|chapter#|verse#|text
@@ -340,12 +377,12 @@ book|chapter#|verse#|text
 
 That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but abbreviated "Gen"), the chapter and verse numbers, and then the verse text. We just want to count words in the verses, although including the book names wouldn't change the results significantly. (Now you can figure out the answer to the "quiz" in the previous section...)
 
-Command line options can be used to override the defaults. You'll have to use `sbt` from a command window to use this feature, and you'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments.
+Command line options can be used to override the defaults. You'll have to use the Activator shell from a login window to use this feature, and you'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments. We have also defined some shortcut command aliases for many of the programs. In this case, you can either enter `run-main WordCount3` at the activator shell prompt. Or, you can use the alias `ex3`. Either way, you can add options after these terms.
 
-The "\" characters in the following and subsequent command descriptions are used to indicate long lines that I wrapped to fit. Enter the commands on a single line without the "\". I use `[...]` to indicate optional arguments, and `|` to indicate alternative flags:
+The "\" characters in the following and subsequent command descriptions are used to indicate long lines that I wrapped to fit. Enter the commands on a single line without the "\". Following Unix conventions, `[...]` indicate optional arguments, and `|` indicate alternatives:
 
 ```
-run-main spark.WordCount3 [ -h | --help] \
+run-main WordCount3 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
@@ -358,21 +395,23 @@ Where the options have the following meanings:
 -h | --help     Show help and exit.
 -i ... input    Read this input source (default: data/kjvdat.txt).
 -o ... output   Write to this output location (default: output/kjvdat-wc3).
--m ... master   local, local[k], etc. as discussed previously.
+-m ... master   local, local[k], yarn-client, etc., as discussed previously.
 -q | --quiet    Suppress some informational output.
 ```
 
 Here is an example that simply specifies all the default values for the options (again, all on one line without the "\"):
 
 ```
-run-main spark.WordCount3 \
+run-main WordCount3 \
   --inpath data/kjvdat.txt --output output/kjv-wc3 \
   --master local
 ```
 
 You can try different variants of `local[k]` for the `master` option, but keep `k` less than the number of cores in your machine.
 
-The `input` and `master` arguments are basically the same things we discussed for `WordCount2`, but the `output` argument is used slightly differently. As we'll see, we'll output the results using a different mechanism than before, so the `output/kjvdat-wc3` (or your alternative) will be converted to a simple file, not a Hadoop-style directory; `output/kjvdat-wc3-${now}`, where `${now}` will be replaced with the current timestamp. The `quiet` option is mostly for the automated tests to use.
+As before, you can run with the default arguments using the *Run* panel in the Activator UI. If you use the Activator shell command line, you would use `run-main WordCount3` with or without options. There is also a command alias for these terms, `ex3`. We'll discuss the options for running in Hadoop in the next section.
+
+The `input` and `master` arguments are basically the same things we discussed for `WordCount2`, but the `output` argument.
 
 When you specify an input path for Spark, you can specify `bash`-style "globs" and even a list of them:
 
@@ -383,13 +422,12 @@ When you specify an input path for Spark, you can specify `bash`-style "globs" a
 Okay, with that out of the way, let's walk through the implementation of `WordCount3`, in sections:
 
 ```
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
 
-As before, but with our new `CommandLineOptions` and `Timestamp` utilities. (Note how Scala provides a concise syntax for selectively importing a few types in a package.)
+As before, but with our new `CommandLineOptions` utilities added.
 
 ```
 object WordCount3 {
@@ -402,13 +440,28 @@ object WordCount3 {
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
-    val argz = options(args.toList)
+    val argz   = options(args.toList)
+    val master = argz("master").toString
+    val quiet  = argz("quiet").toBoolean
+    val out    = argz("output-path").toString
+```
+I won't discuss the implementation of [CommandLineOptions.scala](#code/src/main/scala/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+
+After parsing the options, we extract some of the values we need.
+
+Next, if we're running in local mode, we delete the old output, if any. Recall that we do this so it's more convenient to run the program repeatedly, but normally you wouldn't want to delete data automatically! We will also delete old data from HDFS when running in Hadoop, but this is handled through a different mechanism, as we'll see shortly.
+
+```
+    if (master.startsWith("local")) {
+      if (!quiet) println(s" **** Deleting old output (if any), $out:")
+      FileUtil.rmrf(out)
+    }
 ```
 
-I won't discuss the implementation of [CommandLineOptions.scala](src/main/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+Now we create the `SparkContext` with the desired `master` setting. Then we process the input as before, with one change...
 
 ```
-    val sc = new SparkContext(argz("master").toString, "Word Count (3)")
+    val sc = new SparkContext(master, "Word Count (3)")
 
     try {
       val input = sc.textFile(argz("input-path").toString)
@@ -416,7 +469,7 @@ I won't discuss the implementation of [CommandLineOptions.scala](src/main/sparkw
       input.cache
 ```
 
-It starts out much like `WordCount2`, but it splits each line into fields, where the lines are of the form: `book|chapter#|verse#|text`. Only the text is kept. The `input` reference is an *RDD* that we then cache, as before. Note that calling `last` on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.
+It starts out much like `WordCount2`, but it splits each line into fields, where the lines are of the form: `book|chapter#|verse#|text`. Only the text of each verse is kept this time. As before, the `input` reference is an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) that we then cache. Note that calling `last` on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.
 
 ```
       val wc2 = input
@@ -427,19 +480,12 @@ It starts out much like `WordCount2`, but it splits each line into fields, where
 Take input and split on non-alphanumeric sequences of character as we did in `WordCount2`, but rather than map to `(word, 1)` tuples and use `reduceByKey`, we simply treat the words as values and call `countByValue` to count the unique occurrences. Hence, a simpler (and probably more efficient) approach.
 
 ```
-      val now = Timestamp.now()
-      val outpath = s"${argz("output-path")}-$now"
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output (${wc2.size} records) to: $outpath")
+      val wc2b = wc2a.map(key_value => s"${key_value._1},${key_value._2}").toSeq
+      val wc2 = sc.makeRDD(wc2b, 1)
 
-      import java.io._
-      val out = new PrintWriter(outpath)
-      wc2 foreach {
-        case (word, count) => out.println("%20s\t%d".format(word, count))
-      }
-      // WARNING: Without this close statement, it appears the output stream is
-      // not completely flushed to disk!
-      out.close()
+      if (!quiet) println(s"Writing output to: $out")
+      wc2.saveAsTextFile(out)
+
     } finally {
       sc.stop()
     }
@@ -447,111 +493,201 @@ Take input and split on non-alphanumeric sequences of character as we did in `Wo
 }
 ```
 
-The result of `countByValue` is a Scala `Map`, not an *RDD*, so we use conventional Java I/O to write the output. Note the warning in the comment; failure to close the stream explicitly appears to cause data truncation when the `SparkContext` is stopped before the stream is flushed.
+The result of `countByValue` is a Scala `Map`, not an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD), so we format the key-value pairs into a sequence of strings in comma-separated value (CSV) format. The we convert this sequence back to an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) with `makeRDD`. Finally, we save to a text file as before.
+
+## Running as a Hadoop Job
+
+So, running this program in Activator will run locally. Let's now run it in Hadoop. The data is already copied to HDFS. All we need to do is run a different driver program, [hadoop.HWordCound3](#code/src/main/scala/sparkworkshop/hadoop.HWordCound3.scala), which is also available in the *Run* panel. Try it now.
+
+The output is more verbose and the execution time is longer, due to Hadoop's overhead. The end of the output shows a URL for the *Hue* UI that's also part of the Sandbox. Open your browser to that URL to look at the data. The content will be very similar to the output of the previous, local run, but it will be formatted differently and the word-count pairs will be in a different (random) order.
+
+Using the Activator shell, you can use `run-main hadoop.HWordCount3` or the alias `hex3`.
+
+For convenient, there is also a bash shell script for this exercise in the `scripts` directory under the `spark-workshop` home, [scripts.wordcount3.sh](#code/scripts.wordcount3.sh). The other exercises also have corresponding scripts. The `wordcount3.sh` script looks like this:
+
+```
+#!/bin/bash
+
+output=output/kjv-wc3
+dir=$(dirname $0)
+$dir/hadoop.sh --class WordCount3 --output "$output" "$@"
+```
+
+It calls a [scripts.hadoop.sh](#code/scripts.hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime to you invoke the Activator *run* command.
+
+Let's return to [hadoop.HWordCound3](#code/src/main/scala/sparkworkshop/hadoop.HWordCound3.scala), which is quite small:
+
+```
+package hadoop
+import com.typesafe.sparkworkshop.util.Hadoop
+
+object HWordCount3 {
+  def main(args: Array[String]): Unit = {
+    Hadoop("WordCount3", "output/kjv-wc3", args)
+  }
+}
+```
+
+It accepts the same options as `WordCount3`, although the `--master` option is automatically supplied to specify YARN (overriding the default `local` value). This will be true of the Hadoop drivers classes for the other examples, too.
+
+It delegates to a helper class [com.typesafe.sparkworkshop.util.Hadoop](#code/src/main/scala/com/typesafe/sparkworkshop/util/Hadoop.scala) to do the work. It passes the class name and the output, which will be used to delete old output. This is a hack: the default output path must be specified here, even though the same default value is also encoded in the application. This is because we have to pass it to the `hadoop.sh` script.
+
+Here is the `Hadoop` helper class:
+
+```
+package com.typesafe.sparkworkshop.util
+import scala.sys.process._
+
+object Hadoop {
+  def apply(className: String, defaultOutpath: String, args: Array[String]): Unit = {
+    val user = sys.env.get("USER") match {
+      case Some(user) => user
+      case None =>
+        println("ERROR: USER environment variable isn't defined. Using root!")
+        "root"
+    }
+
+    // Did the user specify an output path? Use it instead.
+    val predicate = (arg: String) => arg.startsWith("-o") || arg.startsWith("--o")
+    val args2 = args.dropWhile(arg => !predicate(arg))
+    val outpath = if (args2.size == 0) s"/user/$user/$defaultOutpath"
+      else if (args2(1).startsWith("/")) args2(1)
+      else s"/user/$user/${args(2)}"
+
+    // We don't need to remove the output argument. A redundant occurrence
+    // is harmless.
+    val argsString = args.mkString(" ")
+    val exitCode = s"scripts/hadoop.sh --class $className --out $outpath $argsString".!
+    if (exitCode != 0) sys.exit(exitCode)
+  }
+}
+```
+
+It tries to determine the user name and whether or not the user explicitly specified an output argument, which should override the hard-coded value.
+
+Finally, it invokes the [scripts.hadoop.sh](#code/scripts.hadoop.sh) `bash` script we mentioned above, so that we go thorugh Spark's `spark-submit` script for submitting to the Hadoop YARN cluster.
 
 Don't forget the try the exercises at the end of the source file.
 
 ## Matrix4
 
-[Matrix4.scala](src/main/sparkworkshop/Matrix4.scala)
+[Matrix4.scala](#code/src/main/scala/sparkworkshop/Matrix4.scala)
 
-An early use for Spark was implementing Machine Learning algorithms. It has a built-in Matrix API that is useful for many such algorithms. This exercise briefly explores the Matrix API.
+An early use for Spark was implementing Machine Learning algorithms. Spark's `MLlib` of algorithms contains classes for vectors and matrices, which are important for many ML algorithms. This exercise uses a simple representation of matrices to explore another topic; explicit parallelism.
 
-The sample data is generated internally; there is no input that is read. The output is written to the console.
+The sample data is generated internally; there is no input that is read. The output is written to the file system as before.
 
 Here is the `run-main` command with optional arguments:
 
 ```
-run-main spark.Matrix4 [m [n]]
+run-main Matrix4 [ -h | --help] \
+  [-d | --dims NxM] \
+  [-o | --out | --outpath output] \
+  [-m | --master master] \
+  [-q | --quiet]
 ```
 
-The supported options are:
+The one new optin is for specifying the dimensions, where the string `NxM` is parsed to mean `N` rows and `M` columns. The default is `5x10`.
+
+Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4` and you can run with the default arguments using the Activator *Run* panel.
+
+For Hadoop, select and run [hadoop.HMatrix4](#code/src/main/scala/sparkworkshop/hadoop.HMatrix4.scala) in the UI, use `run-main hadoop.HMatrix4` or `hex4` in the Activator shell (both of which accept the same list of options, except for `--master` which is already provided), and there is a bash script [scripts/matrix4.sh](#code/scripts/matrix4.sh).
+
+We won't cover all the code, skipping the familiar stuff:
 
 ```
-m   Number of rows (default: 5)
-n   Number of columns (default: 10)
-```
-
-Here is the code:
-
-```
-package com.typesafe.sparkworkshop
-import com.typesafe.sparkworkshop.util.{Matrix, Timestamp}
-import org.apache.spark.SparkContext
+import com.typesafe.sparkworkshop.util.Matrix
+...
 
 object Matrix4 {
 
-  // Override for tests.
-  var out = Console.out
+  case class Dimensions(m: Int, n: Int)
 
   def main(args: Array[String]) = {
 
-    case class Dimensions(m: Int, n: Int)
+    val options = CommandLineOptions(...)
+    val argz   = options(args.toList)
+    ...
 
-    val dims = args match {
-      case Array(m, n) => Dimensions(m.toInt, n.toInt)
-      case Array(m)    => Dimensions(m.toInt, 10)
-      case Array()     => Dimensions(5,       10)
-      case _ =>
-        println("""Expected optional matrix dimensions, got this: ${args.mkString(" ")}""")
+    val dimsRE = """(\d+)\s*x\s*(\d+)""".r
+    val dimensions = argz("dims").toString match {
+      case dimsRE(m, n) => Dimensions(m.toInt, n.toInt)
+      case s =>
+        println("""Expected matrix dimensions 'NxM', but got this: $s""")
         sys.exit(1)
     }
 ```
 
-`Dimensions` is a convenience class for capturing the default or user-specified matrix dimensions.
+`Dimensions` is a convenience class for capturing the default or user-specified matrix dimensions. We parse the argument string to extract `N` and `M`, then construct a `Dimension` instance.
 
 ```
     val sc = new SparkContext("local", "Matrix (4)")
 
     try {
       // Set up a mxn matrix of numbers.
-      val matrix = Matrix(dims.m, dims.n)
+      val matrix = Matrix(dimensions.m, dimensions.n)
 
       // Average rows of the matrix in parallel:
-      val sums_avgs = sc.parallelize(1 to dims.m).map { i =>
+      val sums_avgs = sc.parallelize(1 to dimensions.m).map { i =>
         // Matrix indices count from 0.
         // "_ + _" is the same as "(count1, count2) => count1 + count2".
         val sum = matrix(i-1) reduce (_ + _)
-        (sum, sum/dims.n)
-      }.collect
+        (sum, sum/dimensions.n)
+      }.collect    // convert to an array
+```
 
-      out.println(s"${dims.m}x${dims.n} Matrix:")
-      sums_avgs.zipWithIndex foreach {
+The core of this example is the use of `SparkContext.parallelize` to process each row in parallel (subject to the available cores on the machine or cluster, of course). In this case, we sum the values in each row and compute the average.
+
+The argument to `parallelize` is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to `i`. We then grab the `i-1` row (because of zero indexing) and use the `reduce` method to sum the column elements. A final tuple with the sum and the average is returned.
+
+```
+      // Make a new sequence of strings with the formatted output, then we'll
+      // dump to the output location.
+      val outputLines = Vector(          // Scala's Vector, not MLlib's version!
+        s"${dimensions.m}x${dimensions.n} Matrix:") ++ sums_avgs.zipWithIndex.map {
         case ((sum, avg), index) =>
-          out.println(f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d")
+          f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d"
       }
-    } finally {
-      sc.stop()
-    }
+      val output = sc.makeRDD(outputLines)  // convert back to an RDD
+      if (!quiet) println(s"Writing output to: $out")
+      output.saveAsTextFile(out)
+    } finally { ... }
   }
 }
 ```
 
-The comments explain most of the steps. The crucial part is the call to `parallelize` that creates N parallel operations. If you have less than N cores available, some of the operations will have to wait for an available core.
-
-The argument to `parallelize` is a sequence of "things" where each one will be passed to one of the operations. Here, we just use the literal syntax to construct a sequence of integers from 1 to the number of rows. When the anonymous function is called, one of those row numbers will get assigned to `i`. We then grab the `i-1` row (because of zero indexing) and use the `reduce` method to sum the column elements. A final tuple with the sum and the average is returned.
-
-The `collect` method is called to convert the RDD to an array, because we're just going to print results to the console. The expression `sums_avgs.zipWithIndex` creates a tuple with each `sums_avgs` value and it's index into the collection. We use that to print the row index.
+The output is formatted as a sequence of strings and converted back to an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) for output. The expression `sums_avgs.zipWithIndex` creates a tuple with each `sums_avgs` value and it's index into the collection. We use that to add the row index to the output.
 
 ## Crawl5a
 
-[Crawl5a.scala](src/main/sparkworkshop/Crawl5a.scala)
+[Crawl5a.scala](#code/src/main/scala/sparkworkshop/Crawl5a.scala)
 
-This the first part of the fifth exercise. It simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
+The fifth example is in two-parts. The first part simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
 `Crawl5a` supports the same command-line options as `WordCount3`:
 
 ```
-run-main spark.Crawl5a [ -h | --help] \
+run-main Crawl5a [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
   [-q | --quiet]
 ```
 
-In this case, no timestamp is appended to the output path, since it will be read by the next exercise `InvertedIndex5b`. So, if you rerun `Crawl5a`, you'll have to delete or rename the previous output manually.
+As before, there is also a `ex5a` short cut for `run-main Crawl5a` and you can run with the default arguments using the Activator *Run* panel.
 
-Most of this code is straightforward. Its comments explain any complicated constructs used.
+There is no Hadoop driver for this program, because `Crawl5a` is designed to read the files in a directory tree. It uses the file name as the key and the contents as the value. Unfortunately, this means it can't work in Hadoop as written, because Hadoop's I/O is designed to work with directories and ignore the file names. A workaround could be implemented manually with the Hadoop API, where an HDFS directory tree is walked and each file is handled separately. However, in a real-world scenario, a non-Hadoop process (like this program running in local mode!) would generate the index of document names/ids to contents. So, for this workshop we've simply copied the local-mode output to HDFS. You can run hadoop.HInvertedIndex5b on that data.
+
+If you need to recopy the data to HDFS, run `Crawl5a` in local mode and use the following HDFS command from the root of the project:
+
+```
+hadoop fs -put output/crawl output
+```
+
+(The target `output` directory will be relative to `/user/$USER`.)
+
+
+Most of the code is straightforward. The comments explain the details.
 
 The output format is demonstrated with the following line from the output `(email_file_name, text)`:
 
@@ -559,58 +695,40 @@ The output format is demonstrated with the following line from the output `(emai
 (0038.2001-08-05.SA_and_HP.spam.txt,  Subject: free foreign currency newsletter ...)
 ```
 
-The next step has to parse this format.
+The next step has to parse this format to generate the *inverted index*.
 
 ## InvertedIndex5b
 
-[InvertedIndex5b.scala](src/main/sparkworkshop/InvertedIndex5b.scala)
+[InvertedIndex5b.scala](#code/src/main/scala/sparkworkshop/InvertedIndex5b.scala)
 
 Using the crawl data just generated, compute the index of words to documents (emails).
 
-`InvertedIndex5b` supports the same command-line options as `WordCount3`:
+`InvertedIndex5b` supports the usual command-line options:
 
 ```
-run-main spark.InvertedIndex5b [ -h | --help] \
+run-main InvertedIndex5b [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
   [-q | --quiet]
 ```
 
-Here is the code:
+For Hadoop, select and run [hadoop.HInvertedIndex5b](#code/src/main/scala/sparkworkshop/hadoop.HInvertedIndex5b.scala) in the UI, use `run-main hadoop.HInvertedIndex5b` or `hex5b` in the Activator shell. There is also a bash script [scripts/invertedindex5b.sh](#code/scripts/invertedindex5b.sh).
+
+The code outside the usual `try` clause follows the usual pattern, so we'll focus on the contents of the `try` clause:
 
 ```
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-
-object InvertedIndex5b {
-  def main(args: Array[String]) = {
-
-    val options = CommandLineOptions(
-      this.getClass.getSimpleName,
-      CommandLineOptions.inputPath("output/crawl"),
-      CommandLineOptions.outputPath("output/inverted-index"),
-      CommandLineOptions.master("local"),
-      CommandLineOptions.quiet)
-
-    val argz = options(args.toList)
-
-    val sc = new SparkContext(argz("master").toString, "Inverted Index (5b)")
-
-    try {
-      val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-      val input = sc.textFile(argz("input-path").toString) map {
-        case lineRE(name, text) => (name.trim, text.toLowerCase)
-        case badLine =>
-          Console.err.println("Unexpected line: $badLine")
-          ("", "")
-      }
+try {
+  val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
+  val input = sc.textFile(argz("input-path").toString) map {
+    case lineRE(name, text) => (name.trim, text.toLowerCase)
+    case badLine =>
+      Console.err.println("Unexpected line: $badLine")
+      ("", "")
+  }
 ```
 
-Inside the `try` expression, we load the "crawl" data, where each line was written by `Crawl5a` with the following format: `(document_id, text)` (including the parentheses). Hence, we use a regular expression with "capture groups" for the document and text.
+We load the "crawl" data, where each line was written by `Crawl5a` with the following format: `(document_id, text)` (including the parentheses). Hence, we use a regular expression with "capture groups" to extract the `document_id` and `text`.
 
 Note the function passed to `map`. It has the form:
 
@@ -627,59 +745,62 @@ We have two `case` match clauses, one for when the regular expression successful
 
 Note that the specified or default `input-path` is a directory with Hadoop-style content, as discussed previously. Spark knows to ignore the "hidden" files.
 
-```
-      val now = Timestamp.now()
-      val out = s"${argz("output-path")}-$now"
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
+The embedded comments in the rest of the code explains each step:
 
-      // Split on non-alphanumeric sequences of character as before.
-      // Rather than map to "(word, 1)" tuples, we treat the words by values
-      // and count the unique occurrences.
-      input
-        .flatMap {
-          case (path, text) => text.split("""\W+""") map (word => (word, path))
-        }
-        .map {
-          case (word, path) => ((word, path), 1)
-        }
-        .reduceByKey{
-          case (count1, count2) => count1 + count2
-        }
-        .map {
-          case ((word, path), n) => (word, (path, n))
-        }
-        .groupBy {
-          case (word, (path, n)) => word
-        }
-        .map {
-          case (word, seq) =>
-            val seq2 = seq map {
-              case (redundantWord, (path, n)) => (path, n)
-            }
-            (word, seq2.mkString(", "))
-        }
-        .saveAsTextFile(out)
-    } finally {
-      sc.stop()
-    }
+```
+if (!quiet)  println(s"Writing output to: $out")
+
+// Split on non-alphanumeric sequences of character as before.
+// Rather than map to "(word, 1)" tuples, we treat the words by values
+// and count the unique occurrences.
+input
+  .flatMap {
+    // all lines are two-tuples; extract the path and text into variables
+    // named "path" and "text".
+    case (path, text) =>
+      // If we don't trim leading whitespace, the regex split creates
+      // an undesired leading "" word!
+      text.trim.split("""\W+""") map (word => (word, path))
   }
-}
+  .map {
+    // We're going to use the (word, path) tuple as a key for counting
+    // all of them that are the same. So, create a new tuple with the
+    // pair as the key and an initial count of "1".
+    case (word, path) => ((word, path), 1)
+  }
+  .reduceByKey{    // Count the equal (word, path) pairs, as before
+    case (count1, count2) => count1 + count2
+  }
+  .map {           // Rearrange the tuples; word is now the key we want.
+    case ((word, path), n) => (word, (path, n))
+  }
+  .groupBy {       // Group the same words together
+    case (word, (path, n)) => word
+  }
+  .map {           // reformat the output; make string of the groups.
+    case (word, seq) =>
+      val seq2 = seq map {
+        case (redundantWord, (path, n)) => (path, n)
+      }
+      (word, seq2.mkString(", "))
+  }
+  .saveAsTextFile(out)
+} finally { ... }
 ```
 
-See if you can understand what this sequence of transformations is doing. You could try reading a smaller input file (say the first "N" lines of the crawl output), then hack on the script to output some of the results from each step.
-
-A few useful [RDD](http://spark.apache.org/docs/1.1.0/api/scala/index.html#org.apache.spark.rdd.RDD) methods include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "normal" collection and then use one of the `print*` methods to dump the contents.
-
-The end goal is to output each record string in the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
+Each output record has the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
 
 ```
 (ability,(0018.2003-12-18.GP.spam.txt,2), (0020.2001-07-28.SA_and_HP.spam.txt,1))
 ```
 
+It's worth studying this sequence of transformations to understand how it works. Many problems can be solves with these techniques. You might try reading a smaller input file (say the first 5 lines of the crawl output), then hack on the script to dump the [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) after each step.
+
+A few useful [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) methods for exploration include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "regular" Scala collection and then use `println`, etc. to dump the contents.
+
 ## NGrams6
 
-[NGrams6.scala](src/main/sparkworkshop/NGrams6.scala)
+[NGrams6.scala](#code/src/main/scala/sparkworkshop/NGrams6.scala)
 
 In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
@@ -688,7 +809,7 @@ This exercise finds all NGrams matching a user-specified pattern. The default is
 `NGrams6` supports the same command-line options as `WordCount3`, except for the output path (it just writes to the console), plus two new options:
 
 ```
-run-main spark.NGrams6 [ -h | --help] \
+run-main NGrams6 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-m | --master master] \
   [-c | --count N] \
@@ -703,93 +824,40 @@ Where
 -n | --ngrams string  Match string (default "% love % %"). Quote the string!
 ```
 
+For Hadoop, select and run [hadoop.HNGrams6](#code/src/main/scala/sparkworkshop/hadoop.HNGrams6.scala) in the UI, use `run-main hadoop.HNGrams6` or `hex6` in the Activator shell. There is also a bash script [scripts/ngrams6.sh](#code/scripts/ngrams6.sh).
+
 I'm in yür codez:
 
 ```
-package com.typesafe.sparkworkshop
-
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, Timestamp}
-import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-
-object NGrams6 {
-
-  // Override for tests.
-  var out = Console.out
-
-  def main(args: Array[String]) = {
-
-    /** A function to generate an Opt for handling the count argument. */
-    def count(value: String): Opt = Opt(
-      name   = "count",
-      value  = value,
-      help   = s"-c | --count  N  The number of NGrams to compute (default: $value)",
-      parser = {
-        case ("-c" | "--count") +: n +: tail => (("count", n), tail)
-      })
-
-    /**
-     * The NGram phrase to match, e.g., "I love % %" will find 4-grams that
-     * start with "I love", and "% love %" will find trigrams with "love" as the
-     * second word.
-     * The "%" are replaced by the regex "\w+" and whitespace runs are replaced
-     * with "\s+" to create a matcher regex.
-     */
-    def ngrams(value: String): Opt = Opt(
-      name   = "ngrams",
-      value  = value,
-      help   = s"-n | --ngrams  S     The NGrams match string (default: $value)",
-      parser = {
-        case ("-n" | "--ngrams") +: s +: tail => (("ngrams", s), tail)
-      })
-
-    val options = CommandLineOptions(
-      this.getClass.getSimpleName,
-      CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.master("local"),
-      CommandLineOptions.quiet,
-      count("100"),
-      ngrams("% love % %"))
-
-    val argz = options(args.toList)
-
-    val sc = new SparkContext(argz("master").toString, "NGrams (6)")
-    val ngramsStr = argz("ngrams").toString.toLowerCase
-    // Note that the replacement strings use Scala's triple quotes; necessary
-    // to ensure that the final string is "\w+" and "\s+" for the reges.
-    val ngramsRE =
-      ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
-    val n = argz("count").toInt
+...
+val ngramsStr = argz("ngrams").toString.toLowerCase
+val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
+val n = argz("count").toInt
 ```
 
-Without discussing the details, this example defines two new `Opt` instances for handling the NGram phrase and count options. Because we allow the user to mix `%` characters for word wildcards and regular expressions, we convert the `%` to regexs for words and also replace all runs of whitespace with a more flexible regex for whitespace.
+From the two new options, we get the `ngrams` string. Each `%` is replaced by a regex to match a word and whitespace is replaced by a general regex for whitespace.
 
 ```
-    try {
-      object CountOrdering extends Ordering[(String,Int)] {
-        def compare(a:(String,Int), b:(String,Int)) =
-          -(a._2 compare b._2)  // - so that it sorts descending
-      }
-
-      val ngramz = sc.textFile(argz("input-path").toString)
-        .flatMap { line =>
-            val text = line.toLowerCase.split("\\s*\\|\\s*").last
-            ngramsRE.findAllMatchIn(text).map(_.toString)
-        }
-        .map(ngram => (ngram, 1))
-        .reduceByKey((count1, count2) => count1 + count2)
-        .takeOrdered(n)(CountOrdering)
-
-      out.println(s"Found ${ngramz.size} ngrams:")
-      ngramz foreach {
-        case (ngram, count) => out.println("%30s\t%d".format(ngram, count))
-      }
-    } finally {
-      sc.stop()
-    }
+try {
+  object CountOrdering extends Ordering[(String,Int)] {
+    def compare(a:(String,Int), b:(String,Int)) =
+      -(a._2 compare b._2)  // - so that it sorts descending
   }
-}
+
+  val ngramz = sc.textFile(argz("input-path").toString)
+    .flatMap { line =>
+        val text = line.toLowerCase.split("\\s*\\|\\s*").last
+        ngramsRE.findAllMatchIn(text).map(_.toString)
+    }
+    .map(ngram => (ngram, 1))
+    .reduceByKey((count1, count2) => count1 + count2)
+    .takeOrdered(n)(CountOrdering)
+
+  out.println(s"Found ${ngramz.size} ngrams:")
+  ngramz foreach {
+    case (ngram, count) => out.println("%30s\t%d".format(ngram, count))
+  }
+} finally { ... }
 ```
 
 We need an implementation of `Ordering` to sort our found NGrams descending by count.
@@ -799,7 +867,7 @@ The `map` and `reduceByKey` calls are just like we used previously for `WordCoun
 
 ## Joins7
 
-[Joins7.scala](src/main/sparkworkshop/Joins7.scala)
+[Joins7.scala](#code/src/main/scala/sparkworkshop/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
 
@@ -808,7 +876,7 @@ Here, we will join the KJV Bible data with a small "table" that maps the book ab
 `Joins7` supports the following command-line options:
 
 ```
-run-main spark.Joins7 [ -h | --help] \
+run-main Joins7 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
@@ -818,259 +886,177 @@ run-main spark.Joins7 [ -h | --help] \
 
 Where the `--abbreviations` is the path to the file with book abbreviations to book names. It defaults to `data/abbrevs-to-names.tsv`. Note that the format is tab-separated values, which the script must handle correctly.
 
-Here r yur codez:
+For Hadoop, select and run [hadoop.HJoins7](#code/src/main/scala/sparkworkshop/hadoop.HJoins7.scala) in the UI, use `run-main hadoop.HJoins7` or `hex7` in the Activator shell. There is also a bash script [scripts/joins7.sh](#code/scripts/joins7.sh).
+
+Here r yür codez:
 
 ```
-object Joins7 {
-  def main(args: Array[String]) = {
-
-    /** The "dictionary" of book abbreviations to full names */
-    val abbrevsFile = "data/abbrevs-to-names.tsv"
-    val abbrevs = Opt(
-      name   = "abbreviations",
-      value  = abbrevsFile,
-      help   = s"-a | --abbreviations  path The dictionary of book abbreviations to full names (default: $abbrevsFile)",
-      parser = {
-        case ("-a" | "--abbreviations") +: path +: tail => (("abbreviations", path), tail)
-      })
-
-    val options = CommandLineOptions(
-      this.getClass.getSimpleName,
-      CommandLineOptions.inputPath("data/kjvdat.txt"),
-      abbrevs,
-      CommandLineOptions.outputPath("output/kjv-joins"),
-      CommandLineOptions.master("local"),
-      CommandLineOptions.quiet)
-
-    val argz = options(args.toList)
-
-    val sc = new SparkContext(argz("master").toString, "Joins (7)")
+...
+try {
+  val input = sc.textFile(argz("input-path").toString)
+    .map { line =>
+      val ary = line.split("\\s*\\|\\s*")
+      (ary(0), (ary(1), ary(2), ary(3)))
+    }
 ```
 
-The input sacred text (default: `data/kjvdat.txt`) is assumed to have the format `book|chapter#|verse#|text`:
+The input sacred text (default: `data/kjvdat.txt`) is assumed to have the format `book|chapter#|verse#|text`. We split on the delimiter and output a two-element tuple with the book abbreviation as the first element and a nested tuple with the other three elements. For joins, Spark wants a `(key,value)` tuple, which is why we use the nested tuple.
+
+The abbreviations file is handled similarly, but the delimiter is a tab:
 
 ```
-    try {
-      val input = sc.textFile(argz("input-path").toString)
-        .map { line =>
-          val ary = line.split("\\s*\\|\\s*")
-          (ary(0), (ary(1), ary(2), ary(3)))
-        }
-```
-
-Note the output tuple format from the `map`. For joins, Spark wants a `(key,value)` tuple, so we use a nested tuple for the chapter, verse, and text. The abbreviations file is handled similarly, but the delimiter is a tab:
-
-```
-      val abbrevs = sc.textFile(argz("abbreviations").toString)
-        .map{ line =>
-          val ary = line.split("\\s+", 2)
-          (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
-        }
+val abbrevs = sc.textFile(argz("abbreviations").toString)
+  .map{ line =>
+    val ary = line.split("\\s+", 2)
+    (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
+  }
 ```
 
 Note the second argument to `split`. Just in case a full book name has a nested tab, we explicitly only want to split on the first tab found, yielding two strings.
 
 ```
-      // Cache both RDDs in memory for fast, repeated access.
-      input.cache
-      abbrevs.cache
+// Cache both RDDs in memory for fast, repeated access.
+input.cache
+abbrevs.cache
 
-      // Join on the key, the first field in the tuples; the book abbreviation.
+// Join on the key, the first field in the tuples; the book abbreviation.
 
-      val verses = input.join(abbrevs)
+val verses = input.join(abbrevs)
 
-      if (input.count != verses.count) {
-        println(s"input count != verses count (${input.count} != ${verses.count})")
-      }
+if (input.count != verses.count) {
+  println(s"input count != verses count (${input.count} != ${verses.count})")
+}
 ```
 
 We perform an inner join on the keys of each RDD and add a sanity check for the output. Since this is an inner join, the sanity check catches the case where an abbreviation wasn't found and the corresponding verses were dropped!
 
-The schema of `verses` is this: `(key, (value1, value2))`, where `value` is `(chapter, verse, text)` from the KJV input and `value` is the full book name, the second "field" from the abbreviations file. We now flatten the records to the final desired form, `fullBookName|chapter|verse|text`:
+The schema of `verses` is this: `(key, (value1, value2))`, where `value1` is `(chapter, verse, text)` from the KJV input and `value2` is the full book name, the second "field" from the abbreviations file. We now flatten the records to the final desired form, `fullBookName|chapter|verse|text`:
 
 ```
-      val verses2 = verses map {
-        // Drop the key - the abbreviated book name
-        case (_, ((chapter, verse, text), fullBookName)) =>
-          (fullBookName, chapter, verse, text)
-      }
+val verses2 = verses map {
+  // Drop the key - the abbreviated book name
+  case (_, ((chapter, verse, text), fullBookName)) =>
+    (fullBookName, chapter, verse, text)
+}
 ```
 
 Lastly, we write the output:
 
 ```
-      val now = Timestamp.now()
-      val out = s"${argz("output-path")}-$now"
-      if (argz("quiet").toBoolean == false)
-        println(s"Writing output to: $out")
-      verses2.saveAsTextFile(out)
-    } finally {
-      sc.stop()
-    }
-  }
-}
+  if (!quiet) println(s"Writing output to: $out")
+  verses2.saveAsTextFile(out)
+} finally { ... }
 ```
 
 The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), with many other methods for computing "co-groups", outer joins, etc.
 
-You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not in the correct order! (See the exercises in the source file.)
+You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not retained in the correct order! (See the exercises in the source file.)
 
 ## SparkStreaming8
 
-[SparkStreaming8.scala](src/main/sparkworkshop/SparkStreaming8.scala)
+[SparkStreaming8.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8.scala)
 
-The streaming capability is relatively new and our last exercise shows how it works to construct a simple "echo" server. It has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command.
+The streaming capability is relatively new and this exercise uses it to construct a simple "word count" server. The example has two running modes. The default mode just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command. The other mode ingests "events" over a socket. In either case, the data is captured in 1-second intervals (called *batches*) and word count it performed on the data in the batch.
 
-In Activator or `sbt`, run `SparkStreaming8` as we've done for the other exercises. It will read the KJV Bible text file, then terminate after 5 seconds, because otherwise the app will run forever, waiting for a changed text file to appear!
+Let's start with the mode that just reads a file. In Activator, run `SparkStreaming8` as we've done for the other exercises. It will read the KJV Bible text file, then terminate after 5 seconds, because otherwise the app will run forever, waiting for a changed text file to appear!
 
-Alternatively, the app can receive text over a socket connection. We'll use a console network app to send data to the spark streaming process, either the `nc` console app that's part of [NetCat](http://netcat.sourceforge.net/) or the `NCat` app that comes with [NMap](http://nmap.org/download.html), which is available for more platforms, like Windows. If you're on a Mac or Linux machine, you probably already have `nc` installed.
+If you look in the local `output` directory, you'll see many subdirectories of the form `output/kjv-wc-streaming-<timestamp>.out/`, where the timestamp will be milliseconds that increment by 1000 at a time. In Spark Streaming, each batch (time interval of events) is written to a new, timestamped directory when output methods are called. The `--out` argument to the program is used as the directory name prefix. Most of the `part-0000N` files (you'll probably see two per directory) will be empty, because most or all of the KJV input is handled in the first batch. `SparkStreaming8` automatically terminates after a few seconds, so it doesn't run forever, even when the input is exhausted!
 
-To try the app with a socket connection, open a second console window to use `nc` or `ncat`. Then, run this `nc` command (or the equivalent for `ncat`):
+Alternatively, the app can receive text over a socket connection. To do this, you'll need to log into two terminal window in the VM.
 
-```
-nc -c -l -p 9999
-```
+We'll use the `nc` command to send data to the spark streaming process (part of [NetCat](http://netcat.sourceforge.net/)).
 
-The `-c` option (which could be omitted) tells it to terminate if the socket drops, the `-l` option puts `nc` into listen mode, and the `-p` option is used to specify the port.
-
-If you've been using Activator, open another console/shell window and change to the project directory. If you've been using `sbt`, just use the same session. Run `SparkStreaming8` with the following `sbt` command:
-
-
-Note that it has default arguments for the host (`localhost`) and the port (`9999`), e.g., you could use this `sbt` command to override them:
+To try the streaming program with a socket connection, run the following command in one of the terminal windows:
 
 ```
-run-main spark.SparkStreaming8 --socket localhost:9999
+nc -l 9900
 ```
 
-Back to the `nc` console, type (or copy and paste) text into the window. After each carriage return, the text is sent to the `SparkStreaming8` app, where word count is performed on it and some output is written to that app's console window.
+It will wait for connections (the `-l` option) on port 9900. Type in several lines of random text, with line feeds. They will be read by the streaming program when it connects.
 
-Once again, `SparkStreaming8` will terminate after 5 seconds, because otherwise the app will try to run forever!
+Now run `SparkStreaming8` with one of the following scripts:
 
-However, it does detect if the socket connection drops, e.g., you hit `^C` in the `nc` window. It will take a few moments to shut itself down. The app has a "listener" that
-will shutdown when the socket drops. However, by default, Spark Streaming will attempt to re-establish the connection, which is probably what you would want in a long-running system.
+* `scripts/sparkstreaming8-local.sh` - Run streaming in local mode.
+* `scripts/sparkstreaming8.sh` - Run streaming in Hadoop.
 
-The 5-second timeout is still on in the streaming scenario, but you can disable it when using either input mode by also passing the argument `--no-term` ("no terminate"):
-
-```
-run-main spark.SparkStreaming8 --socket localhost:9999 --no-term
-```
-
-Restart `nc` in the other window and try this variant of `run-main`. After a few seconds, use `^C` to kill `nc` and watch the error messages generated in the `sbt` window. Note how long it takes for the application to shutdown.
-
-You can use any `server:port` combination you want, even on a remote machine.
-
-To recap, `SparkStreaming8` supports the following command-line options:
+The "local" version starts Activator in shell mode and then invokes a `run-main` command. You may need to terminate the UI process if it's running. Control-C is your friend. ;) Here is the command that's executed in the Activator shell:
 
 ```
-run-main spark.SparkStreaming8 [ -h | --help] \
+run-main SparkStreaming8 --socket localhost:9900 --out output/socket-streaming
+```
+
+Once it starts you'll see similar output, where it dumps the garbage you typed into the `nc` window. Once `SparkStreaming8` exits, so will `nc`. Activator will exit, too. Look at the output directories created. Most files will be empty.
+
+Once again, `SparkStreaming8` will terminate automatically after 5 seconds, even if you keep inputing text into `nc`. We'll discuss an override in a moment.
+
+Do these steps again with the Hadoop version, `scripts/sparkstreaming8.sh`. This script works just like the other Hadoop scripts we described previously. It invokes `$SPARK_HOME/bin/spark-submit`. Don't forget to start `nc` again.
+
+What if kill the `nc` process? `SparkStreaming8` detects that the socket dropped and starts shutting down, which takes a few moments. The program has a "listener" that
+triggers shutdown when the socket drops. However, by default, Spark Streaming will attempt to re-establish the connection, which is probably what you would want in a real, long-running system.
+
+`SparkStreaming8` supports the following command-line options:
+
+```
+run-main SparkStreaming8 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-s | --socket server:port] \
   [-n | --no | --no-term] \
   [-q | --quiet]
 ```
 
-Where the default is `--inpath data/kjvdat.txt`.
+Where the default is `--inpath data/kjvdat.txt`. However, it is ignored if the `--socket` option is given. If you don't want the program to terminate automatically after 5 seconds, use the `--no-term` option.
 
 ## How Spark Streaming Works
 
-Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on *deltas* of data, say all the events received within 1-second intervals (which is what we used here). Those deltas are `RDDs` encapsulated in a `DStream` ("Discretized Stream").
+Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on *deltas* of data, say all the events received within one-second intervals (which is what we used here). Deltas of one second to several minutes are most common. Each delta of events is stored in its own [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) encapsulated in a [DStream](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.dstream.DStream) ("Discretized Stream").
 
-A `StreamingContext` is used to wrap the normal `SparkContext`, too.
+A [StreamingContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.StreamingContext) is used to wrap the normal [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext), too.
 
 ## The SparkStreaming8 Code
 
-Here is the code for [SparkStreaming8.scala](src/main/sparkworkshop/SparkStreaming8.scala):
+Here are the key parts of the code for [SparkStreaming8.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8.scala):
 
 ```
-object SparkStreaming8 {
-  // Override for tests, etc.
-  var out = Console.out
-
-  val timeout = 5 * 1000   // 5 seconds
-
-  /**
-   * Use "--socket host:port" to listen for events.
-   * To read "events" from a directory of files instead, e.g., for testing,
-   * use the "--inpath" argument.
-   */
-  def socket(hostPort: String): Opt = Opt(
-    name   = "socket",
-    value  = hostPort,
-    help   = s"-s | --socket host:port  Listen to a socket for events (default: $hostPort unless --inpath used)",
-    parser = {
-      case ("-s" | "--socket") +: hp +: tail => (("socket", hp), tail)
-    })
-
-  /**
-   * Use "--no-term" to keep this process running "forever" (or until ^C).
-   */
-  def noterm(): Opt = Opt(
-    name   = "no-term",
-    value  = "",  // ignored
-    help   = s"-n | --no | --no-term  Run forever; don't terminate after $timeout seconds)",
-    parser = {
-      case ("-n" | "--no" | "--no-term") +: tail => (("no-term", "true"), tail)
-    })
-
-  case class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
-    override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
-      out.println(s"Receiver Error: $error. Stopping...")
-      sc.stop()
-    }
-    override def onReceiverStopped(stopped: StreamingListenerReceiverStopped):Unit = {
-      out.println(s"Receiver Stopped: $stopped. Stopping...")
-      sc.stop()
-    }
+...
+case class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
+  override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
+    out.println(s"Receiver Error: $error. Stopping...")
+    sc.stop()
   }
+  override def onReceiverStopped(stopped: StreamingListenerReceiverStopped):Unit = {
+    out.println(s"Receiver Stopped: $stopped. Stopping...")
+    sc.stop()
+  }
+}
 ```
-
-We define `Opt` objects for the new command-line options `--socket server:port` and `--no-term`.
 
 The `EndOfStreamListener` will be used to detect when a socket connection drops. It will start the exit process. Note that it is not triggered when the end of file is reached while reading directories of files. In this case, we have to rely on the 5-second timeout to quit.
 
 ```
-  def main(args: Array[String]) = {
-
-    val options = CommandLineOptions(
-      this.getClass.getSimpleName,
-      CommandLineOptions.inputPath("data/kjvdat.txt"),
-      // We write to "out" instead of to a directory:
-      // CommandLineOptions.outputPath("output/kjv-wc3"),
-      // For this process, use at least 2 cores!
-      CommandLineOptions.master("local[2]"),
-      socket(""),  // empty default, so we know the user specified this option.
-      noterm(),
-      CommandLineOptions.quiet)
-
-    val argz = options(args.toList)
+...
+val conf = new SparkConf()
+         .setMaster("local[2]")
+         .setAppName("Spark Streaming (8)")
+         .set("spark.cleaner.ttl", "60")
+         .set("spark.files.overwrite", "true")
+         // If you need more memory:
+         // .set("spark.executor.memory", "1g")
+val sc  = new SparkContext(conf)
+val ssc = new StreamingContext(sc, Seconds(1))
+ssc.addStreamingListener(EndOfStreamListener(ssc))
 ```
 
-The usual command-line argument processing.
-
-```
-    val conf = new SparkConf()
-             .setMaster("local[2]")
-             .setAppName("Spark Streaming (8)")
-             .set("spark.cleaner.ttl", "60")
-             .set("spark.files.overwrite", "true")
-             // If you need more memory:
-             // .set("spark.executor.memory", "1g")
-    val sc  = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(1))
-    ssc.addStreamingListener(EndOfStreamListener(ssc))
-```
-
-Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use 2 cores, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
+Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use at least 2 cores when running locally, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
 
 Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/1.0.0/configuration.html) for more details.
 
 With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval. Finally, we add a listener for socket drops.
 
 ```
-    try {
-      val lines =
-        if (argz("socket") == "") useDirectory(ssc, argz("input-path"))
-        else useSocket(ssc, argz("socket"))
+try {
+  val lines =
+    if (argz("socket") == "") useDirectory(ssc, argz("input-path"))
+    else useSocket(ssc, argz("socket"))
 ```
 
 If a socket connection wasn't specified, then use the `input-path` to read from one or more files (the default case). Otherwise use a socket. An `InputDStream` is returned in either case as `lines`. The two methods `useDirectory` and `useSocket` are listed below.
@@ -1080,37 +1066,35 @@ From the `DStream` (Discretized Stream) that fronts either the socket or the fil
 Now we implement an incremental word count:
 
 ```
-      val words = lines.flatMap(line => line.split("""\W+"""))
+  val words = lines.flatMap(line => line.split("""\W+"""))
 
-      val pairs = words.map(word => (word, 1))
-      val wordCounts = pairs.transform(rdd => rdd.reduceByKey(_ + _))
+  val pairs = words.map(word => (word, 1))
+  val wordCounts = pairs.transform(rdd => rdd.reduceByKey(_ + _))
 
-      wordCounts.print()  // print a few counts...
+  wordCounts.print()  // print a few counts...
 
-      // Generates a separate directory inside "out" each interval!!
-      // val now = Timestamp.now()
-      // val out = s"output/streaming/kjv-wc-$now"
-      // println(s"Writing output to: $out")
-      // wordCounts.saveAsTextFiles(out, "txt")
+  // Generates a new, timestamped directory for each batch interval.
+  if (!quiet) println(s"Writing output to: $out")
+  wordCounts.saveAsTextFiles(out, "out")
 
-      ssc.start()
-      if (argz("no-term") == "") ssc.awaitTermination(timeout)
-      else  ssc.awaitTermination()
-    } finally {
-      // Having the ssc.stop here is only needed when we use the timeout.
-      out.println("+++++++++++++ Stopping! +++++++++++++")
-      ssc.stop()
-    }
-  }
+  ssc.start()
+  if (argz("no-term").toString == "") ssc.awaitTermination(5 * 1000)
+  else  ssc.awaitTermination()
+
+} finally {
+  // Having the ssc.stop here is only needed when we use the timeout.
+  out.println("+++++++++++++ Stopping! +++++++++++++")
+  ssc.stop()
+}
 ```
 
 This works much like our previous word count logic, except for the use of `transform`, a `DStream` method for transforming the `RDDs` into new `RDDs`. In this case, we are performing "mini-word counts", within each RDD, but not across the whole `DStream`.
 
-Note that we comment out writing the results to files, as it creates a separate output directory *per interval* (1 second), most of which are empty for this example. However, it's worth uncommenting these lines for one run to see what's produced.
+The `DStream` also provides the ability to do *window operations*, e.g., a moving average over the last N intervals.
 
-Lastly, we wait for termination. By default, we set a `timeout` of 5 seconds.
+Lastly, we wait for termination. We set a `timeout` of 5 seconds unless the `--no-term` option was specified.
 
-The app ends with `useSocket` and `useDirectory`:
+The code ends with `useSocket` and `useDirectory`:
 
 ```
   private def useSocket(sc: StreamingContext, serverPort: String): DStream[String] = {
@@ -1138,11 +1122,204 @@ The app ends with `useSocket` and `useDirectory`:
 
 This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/1.0.0/streaming-programming-guide.html) for more information.
 
-## Best Practices, Tips, and Tricks
+## SparkSQL9
 
-### Safe Closures
+[SparkSQL9.scala](#code/src/main/scala/sparkworkshop/SparkSQL9.scala)
 
-When you use a closure (anonymous function), Spark will serialize it and send it around the cluster. This means that any captured variables must be serializable.
+The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a "schema" for records, defined using Scala _case classes_, and allows you to embed queries using a subset of SQL in strings, as a supplement to the regular manipulation methods on the RDD type; use the best tool for the job in the same application! There is also a builder DSL for constructing these queries, rather than using SQL strings.
+
+Furthermore, SparkSQL can read and write the new [Parquet](http://parquet.io) format that's becoming popular in Hadoop environments. SparkSQL also supports parsing JSON-formatted records, with inferred schemas, and writing RDDs in JSON.
+
+Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, HiveQL.
+
+This example treats the KJV text we've been using as a table with a schema. It runs several queries on the data.
+
+There is a `SparkSQL9.scala` program that you can run as before, but SQL queries are more interesting when used interactively. So, there's also a "script" form called `SparkSQL9-script.scala`, which we'll look at instead. Then we'll see how to run this code and thereby learn how to use the Spark interactive shell, even in Hadoop!
+
+The codez!
+
+```
+// Adapted from SparkSQL9, but written as a script for easy use with the
+// spark-shell command.
+import com.typesafe.sparkworkshop.util.Verse
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.rdd.RDD
+```
+
+The helper class `Verse` will be used to define the schema for Bible verses. Note the new imports.
+
+Next define a convenience function for collecting an `RDD` into an array and dumping its contents to the console. Since there could be a lot of "records", we'll take the first `n`, where `n` defaults to 100.
+
+```
+def dump(rdd: RDD[_], n: Int = 100) = rdd
+  .collect()        // Convert to a regular in-memory collection.
+  .take(n)          // Take the first n lines.
+  .foreach(println) // Print the query results.
+```
+
+Now create a [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) that wraps the SparkContext, just like the `StreamingContext` did. We don't show this here, but in fact you can mix SparkSQL _and_ Spark Streaming in the same program.
+
+```
+val sqlc = new SQLContext(sc)
+import sqlc._
+```
+
+The import statement brings SQL-specific functions and values in scope.
+
+Next we use a regex to parse the input verses and extract the book abbreviation, chapter number, verse number, and text. The fields are separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
+
+We use `flatMap` over the results so that lines that fail to parse are essentially put into empty lists that will be ignored.
+
+```
+// Regex to match the fields separated by "|".
+// Also strips the trailing "~" in the KJV file.
+val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
+// Use flatMap to effectively remove bad lines.
+val verses = sc.textFile(argz("input-path").toString) flatMap {
+  case lineRE(book, chapter, verse, text) =>
+    Seq(Verse(book, chapter.toInt, verse.toInt, text))
+  case line =>
+    Console.err.println("Unexpected line: $line")
+    Seq.empty[Verse]  // Will be eliminated by flattening.
+}
+```
+
+Register the RDD as a temporary "table", so we can write SQL queries against it. As the name implies, this "table" only exists for the life of the process. Then we write queries and dump the results!
+
+```
+verses.registerTempTable("kjv_bible")
+verses.cache()
+dump(verses)  // print the 1st 100 lines
+
+val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
+println("Number of verses that mention God: "+godVerses.count())
+dump(godVerses)  // print the 1st 100 lines
+
+val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
+  // Collect all partitions into 1 partition. Otherwise, there are 100s
+  // output from the last query!
+  .coalesce(1)
+dump(counts)  // print the 1st 100 lines
+```
+
+Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
+
+## Using SQL in the Spark Shell
+
+So, how do we use this script? To run it in Hadoop, you can run the script using the following script command, which wraps Spark's own `spark-shell`:
+
+```
+scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala
+```
+
+Or, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the the first time:
+
+```
+scripts/sparkshell.sh
+```
+
+This script does some set up, but essentially its equivalent to the following:
+
+```
+$SPARK_HOME/bin/spark-shell \
+  --jars target/scala-2.10/activator-spark_2.10-2.1.0.jar [arguments]
+```
+
+The jar file contains all the project's build artifacts (but not the dependencies).
+
+To run this script locally, use the Activator shell's `console` command. Assuming you're at the shell's prompt `>`, use the following commands to enter the Scala interpreter ("REPL") and then load and run the whole file.
+
+```
+(Activator-Spark)> console
+scala> :load src/main/scala/sparkworkshop/SparkSQL9-script.scala
+...
+scala> :quit
+(Activator-Spark)> exit
+```
+
+To enter the statements using copy and paste, just paste them at the `scala>` prompt instead of loading the file.
+
+## SparkSQLParquet10
+
+[SparkSQLParquet10.scala](#code/src/main/scala/sparkworkshop/hadoop/SparkSQLParquet10.scala)
+
+This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
+
+> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it isn the `hadoop` package.
+
+The key [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD) methods are `SchemaRDD.saveAsParquetFile(outpath)` and `SqlContext.parquetFile(inpath)`. The rest of the details are very similar to the previous exercise.
+
+See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9`.
+
+## HiveSQL11
+
+[HiveSQL11.scala](#code/src/main/scala/sparkworkshop/hadoop/HiveSQL11.scala)
+
+The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
+
+> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it isn the `hadoop` package.
+
+Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
+
+Let's discuss the code hightlights. There is additional imports for Hive:
+
+```
+import org.apache.spark.sql._
+import org.apache.spark.sql.hive.LocalHiveContext
+import com.typesafe.sparkworkshop.util.Verse
+```
+
+We need the user name.
+
+```
+val user = sys.env.get("USER") match {
+  case Some(user) => user
+  case None =>
+    println("ERROR: USER environment variable isn't defined. Using root!")
+    "root"
+}
+```
+
+Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.LocalHiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we collect the result into an array and print each line.
+
+```
+val sc = new SparkContext("local[2]", "Hive SQL (10)")
+val hiveContext = new LocalHiveContext(sc)
+import hiveContext._   // Make methods local, like for SQLContext
+
+def hql2(title: String, query: String, n: Int = 100): Unit = {
+  println(title)
+  println(s"Running query: $query")
+  hql(query).collect.take(n).foreach(println)
+}
+```
+
+We can now execute Hive DDL statements, such the following statements to create a database, "use it" as the working database, and then a table inside it.
+
+```
+hql2("Create a work database:", "CREATE DATABASE work")
+hql2("Use the work database:", "USE work")
+
+hql2("Create the 'external' kjv Hive table:", s"""
+  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+    book    STRING,
+    chapter INT,
+    verse   INT,
+    text    STRING)
+  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+  LOCATION '/user/$user/data/hive-kjv'""")
+```
+
+Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, a Hive extension, where we just tell it use data in a particular directory (`LOCATION`). Here is why we needed the user name, because Hive expects an absolute path.
+
+A few points to keep in mind:
+
+* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's own REPL or scripts, they cause errors here!
+* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `hql2`.
+
+## Tip: Writing Serializable Closures
+
+Let's end with a tip; how to write "safe" closures. When you use a closure (anonymous function), Spark will serialize it and send it around the cluster. This means that any captured variables must be serializable.
 
 A common mistake is to capture a field in an object, which forces the whole object to be serialized. Sometimes it can't be. Consider this example adapted from [this presentation](http://spark-summit.org/wp-content/uploads/2013/10/McDonough-spark-tutorial_spark-summit-2013.pdf).
 
@@ -1175,178 +1352,18 @@ class RDDApp {
 
 Now, only `factor2` must be serialized.
 
-## SparkSQL9
-
-[SparkSQL9.scala](src/main/sparkworkshop/SparkSQL9.scala)
-
-The new SparkSQL API extends RDDs with a "schema" for records, defined using a Scala _case class_, and allows you to embed queries using a subset of SQL in strings, as a supplement to the regular manipulation methods on the RDD type; use the best tool for the job in the same application! There is also a builder DSL for constructing these queries, rather than using a string.
-
-Furthermore, SparkSQL now supports parsing JSON-formatted records, inferring the schema, and writing RDDs in JSON.
-
-Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, HiveQL.
-
-This example treats the King James Bible text, `kjvdat.txt`, as a table with a schema. It runs several queries on the data.
-
-As in the previous *Spark Workshop*, command line options can be used to override the defaults. We'll have to use `sbt` from a command window to use this feature (rather than the *Activator UI*), and we'll have to use the `run-main` task, which lets us specify a particular `main` to run and optional arguments.
-
-The "\" characters in the following and subsequent command descriptions are used to indicate long lines that I wrapped to fit. Enter the commands on a single line without the "\". I use `[...]` to indicate optional arguments, and `|` to indicate alternative flags:
-
-```
-run-main spark.SparkSQL9 [ -h | --help] \
-  [-i | --in | --inpath input] \
-  [-m | --master master] \
-  [-q | --quiet]
-```
-
-Where the options have the following meanings:
-
-```
--h | --help     Show help and exit.
--i ... input    Read this input source (default: data/kjvdat.txt).
--m ... master   local, local[k], etc. as discussed previously.
--q | --quiet    Suppress some informational output.
-```
-
-The options work the same as before, except we don't append a timestamp to the output path, because its contents will be read by the next exercise.
-
-The codez!
-
-```
-    val options = CommandLineOptions(...)  // as before
-    val argz = options(args.toList)
-
-    val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
-    val sqlc = new SQLContext(sc)
-    import sqlc._
-
-    try {
-      ...
-    } finally {
-      sc.stop()
-    }
-
-```
-
-After the typical options parsing and creating a `SparkContext`, we create a special `SQLContext` that wraps then. The import statement that follows pulls in some context objects and "implicit" conversations needed later. Implicit conversions are invoked by the compiler when an instance of one object needs to be wrapped in or converted to another one, e.g., to create the illusion that you can call new methods on the object that aren't defined for the original type! (If you don't know Scala and you didn't follow that explanation, it's not critical for what follows.)
-
-Here is the contents of the `try` block:
-
-```
-      val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|...~?\s*$""".r
-      val verses = sc.textFile(argz("input-path").toString) flatMap {
-        case lineRE(book, chapter, verse, text) =>
-          Seq(Verse(book, chapter.toInt, verse.toInt, text))
-        case line =>
-          Console.err.println("Unexpected line: $line")
-          Seq.empty[Verse]  // Will be eliminated by flattening.
-      }
-      ...
-```
-
-Defines a regex to extract the fields on each line, separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
-
-```
-      verses.registerTempTable("kjv_bible")
-      verses.cache()
-
-      val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
-      println("Number of verses that mention God: "+godVerses.count())
-      godVerses
-        .collect()   // convert to a regular in-memory collection
-        .foreach(println) // print the query results.
-      ...
-```
-
-Registers the RDD as a temporary table in the Hive metadata store. A single process [Derby SQL](http://db.apache.org/derby/) database is used. It writes its data to a `metastore` directory in the current directory. The data is also cached in memory.
-
-Even though `verses` is an RDD, an "implicit" conversion imported from `sqlc` (`SQLContext`) converts it to a The actual method is defined on `org.apache.spark.sql.SchemaRDD`, which provides the `registerTempTable` method.
-
-The call to `sql` was imported from the `sqlc` (`SQLContext`) instance. We can write a SQL query and the results are returned as a new RDD! We then `collect` it into an `Array[Verse]` and then print each line.
-
-```
-      val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-        .coalesce(1)
-      println("Verses per book:")
-      counts
-        .collect()        // Convert to a regular in-memory collection.
-        .foreach(println) // Print the query results.
-      ...
-```
-
-Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
-
-Then take the RDD returned by the query and collect all partitions into 1 partition. Otherwise, there are hundreds of partitions output from the last query!
-
-That's it. As before, there are suggested exercises at the end of the source file. Some solutions are provided in the `solns` source package.
-
-## SparkSQLParquet10
-
-[SparkSQLParquet10.scala](src/main/sparkworkshop/hadoop/SparkSQLParquet10.scala)
-
-This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
-
-> NOTE: Running this script requires a Hadoop installation, therefore it won't run in the SBT `console` as configured for the project.
-
-The key SchemaRDD methods are `SchemaRDD.saveAsParquetFile(outpath)` and `SqlContext.parquetFile(inpath)`. The rest of the details are very similar to the previous exercise.
-
-See the script for more details.
-
-## HiveSQL11
-
-[HiveSQL11.scala](src/main/sparkworkshop/hadoop/HiveSQL11.scala)
-
-The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
-
-> NOTE: Running this script requires a Hadoop installation, therefore it won't run in the SBT `console` as configured for the project.
-
-
-Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
-
-```
-import org.apache.spark.SparkContext
-import org.apache.spark.sql._
-import org.apache.spark.sql.hive.LocalHiveContext
-import com.typesafe.sparkworkshop.util.Verse
-val sc = new SparkContext("local[2]", "Hive SQL (10)")
-val hiveContext = new LocalHiveContext(sc)
-import hiveContext._   // Make methods local, like for SQLContext
-...
-```
-
-Analogous to the previous examples, but now we crate a `LocalHiveContext`.
-
-```
-println("Create the 'external' kjv Hive table:")
-hql("""
-  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
-    book    STRING,
-    chapter INT,
-    verse   INT,
-    text    STRING)
-  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-  LOCATION '/tmp/data'""")
-...
-```
-
-Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, where we just tell it use data in a particular directory (`LOCATION`).
-
-While we can't actually run this script, should you try it on a Hadoop installation, here are a few things to do first or to keep in mind:
-
-* You must first copy `data/kjvdat.txt` to an empty `/tmp/kjv` directory, because Hive expects the `LOCATION` to be an *absolute* directory path. Also, Hive (like all Hadoop applications) will expect this path to be a directory and it will read all the files in it. If you are on Windows (and not running Cygwin), pick a suitable location on your hard drive and change the `LOCATION` line to use the correct, absolute path.
-* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's REPL or scripts, they cause errors here!
-* The query results are returned in an RDD. To dump to the console, we use `collect.foreach(println)`, which converts the RDD to an in-memory array,    then loops over each record and prints the results.
+This is a general issue for distributed programs written for the JVM. A future version of Scala may introduce a "serialization-safe" mechanism for defining closures for this purpose.
 
 ## Going Forward from Here
 
-To learn more, see the following:
+To learn more, see the following resources:
 
+* [Typesafe's Big Data Solutions](http://typesafe.com/reactive-big-data). Typesafe now offers more detailed Spark training and consulting services. Additional products and services are forthcoming.
 * The Apache Spark [website](http://spark.apache.org/).
-* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as `RDD` and `SchemaRDD`.
+* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD).
 * The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
 * [Talks from Spark Summit 2014](http://spark-summit.org/2014/training).
-* [Running Spark in EC2](http://aws.amazon.com/articles/4926593393724923).
-* [Running Spark on Mesos](http://mesosphere.io/learn/run-spark-on-mesos/).
 
 **Experience Reports:**
 
@@ -1360,5 +1377,11 @@ To learn more, see the following:
 ## For more about Typesafe:
 
 * See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
-* See [Typesafe](http://typesafe.com) for more information about our products and services.
+* See [Typesafe Reactive Big Data](http://typesafe.com/reactive-big-data) for more information about our products and services around Big Data.
+* See [Typesafe](http://typesafe.com) for information about our other products and services.
 
+## Final Thoughts
+
+Thank you for working through this workshop. Feedback, including pull requests for enhancements are welcome.
+
+[Dean Wampler](mailto:dean.wampler@typesafe.com)
