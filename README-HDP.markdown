@@ -9,4 +9,6 @@ This workshop demonstrates how to write and run [Apache Spark](http://spark.apac
 
 For more advanced Spark training and services from Typesafe, please visit [typesafe.com/reactive-big-data](http://www.typesafe.com/platform/reactive-big-data/spark).
 
-Run the script `./start.sh` to launch the [Activator](http://typesafe.com/activator) environment with its web UI. It will echo a message with the URL to view it. The UI will show the tutorial for this project and allow you to browse the code and run the examples.
+Login as `root` (password `hadoop`) and run the script `spark-workshop/start.sh` to launch the [Activator](http://typesafe.com/activator) environment with its web UI. The script will echo a message to the console with the URL to view the UI.
+
+The UI shows the tutorial for this project and it allows you to browse the code, compile, test, and run it.
