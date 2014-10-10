@@ -125,7 +125,6 @@ We're using a few conventions for the package structure and `main` class names:
 * `AbcN` - The `Abc` program and the N^th^ example. With a few exceptions, it can be executed locally and in Hadoop. It defaults to local execution.
 * `hadoop/HAbcN` - A driver program to run `AbcN` in Hadoop. These small classes use a Scala library API for managining operating system "processes". In this case, they invoke one or more shell scripts in the `scripts` directory, which in turn call the Spark driver program `$HOME/spark/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
 * `solns/AbcNFooBarBaz` - The solution to the "foo bar baz" exercise that's built on `AbcN`. These programs can also be invoked from the *Run* panel.
-* `other/AbcNFooBarBaz` - Alternative implementations for certain algorithms for your reference.
 
 Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* panel.
 

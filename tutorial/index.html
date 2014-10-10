@@ -128,7 +128,6 @@
 <li><code>AbcN</code> - The <code>Abc</code> program and the N<sup>th</sup> example. With a few exceptions, it can be executed locally and in Hadoop. It defaults to local execution.</li>
 <li><code>hadoop/HAbcN</code> - A driver program to run <code>AbcN</code> in Hadoop. These small classes use a Scala library API for managining operating system &#8220;processes&#8221;. In this case, they invoke one or more shell scripts in the <code>scripts</code> directory, which in turn call the Spark driver program <code>$HOME/spark/bin/spark-submit</code>, passing it the correct arguments. We&#8217;ll explore the details shortly.</li>
 <li><code>solns/AbcNFooBarBaz</code> - The solution to the &#8220;foo bar baz&#8221; exercise that&#8217;s built on <code>AbcN</code>. These programs can also be invoked from the <em>Run</em> panel.</li>
-<li><code>other/AbcNFooBarBaz</code> - Alternative implementations for certain algorithms for your reference.</li>
 </ul>
 
 <p>Otherwise, we don&#8217;t use package prefixes, but only because they tend to be inconvenient with the Activator&#8217;s <em>Run</em> panel.</p>
