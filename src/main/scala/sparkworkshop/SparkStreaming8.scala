@@ -84,7 +84,7 @@ object SparkStreaming8 {
       CommandLineOptions.inputPath("data/kjvdat.txt"),
       CommandLineOptions.outputPath("output/kjv-wc-streaming"),
       // For this process, use at least 2 cores!
-      CommandLineOptions.master("local[2]"),
+      CommandLineOptions.master("local[*]"),
       socket(""),  // empty default, so we know the user specified this option.
       noterm(),
       CommandLineOptions.quiet)
@@ -114,7 +114,7 @@ object SparkStreaming8 {
     // for this example, it was necessary to specify 2 cores using
     // setMaster("local[2]").
     val conf = new SparkConf()
-             .setMaster(argz("master").toString)
+             .setMaster(master)
              .setAppName("Spark Streaming (8)")
              .set("spark.cleaner.ttl", "60")
              .set("spark.files.overwrite", "true")
@@ -170,6 +170,7 @@ object SparkStreaming8 {
   // Hadoop text file compatible.
   private def useDirectory(sc: StreamingContext, dirName: String): DStream[String] = {
     println(s"Reading 'events' from directory $dirName")
+    // For files that aren't plain text, see StreamingContext.fileStream.
     sc.textFileStream(dirName)
   }
 }

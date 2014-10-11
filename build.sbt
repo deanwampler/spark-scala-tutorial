@@ -34,7 +34,7 @@ addCommandAlias("hex3",  "runMain hadoop.HWordCount3")
 
 addCommandAlias("hex4",  "runMain hadoop.HMatrix4")
 
-addCommandAlias("hex5a", "runMain hadoop.HCrawl5a")
+addCommandAlias("hex5a", "runMain hadoop.HCrawl5aHDFS")
 
 addCommandAlias("hex5b", "runMain hadoop.HInvertedIndex5b")
 

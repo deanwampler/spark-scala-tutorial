@@ -9,15 +9,11 @@ import org.apache.spark.rdd.RDD
 /**
  * Simulate a web crawl to prep. data for InvertedIndex5b.
  * Crawl is designed to read the files in a directory tree. It uses the
- * file name as the key and the contents as the value. Unfortunately, this
- * means it can't work in Hadoop as written, because Hadoop's I/O is
- * designed to work with directories and ignore the file names. A workaround
- * could be implemented manually with the Hadoop API, where an HDFS directory
- * tree is walked and each file is handled separately. However, in a real-world
- * scenario a non-Hadoop process (like this program running in local mode!)
- * would generate the index of document names/ids to contents. So, for this
- * workshop we've simply copied the local-mode output to HDFS. You can run
- * hadoop.HInvertedIndex5b on that data.
+ * file name as the key and the contents as the value. This script also
+ * uses Java's local filesystem I/O library, which means the script can't
+ * work in Hadoop as written, because HDFS is not POSIX compliant. However,
+ * see the companion program, Crawl5aHDFS, which uses a different Spark API
+ * call to ingest the data as needed.
  */
 object Crawl5a {
   def main(args: Array[String]) = {

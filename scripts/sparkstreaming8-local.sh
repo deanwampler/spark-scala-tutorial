@@ -6,7 +6,5 @@
 output=output/socket-streaming
 echo "Output will be written to: $output"
 
-$HOME/activator/activator shell < cat <<EOF
-run-main SparkStreaming8 --socket localhost:9900 --output "$output"
-EOF
+echo run-main SparkStreaming8 --socket localhost:9900 --output "$output" | $HOME/activator/activator shell
 
