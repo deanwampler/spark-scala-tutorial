@@ -675,16 +675,9 @@ run-main Crawl5a [ -h | --help] \
 
 As before, there is also a `ex5a` short cut for `run-main Crawl5a` and you can run with the default arguments using the Activator *Run* panel.
 
-There is no Hadoop driver for this program, because `Crawl5a` is designed to read the files in a directory tree. It uses the file name as the key and the contents as the value. Unfortunately, this means it can't work in Hadoop as written, because Hadoop's I/O is designed to work with directories and ignore the file names. A workaround could be implemented manually with the Hadoop API, where an HDFS directory tree is walked and each file is handled separately. However, in a real-world scenario, a non-Hadoop process (like this program running in local mode!) would generate the index of document names/ids to contents. So, for this workshop we've simply copied the local-mode output to HDFS. You can run hadoop.HInvertedIndex5b on that data.
+This version of the program doesn't work correctly with HDFS, in part because it uses Java I/O to work a POSIX-compatible file system and HDFS isn't a POSIX file system. So, there's a second version called `Crawl5aHDFS` that uses a different Spark API call to ingest the files. Unfortunately, this call doesn't work with local file systems, so we need two programs. `Crawl5aHDFS` supports the same options that `Crawl5a` supports.
 
-If you need to recopy the data to HDFS, run `Crawl5a` in local mode and use the following HDFS command from the root of the project:
-
-```
-hadoop fs -put output/crawl output
-```
-
-(The target `output` directory will be relative to `/user/$USER`.)
-
+So, for Hadoop, select and run [hadoop.HCrawl5aHDFS](#code/src/main/scala/sparkworkshop/hadoop.HCrawl5aHDFS.scala) in the UI, use `run-main hadoop.HCrawl5aHDFS` or `hex5a` in the Activator shell. There is also a bash script [scripts/crawlhdfs5a.sh](#code/scripts/crawlhdfs5a.sh).
 
 Most of the code is straightforward. The comments explain the details.
 
