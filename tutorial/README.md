@@ -7,17 +7,19 @@ Dean Wampler, Ph.D.
 [dean.wampler@typesafe.com](mailto:dean.wampler@typesafe.com)
 [@deanwampler](https://twitter.com/deanwampler)
 
-This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications within a special, extended version of the Hortonworks Sandbox, version 2.1. This version was extended by Hortonworks and Typesafe to add the [Spark 1.1](https://spark.apache.org) distribution and the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted), including an *Activator* template called [Spark Workshop](https://typesafe.com/activator/template/spark-workshop). You are reading the introduction to this workshop.
+This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
+
+If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine "sandboxes" with Spark included. See their websites for information.
 
 For more advanced Spark training and services from Typesafe, please visit [typesafe.com/reactive-big-data](http://www.typesafe.com/platform/reactive-big-data/spark).
 
 ## Introduction: What Is Spark?
 
+Let's start with an overview of Spark, then discuss how to setup and use this workshop.
+
 [Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming.
 
 Spark includes support for event stream processing, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for working with data sets through SQL queries. It integrates the core Spark API with embedded SQL queries with defined schemas. It also offers [Hive](http://hive.apache.org) integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
-
-We will build the examples and exercises using [Activator](http://typesafe.com/activator), an environment for browsing and using code template, with a built-in build tool called [SBT](http://www.scala-sbt.org/), the standard build tool for Scala. We'll work with our applications both in *local mode*, where we can quickly edit, test, and run our applications using the local file system, then we'll run them in the mini Hadoop cluster in this VM.
 
 There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark's Python API. A Java API is also supported and R support is under development.
 
@@ -25,7 +27,7 @@ There is also an interactive shell, which is an enhanced version of the Scala RE
 
 By 2013, it became increasingly clear that a successor was needed for the venerable [Hadoop MapReduce](http://wiki.apache.org/hadoop/MapReduce) compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.
 
-Spark was seen as the best, general-purpose alternative, so Hortonworks and other Hadoop vendors announced support for it in their distributions.
+Spark was seen as the best, general-purpose alternative, so all the major Hadoop vendors announced support for it in their distributions.
 
 ## Spark Clusters
 
@@ -33,7 +35,9 @@ Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion 
 
 ![](http://spark.apache.org/docs/latest/img/cluster-overview.png)
 
-Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, and other options. The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
+Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, standalone (static cluster) mode, Mesos, and EC2.
+
+The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
 Because each application has its own executor process per node, applications can't share data through the *Spark Context*. External storage has to be used (e.g., the file system, a database, a message queue, etc.)
 
@@ -64,31 +68,53 @@ The following documentation links provide more information about Spark:
 
 The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
 
-## Starting the Sandbox
+## Setup for the Workshop
 
-Import the Hortonworks Sandbox Virtual Machine `.ova` file into VMWare or VirtualBox and start it. It may take a while to boot up and start all the services.
+You can work through the examples and exercises on a local workstation. I'll refer to this arrangement as *local mode*. If you have Hadoop installation available, including a virtual machine "sandbox" from one of the Hadoop vendors, you can also run most of the examples in that environment. I'll refer to this arrangement as *Hadoop mode*.
+
+Let's discuss setup for local mode first.
+
+## Setup for Local Mode
+
+Working in *local mode* makes it easy to edit, test, run, and debug applications quickly. Then, running them in Hadoop provides more real-world testing.
+
+We will build the examples and exercises using [SBT](http://www.scala-sbt.org/) or [Typesafe Activator](http://typesafe.com/activator). SBT is the de facto standard build tool for Scala. It is a command-line tool.
+
+[Activator](https://typesafe.com/activator) is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example.
+
+Activator also includes SBT, which the UI uses under the hood. You can use the *shell* mode explicitly if you prefer running `sbt` "tasks".
+
+You'll need either Activator or SBT installed. We recommend Activator.
+
+To install Activator, follow the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
+
+If you prefer SBT and you need to install it, follow the instructions on the [download](http://www.scala-sbt.org/download.html) page. SBT puts itself on your path. However, if you have a custom installation that isn't on your path, define the environment variable `SBT_HOME` (MacOS, Linux, or Cygwin only).
+
+## Setup for Hadoop Mode
+
+If you want to run the examples on Hadoop, choose one of the following options.
+
+The Hadoop vendors all provide virtual machine "sandboxes" that you can load into [VMWare](http://vmware.com), [VirtualBox](http://virtualbox.org), and other virtualization environments. Most now bundle Spark. Typesafe is working with some of the Hadoop vendors to bundle Activator and this workshop into customized versions of their sandboxes. Check the vendor's documentation.
+
+If you have a Hadoop cluster installation or a "vanilla" virtual machine sandbox, verify if Spark is already installed. For example, log into a cluster node, edge node, or the sandbox and try running `spark-shell`. If Spark does not appear to be installed, your Hadoop vendor's web site should have information on installing and using Spark. In most cases, it will be as simple as downloading an appropriate build from the [Spark download](http://spark.apache.org/downloads.html) page. Select the distribution built for your Hadoop distribution.
+
+Assuming you don't have administration rights, it's sufficient to expand the archive in your home directory on a cluster node, edge node, or within the sandbox. Then add the `bin` directory under the Spark installation directory to your `PATH` or define the environment variable `SPARK_HOME` to match the installation directory.
+
+You'll need this workshop and Activator or SBT on the cluster or edge node, or in the sandbox. You can run Activator or SBT there or go through the workshop running on your local workstation, then move everything to the cluster or sandbox later to try out the Hadoop examples.
 
 ## Starting Activator
 
-[Typesafe Activator](https://typesafe.com/activator) is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example.
+Change to the root directory for this workshop, either on your local machine or in your Hadoop sandbox, cluster node, or shell node.
 
-We have already installed Activator and loaded this workshop for you. Activator is installed the directory `/root/activator`. This Spark Workshop is installed in `/root/spark-workshop`.
+To work on your local workstation, run `activator ui`, assuming it's in your path. If not, use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, go to [localhost:8888](http://localhost:8888).)
 
-Log into the virtual machine as `root` (password: `hadoop`). While you can do this with the boot-up window for your VM, it's more useful to log in using an `ssh` client like [PuTTY](http://putty.org) for Windows or the `ssh` command for MacOS, Cygwin, and Linux. You'll need to open several terminal windows for some of the exercises anyway.
+If you prefer a command-line interface, either run `activator shell` or `sbt`.
 
-Once you're logged in, run the following command to launch Activator and its web console:
+If you have installed this workshop and Activator on a Hadoop cluster node or edge node, or in a sandbox virtual machine, change to the workshop root directory and run the command `./start.sh`. It will start Activator and load this workshop.
 
-```
-spark-workshop/start.sh
-```
+By default, it will also start the Activator web-based UI, but you'll have to open your browser to the correct URL yourself. See the message printed to the login console for the correct URL (including a different port number, 9999).
 
-If you are familiar with SBT commands and you prefer to use the command-line interface, use the `shell` option instead:
-
-```
-spark-workshop/start.sh shell
-```
-
-Assuming you're using the web console, you'll see messages telling you to open your browser to a particular IP address and port 9999. That is, navigate to `http://ip-address:9999`, where `ip-address` is the IP address for the VM that's printed by `start.sh`.
+There are options for running in Activator *shell* mode or using SBT. Use `./start.sh --help` to see those options.
 
 ## Building and Testing
 

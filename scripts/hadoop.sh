@@ -3,6 +3,10 @@
 # hadoop.sh - Wraps calls to spark-submit for submitting Spark jobs.
 #====================================================================
 
+dir=$(dirname $0)
+root=$(dirname $dir)
+. $dir/find_cmds
+
 help() {
   cat <<EOF
   usage: $0 --class main -o | --out output_path [--master master] [app_options]
@@ -15,6 +19,14 @@ help() {
     app_options        Any other options to pass to the app.
 EOF
 }
+
+export HADOOP=$(find_hadoop)
+[[ -z $HADOOP ]] && exit 1
+# echo "Using hadoop command: $HADOOP"
+
+export SPARK_SUBMIT=$(find_spark_submit)
+[[ -z $SPARK_SUBMIT ]] && exit 1
+# echo "Using spark submit command: $SPARK_SUBMIT"
 
 master="yarn-client"
 main=""
@@ -57,15 +69,13 @@ then
   exit 1
 fi
 
-dir=$(dirname $0)
-
 # TODO: This only works if $output is really the output directory, not a prefix.
 # See below, where once the output directories exist, we correctly find them.
-hadoop fs -rm -r -f $output
+$HADOOP fs -rm -r -f $output
 
-project_jar=$(find $HOME/spark-workshop/target/scala-2.* -name 'activator-spark_*.jar' | grep -v 'tests.jar')
+project_jar=$(find $root/target/scala-2.* -name 'activator-spark_*.jar' | grep -v 'tests.jar')
 
-echo running: $HOME/spark/bin/spark-submit --master $master --class $main \
+echo running: $SPARK_SUBMIT --master $master --class $main \
   $project_jar --master $master --out $output $@
 echo ""
 
@@ -73,26 +83,26 @@ echo ""
 # previous echo output.
 if [[ -z $NOOP ]]
 then
-  $HOME/spark/bin/spark-submit --master $master --class $main \
-  $project_jar --master $master --out $output $@
+  $SPARK_SUBMIT --master $master --class $main \
+    $project_jar --master $master --out $output $@
 fi
 
 echo ""
 outputs=($output)
-hadoop fs -test -d $output
+$HADOOP fs -test -d $output
 if [ $? -eq 0 ]
 then
   echo "Contents of output directory:"
 else
   echo "Contents of the output directories:"
   output2=$(dirname $output)
-  outputs=($(hadoop fs -ls $output2 | grep $output | sed -e "s?.*\($output.*\)?\1?"))
+  outputs=($($HADOOP fs -ls $output2 | grep $output | sed -e "s?.*\($output.*\)?\1?"))
 fi
 
 for o in ${outputs[@]}
 do
   echo " **** $o:"
-  hadoop fs -ls $o
+  $HADOOP fs -ls $o
   echo ""
 done
 

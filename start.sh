@@ -1,28 +1,70 @@
 #!/bin/bash
 
+dir=$(dirname $0)
+. $dir/scripts/find_cmds
+
 help() {
-  echo "usage: $0 [-h|--help] [ui|shell|sbt]"
-  echo "where: ui is the default and sbt is an alias for shell."
-  echo "Use ui for the web-based UI. Use shell/sbt for the command line."
+  cat <<EOF
+  usage: $0 [-h | --help] [act | activator | sbt ] [ui | shell] [options]
+  where:
+    -h | --help       Print help and exit.
+    act | activator   Use Activator (the default).
+    sbt               Use SBT (command line interface).
+    ui | shell        (Activator only) Use the Web UI (default) or the command line shell.
+    options           Any additional options to pass to Activator or SBT.
+
+  The default is Activator and the web-based UI.
+EOF
 }
 
-case $1 in
-  ui|shell) mode=$1    ;;
-  sbt)      mode=shell; echo "Using shell mode" ;;
-  "")       mode=ui    ;;
-  -h|--h*)
-    help
-    exit 0
-    ;;
-  *)
-    echo "Unrecognized argument $1"
+tool=activator
+mode=ui
+while [ $# -gt 0 ]
+do
+  case $1 in
+    -h|--h*)
+      help
+      exit 0
+      ;;
+    act*)     tool=activator    ;;
+    sbt*)     tool=sbt; mode=   ;;
+    ui|shell) mode=$1           ;;
+    *)        break             ;;
+  esac
+  shift
+done
+
+if [[ $tool = sbt ]]
+then
+  if [[ $mode = ui ]]
+  then
+    echo "$0: Can't specify 'sbt' and 'ui' together."
     help
     exit 1
-    ;;
-esac
+  elif [[ $mode = shell ]]
+  then
+    echo "$0: 'shell' argument ignored for sbt"
+    mode=
+  fi
+fi
 
 dir=$(dirname $0)
 ip=$($dir/scripts/getip.sh)
+
+export act=
+if [[ $tool = activator ]]
+then
+  act=$(find_activator "$HOME/activator/activator")
+  [[ -z $act ]] && exit 1
+  # Use http.address=0.0.0.0, because when running on a remote server,
+  # The Activator UI won't listen for remote connections otherwise.
+  # Invoke with NOOP=x start.sh to suppress execution:
+  opts="-Dhttp.address=0.0.0.0 -Dhttp.port=9999"
+else
+  act=$(find_sbt)
+  opts=
+  [[ -z $act ]] && exit 1
+fi
 
 if [[ $mode = ui ]]
 then
@@ -35,13 +77,12 @@ then
   echo
   echo "        http://$ip:9999"
   echo
-  echo "    (Ignore the message that will say 'http://0.0.0.0:9999')"
+  echo "    (Ignore a message that says 'open http://0.0.0.0:9999')"
   echo
   echo "=================================================================="
 
   sleep 2
 fi
 
-# Invoke with NOOP=x start.sh to suppress execution:
-echo $HOME/activator/activator -Dhttp.address=0.0.0.0 -Dhttp.port=9999 $mode
-[[ -z $NOOP ]] && $HOME/activator/activator -Dhttp.address=0.0.0.0 -Dhttp.port=9999 $mode
+echo running: $act $opts $mode $@
+[[ -z $NOOP ]] && $act $opts $mode "$@"
