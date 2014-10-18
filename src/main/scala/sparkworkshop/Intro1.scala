@@ -25,6 +25,8 @@ val sins = input.filter(line => line.contains("sin"))
 val count = sins.count()         // How many sins?
 val array = sins.collect()       // Convert the RDD into a collection (array)
 array.take(20) foreach println   // Take the first 20, and print them 1/line.
+sins.take(20) foreach println    // ... but we don't have to "collect" first;
+                                 // we can just use foreach on the RDD.
 
 // Create a separate filter function instead and pass it as an argument to the
 // filter method. "filterFunc" is a value that's a function of type

@@ -94,33 +94,37 @@ If you prefer SBT and you need to install it, follow the instructions on the [do
 
 If you want to run the examples on Hadoop, choose one of the following options.
 
-The Hadoop vendors all provide virtual machine "sandboxes" that you can load into [VMWare](http://vmware.com), [VirtualBox](http://virtualbox.org), and other virtualization environments. Most now bundle Spark. Typesafe is working with some of the Hadoop vendors to bundle Activator and this workshop into customized versions of their sandboxes. Check the vendor's documentation.
+The Hadoop vendors all provide virtual machine "sandboxes" that you can load into [VMWare](http://vmware.com), [VirtualBox](http://virtualbox.org), and other virtualization environments. Most of them now bundle Spark. Check the vendor's documentation.
 
-If you have a Hadoop cluster installation or a "vanilla" virtual machine sandbox, verify if Spark is already installed. For example, log into a cluster node, edge node, or the sandbox and try running `spark-shell`. If Spark does not appear to be installed, your Hadoop vendor's web site should have information on installing and using Spark. In most cases, it will be as simple as downloading an appropriate build from the [Spark download](http://spark.apache.org/downloads.html) page. Select the distribution built for your Hadoop distribution.
+If you have a Hadoop cluster installation or a "vanilla" virtual machine sandbox, verify if Spark is already installed. For example, log into a cluster node, edge node, or the sandbox and try running `spark-shell`. If it's not found, then assume that Spark is not installed. Your Hadoop vendor's web site should have information on installing and using Spark. In most cases, it will be as simple as downloading an appropriate Spark build from the [Spark download](http://spark.apache.org/downloads.html) page. Select the distribution built for your Hadoop distribution.
 
-Assuming you don't have administration rights, it's sufficient to expand the archive in your home directory on a cluster node, edge node, or within the sandbox. Then add the `bin` directory under the Spark installation directory to your `PATH` or define the environment variable `SPARK_HOME` to match the installation directory.
+Assuming you don't have administration rights, it's sufficient to expand the archive in your home directory on the cluster node or edge node you intend to use, or within the sandbox. Then add the `bin` directory under the Spark installation directory to your `PATH` or define the environment variable `SPARK_HOME` to match the installation directory, *not* the `bin` directory.
 
-You'll need this workshop and Activator or SBT on the cluster or edge node, or in the sandbox. You can run Activator or SBT there or go through the workshop running on your local workstation, then move everything to the cluster or sandbox later to try out the Hadoop examples.
+You'll need this workshop located on the same server. You'll also need Activator or SBT on the server to run the examples. Recall that I recommend going through the workshop on your local workstation first, then move everything to the cluster node or sandbox to try running the examples in Hadoop.
 
 ## Starting Activator
 
-Change to the root directory for this workshop, either on your local machine or in your Hadoop sandbox, cluster node, or shell node.
+From now on, except where noted, the instructions apply for both your local workstation and Hadoop setup.
 
-To work on your local workstation, run `activator ui`, assuming it's in your path. If not, use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, go to [localhost:8888](http://localhost:8888).)
+First, change to the root directory for this workshop.
+
+To work on your local workstation, run `activator ui`, assuming it's in your path, or use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, open [localhost:8888](http://localhost:8888) in your browser.)
 
 If you prefer a command-line interface, either run `activator shell` or `sbt`.
 
-If you have installed this workshop and Activator on a Hadoop cluster node or edge node, or in a sandbox virtual machine, change to the workshop root directory and run the command `./start.sh`. It will start Activator and load this workshop.
+If you are trying the workshop on a Hadoop cluster or edge node, or in a sandbox, change to the workshop root directory and run the command `./start.sh`. It will start Activator and load this workshop.
 
-By default, it will also start the Activator web-based UI, but you'll have to open your browser to the correct URL yourself. See the message printed to the login console for the correct URL (including a different port number, 9999).
+By default, it will start the Activator web-based UI, but you'll have to open your browser to the correct URL yourself, since you'll view the UI on a different machine, i.e., your workstation. The script prints a message to the login console showing the correct URL, including a different port number, 9999, than above. (A different port is used because 8888 is sometimes used for other purposes in Hadoop clusters.)
 
 There are options for running in Activator *shell* mode or using SBT. Use `./start.sh --help` to see those options.
 
 ## Building and Testing
 
-To ensure that the basic environment is working, compile the code and run the tests; use the Activator UI's <a class="shortcut" href="#test">test</a> link (or, if you're using the shell commands, run the `test` task). All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. (We've noticed that sometimes a timeout of some kind prevents the tests from completing successfully, but running the tests again works.)
+To ensure that the basic environment is working, compile the code and run the tests; use the Activator UI's <a class="shortcut" href="#test">test</a> link or the shell/sbt command `test`.
 
-Note that tests are provided for most, but not all of the examples. Also, they run Spark in *local mode*, in a single JVM process without using Hadoop. This is a convenient way to develop and test the logic of your applications before testing and deploying them in a cluster.
+All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time and the tests should pass without error. (We've noticed that sometimes a timeout of some kind prevents the tests from completing successfully, but running the tests again works.)
+
+Tests are provided for most, but not all of the examples. The tests run Spark in *local mode* only, in a single JVM process without using Hadoop.
 
 ## Running the Examples
 
@@ -130,30 +134,43 @@ Next, let's run one of the examples both locally and with Hadoop to further conf
 
 In Activator, select the <a class="shortcut" href="#run">run</a> panel. Find the bullet item under *Main Class* for `WordCount3` and select it. (Unfortunately, they are not listed in alphabetical order.)
 
-Click the *Start* button. The *Logs* panel shows the output as it runs. (If you're using the shell prompt, invoke `run-main WordCount3`.)
+Click the *Start* button. The *Logs* panel shows the output as it runs.
 
-Note the `output` directory listed in the log messages. Use your login window (or create another one) to view the output in the directory, which will be `/root/spark-workshop/output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data.
+If you're using the shell/sbt prompt, invoke `run-main WordCount3`.)
+
+Note the `output` directory listed in the log messages. Use your workstation's file browser or a command window to view the output in the directory, which will be `/root/spark-workshop/output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data. The `_SUCCESS` files are empty. They are written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know it's safe to read the data.
 
 ## Running a Hadoop Example
 
-Now try the same program using Spark running in Hadoop. This time, select `hadoop.HWordCount3` in the *run* panel and click the *Start* button. There will be more log messages and it will take longer to run.
+If you are running Activator or SBT in a Hadoop environment, try the same program there. This time, run `hadoop.HWordCount3`. There will be more log messages and it will take longer to run.
 
-The log messages end with a URL where you can view the output in HDFS. If your VM's IP address is 192.168.64.100, for example, the URL will be `http://192.168.64.100:8000/filebrowser/#/user/root/output/kjv-wc3`. (Once you've opened this file browser, it will be easy to navigate to the outputs for the rest of the examples we'll run.) The same `_SUCCESS` and `part-00000` files will be found, although the lines in the latter might not be in the same order as for the *local* run.
+The log messages end with a URL where you can view the output in HDFS, using either the `hadoop fs` shell command or the HDFS file browser that comes with your distribution.
+
+If you are using the `hadoop fs` command from a login window, ignore everything in the URL up to the `output` directory. In other words, you will type the following command for this example:
+
+```
+hadoop fs -ls output/kjv-wc3
+```
+
+If you are using your HDFS file browser, the host IP address and port in the full URL are only valid for sandbox virtual machines. On a real cluster, consult your administrator for the host name and port for your *Name Node* (the HDFS master process).
+
+For example, in a sandbox, if its IP address is 192.168.64.100, the URL will be `http://192.168.64.100:8000/filebrowser/#/user/root/output/kjv-wc3`. Once you've opened this file browser, it will be easy to navigate to the outputs for the rest of the examples we'll run. If you get a 404 error, check with the sandbox documentation for the correct URL to browse HDFS files (and send us a pull request with a fix!).
+
+Either way, the same `_SUCCESS` and `part-00000` files will be found, although the lines in the latter might not be in the same order as for the *local* run.
 
 Assuming you encountered no problems, everything is working!
 
-> NOTE: The normal Hadoop and Spark convention is to never overwrite existing data. However, that would force us to manually delete old data before rerunning programs. So, to make the workshop easier, the programs delete existing data first.
+> NOTE: The normal Hadoop and Spark convention is to never overwrite existing data. However, that would force us to manually delete old data before rerunning programs, an inconvenience while learning. So, to make the workshop easier, the programs delete existing data first.
 
 ## Naming Conventions
 
 We're using a few conventions for the package structure and `main` class names:
 
 * `AbcN` - The `Abc` program and the N^th^ example. With a few exceptions, it can be executed locally and in Hadoop. It defaults to local execution.
-* `hadoop/HAbcN` - A driver program to run `AbcN` in Hadoop. These small classes use a Scala library API for managining operating system "processes". In this case, they invoke one or more shell scripts in the `scripts` directory, which in turn call the Spark driver program `$HOME/spark/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
+* `hadoop/HAbcN` - A driver program to run `AbcN` in Hadoop. These small classes use a Scala library API for managing operating system *processes*. In this case, they invoke one or more shell scripts in the workshop's `scripts` directory, which in turn call the Spark driver program `$SPARK_HOME/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
 * `solns/AbcNFooBarBaz` - The solution to the "foo bar baz" exercise that's built on `AbcN`. These programs can also be invoked from the *Run* panel.
 
-Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* panel.
-
+Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* UI.
 
 ## The Exercises
 
@@ -163,13 +180,13 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, this example uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a `README` that discusses the sources of the data files.) This example hard-codes various information, so we'll only run it in local mode.
 * **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a small library to handle input command-line arguments, which we won't discuss in detail. This example and all subsequent examples run locally and in Hadoop.
 * **Matrix4:** Demonstrates using explicit parallelism on a simplistic Matrix application.
-* **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
-* **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
+* **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM. (Part 1/1 for example 5.)
+* **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails). (Part 2/2 for example 5.)
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins as shown in this simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
 * **SparkSQL9:** Uses the SparkSQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in previous exercises.
-* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, a popular file format with good performance. This example and the next one are in a `hadoop` package, because they use features that are difficult to run without a build of Spark for a specific Hadoop cluster. In contrast, the previous examples work in "local" mode, as well.
+* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, a popular file format with good performance. This example and the next one are in a `hadoop` package, because they use features that are difficult to run outside Hadoop.
 * **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
@@ -178,29 +195,37 @@ Let's now work through these exercises...
 
 [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala)
 
-Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). We'll copy and paste some commands from the file [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala).
+Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). It allows us to work interactively with our algorithms and data.
 
-The comments in this and the subsequent files try to explain the API calls being made.
+Actually, for local mode execution, we won't use the `spark-shell` command provided by Spark. Instead, we've customized the Activator/SBT `console` (Scala REPL) to behave in a similar way. For Hadoop execution, we'll use `spark-shell`.
 
-> NOTE: while the extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. (The build is configured to not compile this file.)
+We'll copy and paste commands from the file [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala). Click the link to open the file in Activator or open it in your favorite editor/IDE.
+
+The extensive comments in this file and the subsequent files explain the API calls in detail. You can copy and paste the comments, too.
+
+> NOTE: while the file extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. (The build is configured to not compile this file.)
+
+To run this example on your workstation, you can't use the Activator UI. Quit Activator and use the instructions previously to start it in the *shell* mode. Once it starts and presents the prompt `(Activator-Spark)>`, enter the command `console`. It will compile some code and start the Scala REPL, ending with the prompt `scala>`. Continue with the instructions below.
 
 ## Hadoop Execution
 
-Log into the VM as `root` so you can run a shell script we've provided. In the `root` user's home folder `/root` and run the following command:
+In your sandbox or cluster node, change to the root node of the workshop and run the following command:
 
 ```
-spark-workshop/scripts/sparkshell.sh
+./scripts/sparkshell.sh
 ```
 
-This script calls the actual Spark Shell script, `$HOME/spark/bin/spark-shell` and passes a `--jars` argument with the package of the workshop code, as well as any additional arguments you pass to the script. (Try the `--help` option to see the full list.)
+This script calls the actual Spark Shell script, `$SPARK_HOME/bin/spark-shell` and passes a `--jars` argument with the jar of the workshop's compiled code. The script also passes any additional arguments you provide to `spark-shell`. (Try the `--help` option to see the full list.)
 
 You'll see a lot of log messages, ending with the Scala REPL prompt `scala>`.
 
-We're going to paste in the code from [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala). Click the link to view it.
+Continue with the instructions below.
 
-We'll paste a few lines at a time so we can discuss them. (It's harmless to paste comments from the source file.)
+## An Interactive Spark Session
 
-First, there are some commented lines that every Spark program needs, but the Spark Shell does automatically for you:
+Whether you running the REPL in local mode or the `spark-shell` version in Hadoop, continue with the following steps.
+
+First, there are some commented lines that every Spark program needs, but you don't need to run them now. Both the local Scala REPL configured in the build and the `spark-shell` variant of the REPL execute these three lines automatically at startup:
 
 ```
 // import org.apache.spark.SparkContext
@@ -210,62 +235,65 @@ First, there are some commented lines that every Spark program needs, but the Sp
 
 The [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) drives everything else. Why are there two, very similar `import` statements? The first one imports the `SparkContext` type so it wouldn't be necessary to use a fully-qualified name in the `new SparkContext` statement. The second import statement is analogous to a `static import` in Java, where we make some methods and values visible in the current scope, again without requiring qualification.
 
-When a `SparkContext` is constructed, there are several constructors that can be used. This one takes a string for the "master" and a job name. The master must be one of the following:
+When a `SparkContext` is constructed, there are several constructors that can be used. The one shown takes a string for the "master" and an arbitrary job name. The master must be one of the following:
 
 * `local`: Start the Spark job standalone and use a single thread to run the job.
 * `local[k]`: Use `k` threads instead. Should be less than the number of cores.
 * `mesos://host:port`: Connect to a running, Mesos-managed Spark cluster.
 * `spark://host:port`: Connect to a running, standalone Spark cluster.
-* `yarn-client` or `yarn-cluster`: Connect to a YARN cluster.
+* `yarn-client` or `yarn-cluster`: Connect to a YARN cluster, which we'll use implicitly when we run in Hadoop.
+
+So, actually, the comment shown is only correct for *local* mode. When you run `spark-shell` in Hadoop, the actual master argument used is `yarn-client`.
+
+Next we define a read-only variable `input` of type [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case:
 
 ```
 val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
-input.cache
 ```
-
-Define a read-only variable `input` of type [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) (inferred) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case.
 
 > The `data` directory has a `README` that discusses the files present and where they came from.
 
-Finally, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it consumes memory, but when your workflow will repeatedly reread the data, caching provides performance improvements.
+Then, we cache the data in memory for faster, repeated retrieval. You shouldn't always do this, as it's wasteful for data that's simply passed through, but when your workflow will repeatedly reread the data, caching provides performance improvements.
 
-Next, let's work with the data:
+```
+input.cache
+```
+
+Next, we filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many were found, convert the RDD to a Scala collection (in the memory for the driver process JVM). Finally, loop through the first twenty lines of the array, printing each one, then we do it again with RDD itself.
 
 ```
 val sins = input.filter(line => line.contains("sin"))
 val count = sins.count()         // How many sins?
 val array = sins.collect()       // Convert the RDD into a collection (array)
 array.take(20) foreach println   // Take the first 20, and print them 1/line.
+sins.take(20) foreach println    // ... but we don't have to "collect" first;
+                                 // we can just use foreach on the RDD.
 ```
-
-Filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many were found, convert the RDD to a Scala collection (in the memory for the driver process JVM). Finally, loop through the first twenty lines, printing each one.
 
 Note: in Scala, the `()` in method calls are actually optional for no-argument methods.
 
-You can define *functions* as *values*:
+Continuing, you can define *functions* as *values*. Here we create a separate filter function that we pass as an argument to the filter method. Previously we used an *anonymous function*. Note that `filterFunc` is a value that's a function of type `String` to `Boolean`.
 
 ```
 val filterFunc: String => Boolean =
     (s:String) => s.contains("god") || s.contains("christ")
 ```
 
-An alternative approach; create a separate filter function instead and pass it as an argument to the filter method. Specifically, `filterFunc` is a value that's a function of type `String` to `Boolean`.
-
-The following more concise form is equivalent, due to *type inference*:
+The following more concise form is equivalent, due to *type inference* of the argument's type:
 
 ```
 val filterFunc: String => Boolean =
     s => s.contains("god") || s.contains("christ")
 ```
 
-Now use the filter to find all the `sins` verses that mention God or Christ, then count them. (Note that we dropped the parentheses after "count" in this case.)
+Now use the filter to find all the `sin` verses that also mention God or Christ, then count them. Note that this time, we drop the parentheses after "count". Parentheses can be omitted when methods take no arguments.
 
 ```
 val sinsPlusGodOrChrist  = sins filter filterFunc
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 ```
 
-A non-script program should gracefully shutdown, but we don't need to do so here.
+A non-script program should gracefully shutdown, but we don't need to do so here. Both our configured `console` environment for local execution and `spark-shell` do this for us:
 
 ```
 // sc.stop()
@@ -273,15 +301,11 @@ A non-script program should gracefully shutdown, but we don't need to do so here
 
 If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`.
 
-There are comments at the end of each source file, including this one, with suggested exercises to learn the API. Try them as time permits. Solutions for some exercises are provided in the `src/main/scala/sparkworkshop/solns` directory.
+There are comments at the end of this file with suggested exercises to learn the API. Try them as time permits. All the subsequent examples include suggested exercises, too. Solutions for some of them are provided in the `src/main/scala/sparkworkshop/solns` directory.
 
 You can exit the shell now. Type `:quit` or use `^d` (control-d).
 
-## Local Mode Execution
-
-For local mode, you can use Activator's `console` task, because we've configured it to work similarly to Spark's shell. If you're running the Activator shell, you might try repeating the previous session, but this time you'll be running in local mode. Otherwise, skip to the next section.
-
-In the Activator shell, type `console`. You'll see fewer log messages this time, ending with the same `scala>` prompt.  Try pasting in the same code snippets from `Intro1.scala`.
+If you ran this example locally, you can exit SBT or the Activator shell using `exit` or `^d`, then restart the Activator UI, if you wish.
 
 ## WordCount2
 
