@@ -1058,39 +1058,52 @@ You can verify that the output file looks like the input KJV file with the book 
 
 [SparkStreaming8.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8.scala)
 
-The streaming capability is relatively new and this exercise uses it to construct a simple "word count" server. The example has two running configurations. The default configuration just reads the contents of a file (the KJV Bible file, by default). That works best in Activator using the "run" command. The other mode ingests "events" over a socket. In either case, the data is captured in 1-second intervals (called *batches*) and word count it performed on the data in the batch.
+The streaming capability is relatively new and this exercise uses it to construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
 
-Let's start with the mode that just reads a file. In Activator, run `SparkStreaming8` as we've done for the other exercises. It will read the KJV Bible text file, then terminate after 20 seconds, because otherwise the app will run forever, waiting for a changed text file to appear!
+In the first configuration, which is also the default behavior for this example, new data is read from files that appear in a directory. This approach supports a workflow where new files are written to a landing directory and Spark Streaming is used to detect them, ingest them, and process the data.
 
-If you look in the local `output` directory, you'll see many subdirectories of the form `output/kjv-wc-streaming-<timestamp>.out/`, where the timestamp will be milliseconds that increment by 1000 at a time. In Spark Streaming, each batch (time interval of events) is written to a new, timestamped directory when output methods are called. The `--out` argument to the program is used as the directory name prefix. Most of the `part-0000N` files (you'll probably see two per directory) will be empty, because most or all of the KJV input is handled in the first batch. `SparkStreaming8` automatically terminates after a few seconds, so it doesn't run forever, even when the input is exhausted!
+Note that Spark Streaming does not use the `_SUCCESS` marker file we mentioned earlier, in part because that mechanism can only be used once *all* files are written to the directory. Hence, only use this ingestion mechanism with files that "appear instantly" in the directory, i.e., through renaming from another location in the file system.
 
-Alternatively, the app can receive text over a socket connection. To do this, you'll need to log into two terminal window in the VM.
+The second basic configuration reads data from a socket. Spark Streaming also comes with connectors for other data sources, such as [Apache Kafka](http://kafka.apache.org/) and Twitter streams. We don't explore those here.
 
-We'll use the `nc` command to send data to the spark streaming process (part of [NetCat](http://netcat.sourceforge.net/)).
+`SparkStreaming8` uses directory watching by default. A temporary directory is created and a second process writes the KJV Bible file to a temporary file in the directory every few seconds. Hence, the data will be same in every file, but stream processing with read each new file on each iteration. `SparkStreaming8` does *Word Count* on the data.
 
-To try the streaming program with a socket connection, run the following command in one of the terminal windows:
+The socket option works similarly. By default, the same KJV file is written over and over again to a socket.
 
-```
-nc -l 9900
-```
+In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala) is the actual driver program we'll run. It uses two helper classes, [com.typesafe.sparkworkshop.util.streaming.DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/streaming/DataDirectoryServer.scala) and [com.typesafe.sparkworkshop.util.streaming.DataSocketServer.scala](#code/src/main/scala/sparkworkshop/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
-It will wait for connections (the `-l` option) on port 9900. Type in several lines of random text, with line feeds. They will be read by the streaming program when it connects.
+So, let's run this configuration first. In Activator or SBT, run `SparkStreaming8Main` (*not* `SparkStreaming8MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
-Now run `SparkStreaming8` with one of the following scripts:
+This driver uses `DataSocketServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming8` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
-* `scripts/sparkstreaming8-local.sh` - Run streaming in local mode.
-* `scripts/sparkstreaming8.sh` - Run streaming in Hadoop.
-
-The "local" version starts Activator in shell mode and then invokes a `run-main` command. You may need to terminate the UI process if it's running. Control-C is your friend. ;) Here is the command that's executed in the Activator shell:
+If you watch the console output, you'll see messages like this:
 
 ```
-run-main SparkStreaming8 --socket localhost:9900 --out output/socket-streaming
+-------------------------------------------
+Time: 1413724627000 ms
+-------------------------------------------
+(Oshea,2)
+(winefat,2)
+(cleaveth,13)
+(bone,19)
+(House,1)
+(Shimri,3)
+(pygarg,1)
+(nobleman,3)
+(honeycomb,9)
+(manifestly,1)
+...
 ```
 
-Once it starts you'll see similar output, where it dumps the garbage you typed into the `nc` window. Once `SparkStreaming8` exits, so will `nc`. Activator will exit, too. Look at the output directories created. Most files will be empty.
+The time stamp will increent by 2000 ms each time, because that's the size of our batch intervals. This output comes from the `print` method in the program (discussed below), which is a useful debug tool for seeing the first 10 or so values in the current batch `RDD`.
 
-Once again, `SparkStreaming8` will terminate automatically after 5 seconds, even if you keep inputing text into `nc`. We'll discuss an override in a moment.
+At the same time, you'll see new directories appear in `output`, one per batch. They are named like `output/wc-streaming-1413724628000.out`, again with a timestamp appended to our default output argument `output/wc-streaming`. Each of these will contain the usual `_SUCCESS` and `part-0000N` files, one for each core that the job can get!
 
+Now let's run with socket input. In Activator or SBT, run `SparkStreaming8MainSocket` as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8socket`. In either case, the extra option `--socket localhost:9900` is passed to `SparkStreaming8Main` to read data from a socket at this address. It will use `DataSocketServer` for this purpose.
+
+The console output and the directory output should be very similar to the output of the previous run.
+
+To run the same logic in Hadoop, there is `hadoop.HSparkStreaming8` driver, **but don't invoke it directly**, because it doesn't also run one of the `Data*server` processes. Instead, pass the `--hadoop` flag to `SparkStreaming8Main`. (You'll have)
 Do these steps again with the Hadoop version, `scripts/sparkstreaming8.sh`. This script works just like the other Hadoop scripts we described previously. It invokes `$SPARK_HOME/bin/spark-submit`. Don't forget to start `nc` again.
 
 What if kill the `nc` process? `SparkStreaming8` detects that the socket dropped and starts shutting down, which takes a few moments. The program has a "listener" that

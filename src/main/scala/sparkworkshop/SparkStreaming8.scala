@@ -40,7 +40,8 @@ import org.apache.spark.streaming.scheduler.{
  */
 object SparkStreaming8 {
 
-  val timeout = 20 * 1000   // 20 seconds
+  val timeout = 30 * 1000  // Stop program after 30 seconds
+  val batchSeconds = 2     // Size of batch intervals
 
   class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
     override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
@@ -62,7 +63,7 @@ object SparkStreaming8 {
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[*]"),
       CommandLineOptions.socket(""),     // empty default, so we know the user specified this option.
-      CommandLineOptions.terminate(30), // quit after 30 seconds by default.
+      CommandLineOptions.terminate(timeout),
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
@@ -99,7 +100,7 @@ object SparkStreaming8 {
              // If you need more memory:
              // .set("spark.executor.memory", "1g")
     val sc  = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(1))
+    val ssc = new StreamingContext(sc, Seconds(batchSeconds))
     ssc.addStreamingListener(new EndOfStreamListener(ssc))
 
     try {

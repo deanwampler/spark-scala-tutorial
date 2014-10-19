@@ -1,44 +1,34 @@
 #!/bin/bash
 #========================================================================
-# sparkstreaming8.sh - Invoke SparkStreaming8 on Hadoop or locally.
-# Uses socket input.
-# usage: sparkstreaming8.sh [--hadoop | --local] [--dir [dir] | --socket]
-# default is --hadoop.
+# sparkstreaming8.sh - Invoke SparkStreaming8 on Hadoop.
+# Supports the socket input configuration only, using the DataSocketServer.
+# TODO: Some of the hard-coded values could be script options.
 #========================================================================
 
 dir=$(dirname $0)
 root=$(dirname $dir)
 . $dir/find_cmds
 
-mode=local
-
-while [ $# -gt 0 ]
-do
-  case $1 in
-    --l*) mode=local   ;;
-    --h*) mode=hadoop  ;;
-    *)    mode= ;;
-  esac
-done
+datafile=data/kjvdat.txt
 output=output/socket-streaming
 dir=$(dirname $0)
 echo "Output will be written to: $output"
-if [[ $mode == local ]]
+
+export ACT=$(find_activator --silent "$HOME/activator/activator")
+if [[ -n $ACT ]]
+  ACT="$ACT shell"
 then
-  export ACT=$(find_activator --silent "$HOME/activator/activator")
-  if [[ -n $ACT ]]
-    ACT="$ACT shell"
-  then
-    ACT=$(find_sbt)
-    [[ -z $ACT ]] && exit 1
-  fi
-  if [[ -n $NOOP ]]
-  then
-    echo "echo run-main SparkStreaming8 --socket localhost:9900 --output $output | $ACT"
-  else
-    echo run-main SparkStreaming8 --socket localhost:9900 --out "$output" | $ACT
-  fi
-else
+  ACT=$(find_sbt)
+  [[ -z $ACT ]] && exit 1
+fi
+
+echo "Starting the DataSocketServer:"
+echo "  echo run-main com.typesafe.sparkworkshop.util.streaming.DataSocketServer 9900 $datafile | $ACT"
+if [[ -z $NOOP ]]
+  echo run-main com.typesafe.sparkworkshop.util.streaming.DataSocketServer 9900 $datafile | $ACT &
+fi
+sleep 1
+echo "Starting SparkStreaming8"
   $dir/hadoop.sh --class SparkStreaming8 --out "$output" --socket localhost:9900 "$@"
 fi
 

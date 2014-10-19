@@ -12,9 +12,9 @@ import java.io.File
  * socket or by periodically writing new data files to a directory.
  * Run with the --help option for details.
  */
-object SparkStreaming8Main {
+object SparkStreaming8Main extends sparkstreaming.ThreadStarter {
 
-  val timeout = 20 * 1000   // 20 seconds
+  val timeout = 30 * 1000  // Stop program after 30 seconds
 
   /**
    * The source data file to write over a socket or to write repeatedly to the
@@ -51,7 +51,7 @@ object SparkStreaming8Main {
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[*]"),
       CommandLineOptions.socket(""),  // empty default, so we know the user specified this option.
-      CommandLineOptions.terminate(30),
+      CommandLineOptions.terminate(timeout),
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
@@ -61,6 +61,7 @@ object SparkStreaming8Main {
     val out    = argz("output-path")
     val data   = argz("source-data-file")
     val socket = argz("socket")
+    val usehadoop = argz("hadoop").toBoolean
     val rmWatchedDir = argz("remove-watched-dir").toBoolean
 
     // Need to remove the data argument before calling SparkStreaming8.
@@ -78,19 +79,35 @@ object SparkStreaming8Main {
     }
 
     try {
-      val dataThread = if (socket == "") {
-        FileUtil.mkdir(in)
-        new Thread(new DataDirectoryServer(in, data));
-      } else {
-        val port = socket.split(":").last.toInt
-        new Thread(new DataSocketServer(port, data));
-      }
-      dataThread.start();
+      val dataThread =
+        if (socket == "") {
+          startDirectoryDataThread(in, data)
+        } else {
+          val port = socket.split(":").last.toInt
+          startSocketDataThread(port, data)
+        }
       SparkStreaming8.main(streamArgs)
-      // When SparkStreaming8 returns, we can terminate the DataServer
+      // When SparkStreaming8.main returns, we can terminate the data server thread:
       dataThread.interrupt()
     } finally {
       if (rmWatchedDir) FileUtil.rmrf(in)
+    }
+  }
+}
+
+/** This exists to enable reuse by HSparkStreaming8. A package is necessary... */
+package sparkstreaming {
+  trait ThreadStarter {
+    def startSocketDataThread(port: Int, dataFile: String): Thread = {
+      val dataThread = new Thread(new DataSocketServer(port, dataFile))
+      dataThread.start()
+      dataThread
+    }
+    def startDirectoryDataThread(in: String, dataFile: String): Thread = {
+      FileUtil.mkdir(in)
+      val dataThread = new Thread(new DataDirectoryServer(in, dataFile))
+      dataThread.start()
+      dataThread
     }
   }
 }
