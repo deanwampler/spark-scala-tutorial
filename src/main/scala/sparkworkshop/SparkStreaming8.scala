@@ -31,40 +31,16 @@ import org.apache.spark.streaming.scheduler.{
  *   run-main SparkStreaming8 --socket localhost:9900
  * (You can use any server and port combination you want for these two processes):
  *
- * Spark Streaming assumes long-running processes. For this example, we hard-wire
- * a maximum time of 5 seconds, but you can supress this with the "--no-term"
- * invocation option, in which case it will run until you use ^C to kill it!
+ * Spark Streaming assumes long-running processes. For this example, we set a
+ * default termination time of 30 seconds, but you can override this with the
+ * "--terminate N" option with a value of 0, in which case it will run until you use ^C to kill it!
  * Note that the "-c" option used with "nc" above will cause it to terminate
  * automatically if the streaming process dies.
  * Nicer clean up, e.g., when a socket connection dies, is TBD.
  */
 object SparkStreaming8 {
 
-  val timeout = 5 * 1000   // 5 seconds
-
-  /**
-   * Use "--socket host:port" to listen for events.
-   * To read "events" from a directory of files instead, e.g., for testing,
-   * use the "--inpath" argument.
-   */
-  def socket(hostPort: String): Opt = Opt(
-    name   = "socket",
-    value  = hostPort,
-    help   = s"-s | --socket host:port  Listen to a socket for events (default: $hostPort unless --inpath used)",
-    parser = {
-      case ("-s" | "--socket") +: hp +: tail => (("socket", hp), tail)
-    })
-
-  /**
-   * Use "--no-term" to keep this process running "forever" (or until ^C).
-   */
-  def noterm(): Opt = Opt(
-    name   = "no-term",
-    value  = "",  // ignored
-    help   = s"-n | --no | --no-term  Run forever; don't terminate after $timeout seconds)",
-    parser = {
-      case ("-n" | "--no" | "--no-term") +: tail => (("no-term", "true"), tail)
-    })
+  val timeout = 20 * 1000   // 20 seconds
 
   class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
     override def onReceiverError(error: StreamingListenerReceiverError):Unit = {
@@ -77,22 +53,24 @@ object SparkStreaming8 {
     }
   }
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
-      CommandLineOptions.inputPath("data/kjvdat.txt"),
-      CommandLineOptions.outputPath("output/kjv-wc-streaming"),
+      CommandLineOptions.inputPath("tmp/streaming-input"),
+      CommandLineOptions.outputPath("output/wc-streaming"),
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[*]"),
-      socket(""),  // empty default, so we know the user specified this option.
-      noterm(),
+      CommandLineOptions.socket(""),     // empty default, so we know the user specified this option.
+      CommandLineOptions.terminate(30), // quit after 30 seconds by default.
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
+    val term   = argz("terminate").toInt
+
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
@@ -143,8 +121,8 @@ object SparkStreaming8 {
       wordCounts.saveAsTextFiles(out, "out")
 
       ssc.start()
-      if (argz("no-term").toString == "") ssc.awaitTermination(timeout)
-      else  ssc.awaitTermination()
+      if (term > 0) ssc.awaitTermination(term * 1000)
+      else ssc.awaitTermination()
     } finally {
       // Having the ssc.stop here is only needed when we use the timeout.
       println("+++++++++++++ Stopping! +++++++++++++")

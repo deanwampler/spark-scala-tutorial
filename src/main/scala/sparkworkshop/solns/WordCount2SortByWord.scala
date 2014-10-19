@@ -9,7 +9,7 @@ import org.apache.spark.SparkContext._
  * Also implements the sort-by-word exercise.
  */
 object WordCount2SortByWord {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val sc = new SparkContext("local", "Word Count (2)")
 

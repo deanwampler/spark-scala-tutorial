@@ -110,6 +110,30 @@ object CommandLineOptions {
       case ("-m" | "--master") +: master +: tail => (("master", master), tail)
     })
 
+  /**
+   * Use "--socket host:port" to listen for events.
+   * For streaming applications, you specify this option or "--inpath" to read
+   * data from a directory.
+   */
+  def socket(hostPort: String): Opt = Opt(
+    name   = "socket",
+    value  = hostPort,
+    help   = s"-s | --socket host:port  Listen to a socket for events (default: $hostPort unless --inpath used)",
+    parser = {
+      case ("-s" | "--socket") +: hp +: tail => (("socket", hp), tail)
+    })
+
+  /**
+   * Use "--terminate N" to terminate a process after N seconds. Otherwise, it runs forever (or until ^C).
+   */
+  def terminate(seconds: Int): Opt = Opt(
+    name   = "terminate",
+    value  = seconds.toString,
+    help   = s"--term | --terminate N Terminate after N seconds. Use 0 for no termination.",
+    parser = {
+      case ("--term" | "--terminate") +: n +: tail => (("terminate", n), tail)
+    })
+
   /** Common argument: Quiet suppresses some print statements. */
   def quiet: Opt = Opt(
     name   = "quiet",

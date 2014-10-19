@@ -16,7 +16,7 @@ import org.apache.spark.rdd.RDD
  * work for local file systems. Hence, we have two implementations of Crawl.
  */
 object Crawl5aHDFS {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
@@ -26,10 +26,10 @@ object Crawl5aHDFS {
       CommandLineOptions.quiet)
 
     val argz    = options(args.toList)
-    val master  = argz("master").toString
+    val master  = argz("master")
     val quiet   = argz("quiet").toBoolean
-    val out     = argz("output-path").toString
-    val in      = argz("input-path").toString
+    val out     = argz("output-path")
+    val in      = argz("input-path")
     if (master.startsWith("local")) {
       println("ERROR: Crawl5aHDFS only supports Hadoop execution.")
       sys.exit(1)

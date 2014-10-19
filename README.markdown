@@ -287,7 +287,7 @@ Here is the outline of the rest of the program, demonstrating a pattern we'll us
 
 ```
 object WordCount2 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val sc = new SparkContext("local", "Word Count (2)")
 
@@ -430,7 +430,7 @@ As before, but with our new `CommandLineOptions` utilities added.
 
 ```
 object WordCount3 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
@@ -440,9 +440,9 @@ object WordCount3 {
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
 ```
 I won't discuss the implementation of [CommandLineOptions.scala](#code/src/main/scala/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
 
@@ -463,7 +463,7 @@ Now we create the `SparkContext` with the desired `master` setting. Then we proc
     val sc = new SparkContext(master, "Word Count (3)")
 
     try {
-      val input = sc.textFile(argz("input-path").toString)
+      val input = sc.textFile(argz("input-path"))
         .map(line => line.toLowerCase.split("\\s*\\|\\s*").last)
       input.cache
 ```
@@ -602,14 +602,14 @@ object Matrix4 {
 
   case class Dimensions(m: Int, n: Int)
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(...)
     val argz   = options(args.toList)
     ...
 
     val dimsRE = """(\d+)\s*x\s*(\d+)""".r
-    val dimensions = argz("dims").toString match {
+    val dimensions = argz("dims") match {
       case dimsRE(m, n) => Dimensions(m.toInt, n.toInt)
       case s =>
         println("""Expected matrix dimensions 'NxM', but got this: $s""")
@@ -712,7 +712,7 @@ The code outside the usual `try` clause follows the usual pattern, so we'll focu
 ```
 try {
   val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-  val input = sc.textFile(argz("input-path").toString) map {
+  val input = sc.textFile(argz("input-path")) map {
     case lineRE(name, text) => (name.trim, text.toLowerCase)
     case badLine =>
       Console.err.println("Unexpected line: $badLine")
@@ -822,7 +822,7 @@ I'm in yür codez:
 
 ```
 ...
-val ngramsStr = argz("ngrams").toString.toLowerCase
+val ngramsStr = argz("ngrams").toLowerCase
 val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
 val n = argz("count").toInt
 ```
@@ -836,7 +836,7 @@ try {
       -(a._2 compare b._2)  // - so that it sorts descending
   }
 
-  val ngramz = sc.textFile(argz("input-path").toString)
+  val ngramz = sc.textFile(argz("input-path"))
     .flatMap { line =>
         val text = line.toLowerCase.split("\\s*\\|\\s*").last
         ngramsRE.findAllMatchIn(text).map(_.toString)
@@ -885,7 +885,7 @@ Here r yür codez:
 ```
 ...
 try {
-  val input = sc.textFile(argz("input-path").toString)
+  val input = sc.textFile(argz("input-path"))
     .map { line =>
       val ary = line.split("\\s*\\|\\s*")
       (ary(0), (ary(1), ary(2), ary(3)))
@@ -897,7 +897,7 @@ The input sacred text (default: `data/kjvdat.txt`) is assumed to have the format
 The abbreviations file is handled similarly, but the delimiter is a tab:
 
 ```
-val abbrevs = sc.textFile(argz("abbreviations").toString)
+val abbrevs = sc.textFile(argz("abbreviations"))
   .map{ line =>
     val ary = line.split("\\s+", 2)
     (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
@@ -940,7 +940,7 @@ Lastly, we write the output:
 } finally { ... }
 ```
 
-The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), with many other methods for computing "co-groups", outer joins, etc.
+The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), with many other methods for computing "co-groups", outer joins, etc.
 
 You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not retained in the correct order! (See the exercises in the source file.)
 
@@ -992,11 +992,11 @@ triggers shutdown when the socket drops. However, by default, Spark Streaming wi
 run-main SparkStreaming8 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-s | --socket server:port] \
-  [-n | --no | --no-term] \
+  [--term | --terminate N] \
   [-q | --quiet]
 ```
 
-Where the default is `--inpath data/kjvdat.txt`. However, it is ignored if the `--socket` option is given. If you don't want the program to terminate automatically after 5 seconds, use the `--no-term` option.
+Where the default is `--inpath data/kjvdat.txt`. However, it is ignored if the `--socket` option is given. By default, the terminate flag with 30 seconds is used.
 
 ## How Spark Streaming Works
 
@@ -1040,7 +1040,7 @@ ssc.addStreamingListener(EndOfStreamListener(ssc))
 
 Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use at least 2 cores when running locally, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
 
-Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/1.0.0/configuration.html) for more details.
+Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/latest/configuration.html) for more details.
 
 With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval. Finally, we add a listener for socket drops.
 
@@ -1070,7 +1070,7 @@ Now we implement an incremental word count:
   wordCounts.saveAsTextFiles(out, "out")
 
   ssc.start()
-  if (argz("no-term").toString == "") ssc.awaitTermination(5 * 1000)
+  if (argz("no-term").toBoolean == false) ssc.awaitTermination(5 * 1000)
   else  ssc.awaitTermination()
 
 } finally {
@@ -1112,7 +1112,7 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
-This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/1.0.0/streaming-programming-guide.html) for more information.
+This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
 
 ## SparkSQL9
 
@@ -1167,7 +1167,7 @@ We use `flatMap` over the results so that lines that fail to parse are essential
 // Also strips the trailing "~" in the KJV file.
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
 // Use flatMap to effectively remove bad lines.
-val verses = sc.textFile(argz("input-path").toString) flatMap {
+val verses = sc.textFile(argz("input-path")) flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
@@ -1352,7 +1352,7 @@ To learn more, see the following resources:
 
 * [Typesafe's Big Data Solutions](http://typesafe.com/reactive-big-data). Typesafe now offers more detailed Spark training and consulting services. Additional products and services are forthcoming.
 * The Apache Spark [website](http://spark.apache.org/).
-* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/1.0.0/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD).
+* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/latest/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD).
 * The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 * [Talks from Spark Summit 2013](http://spark-summit.org/2013).
 * [Talks from Spark Summit 2014](http://spark-summit.org/2014/training).

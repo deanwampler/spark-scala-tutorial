@@ -8,7 +8,7 @@ import org.apache.spark.SparkContext._
  * to the output, as the 2nd field after the word itself.
  */
 object WordCount3SortByWordLength {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     // I extracted command-line processing code into a separate utility class,
     // an illustration of how it's convenient that we can mix "normal" code
@@ -21,9 +21,9 @@ object WordCount3SortByWordLength {
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
@@ -34,7 +34,7 @@ object WordCount3SortByWordLength {
     try {
       // Load the King James Version of the Bible, then convert
       // each line to lower case, creating an RDD.
-      val input = sc.textFile(argz("input-path").toString).map(line => line.toLowerCase)
+      val input = sc.textFile(argz("input-path")).map(line => line.toLowerCase)
 
       // Cache the RDD in memory for fast, repeated access.
       // You don't have to do this and you shouldn't unless the data IS reused.

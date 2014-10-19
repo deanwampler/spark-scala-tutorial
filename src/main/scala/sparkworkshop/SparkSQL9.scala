@@ -17,7 +17,7 @@ object SparkSQL9 {
       .take(n)          // Take the first n lines.
       .foreach(println) // Print the query results.
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
@@ -27,9 +27,9 @@ object SparkSQL9 {
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     val outgv  = s"$out-god-verses"
     val outvpb = s"$out-verses-per-book"
     if (master.startsWith("local")) {
@@ -41,7 +41,7 @@ object SparkSQL9 {
       FileUtil.rmrf(outvpb)
     }
 
-    val sc = new SparkContext(argz("master").toString, "Spark SQL (9)")
+    val sc = new SparkContext(argz("master"), "Spark SQL (9)")
     val sqlc = new SQLContext(sc)
     import sqlc._
 
@@ -50,7 +50,7 @@ object SparkSQL9 {
       // Also strips the trailing "~" in the KJV file.
       val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
       // Use flatMap to effectively remove bad lines.
-      val verses = sc.textFile(argz("input-path").toString) flatMap {
+      val verses = sc.textFile(argz("input-path")) flatMap {
         case lineRE(book, chapter, verse, text) =>
           Seq(Verse(book, chapter.toInt, verse.toInt, text))
         case line =>

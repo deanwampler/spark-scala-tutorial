@@ -11,7 +11,7 @@ object Matrix4StdDev {
 
   case class Dimensions(m: Int, n: Int)
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     /** A function to generate an Opt for handling the matrix dimensions. */
     def dims(value: String): Opt = Opt(
@@ -30,23 +30,23 @@ object Matrix4StdDev {
       dims("5x10"))
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
     }
 
     val dimsRE = """(\d+)\s*x\s*(\d+)""".r
-    val dimensions = argz("dims").toString match {
+    val dimensions = argz("dims") match {
       case dimsRE(m, n) => Dimensions(m.toInt, n.toInt)
       case s =>
         println("""Expected matrix dimensions 'NxM', but got this: $s""")
         sys.exit(1)
     }
 
-    val sc = new SparkContext(argz("master").toString, "Matrix (4)")
+    val sc = new SparkContext(argz("master"), "Matrix (4)")
 
     try {
       // Set up a mxn matrix of numbers.

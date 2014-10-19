@@ -1,7 +1,8 @@
 #!/bin/bash
 #========================================================================
-# sparkstreaming8.sh - Invoke SparkStreaming8 on Hadoop or locally using sockets.
-# usage: sparkstreaming8.sh [--hadoop|--local]
+# sparkstreaming8.sh - Invoke SparkStreaming8 on Hadoop or locally.
+# Uses socket input.
+# usage: sparkstreaming8.sh [--hadoop | --local] [--dir [dir] | --socket]
 # default is --hadoop.
 #========================================================================
 
@@ -9,11 +10,16 @@ dir=$(dirname $0)
 root=$(dirname $dir)
 . $dir/find_cmds
 
-case $1 in
-  --l*) mode=local   ;;
-  *)    model=hadoop ;;
-esac
+mode=local
 
+while [ $# -gt 0 ]
+do
+  case $1 in
+    --l*) mode=local   ;;
+    --h*) mode=hadoop  ;;
+    *)    mode= ;;
+  esac
+done
 output=output/socket-streaming
 dir=$(dirname $0)
 echo "Output will be written to: $output"

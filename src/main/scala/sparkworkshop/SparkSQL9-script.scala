@@ -20,7 +20,7 @@ import sqlc._
 // Also strips the trailing "~" in the KJV file.
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
 // Use flatMap to effectively remove bad lines.
-val verses = sc.textFile(argz("input-path").toString) flatMap {
+val verses = sc.textFile(argz("input-path")) flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>

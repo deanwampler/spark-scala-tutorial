@@ -11,7 +11,7 @@ import org.apache.spark.SparkContext._
  * </ol>
  */
 object WordCount3 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
     // I extracted command-line processing code into a separate utility class,
     // an illustration of how it's convenient that we can mix "normal" code
     // with "big data" processing code.
@@ -23,9 +23,9 @@ object WordCount3 {
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
@@ -40,7 +40,7 @@ object WordCount3 {
       // Keep only the text. The output is an RDD.
       // Note that calling "last" on the split array is robust against lines
       // that don't have the delimiter, if any.
-      val input = sc.textFile(argz("input-path").toString)
+      val input = sc.textFile(argz("input-path"))
         .map(line => line.toLowerCase.split("\\s*\\|\\s*").last)
 
       // Cache the RDD in memory for fast, repeated access.

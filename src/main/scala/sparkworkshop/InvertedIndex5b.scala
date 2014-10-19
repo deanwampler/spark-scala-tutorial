@@ -4,7 +4,7 @@ import org.apache.spark.SparkContext._
 
 /** Inverted Index - Basis of Search Engines */
 object InvertedIndex5b {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
@@ -14,9 +14,9 @@ object InvertedIndex5b {
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
@@ -33,7 +33,7 @@ object InvertedIndex5b {
       // NOTE: The args("input-path").toString is a directory; Spark finds the correct
       // data files, part-NNNNN.
       val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-      val input = sc.textFile(argz("input-path").toString) map {
+      val input = sc.textFile(argz("input-path")) map {
         case lineRE(name, text) => (name.trim, text.toLowerCase)
         case badLine =>
           Console.err.println("Unexpected line: $badLine")

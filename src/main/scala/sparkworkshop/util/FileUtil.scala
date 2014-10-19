@@ -24,4 +24,6 @@ object FileUtil {
 
   def rm(file: File): Unit =
     if (file.delete == false) throw FileOperationError(s"Deleting $file failed!")
+
+  def mkdir(path: String): Unit = (new File(path)).mkdirs
 }

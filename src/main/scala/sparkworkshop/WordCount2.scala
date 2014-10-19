@@ -17,7 +17,7 @@ import org.apache.spark.SparkContext._
  * "main".
  */
 object WordCount2 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     // The first argument specifies the "master" (see the tutorial notes).
     // The second argument is a name for the job. Additional arguments

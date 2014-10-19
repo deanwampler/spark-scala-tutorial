@@ -6,7 +6,7 @@ import org.apache.spark.SparkContext._
 
 /** First implementation of Word Count */
 object WordCount2GroupBy {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val sc = new SparkContext("local", "Word Count (2)")
 

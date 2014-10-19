@@ -9,39 +9,42 @@ cleanupCommands += """
   |sc.stop()
   |""".stripMargin
 
-addCommandAlias("ex2",  "runMain WordCount2")
+addCommandAlias("ex2",  "run-main WordCount2")
 
-addCommandAlias("ex3",  "runMain WordCount3")
+addCommandAlias("ex3",  "run-main WordCount3")
 
-addCommandAlias("ex4",  "runMain Matrix4")
+addCommandAlias("ex4",  "run-main Matrix4")
 
-addCommandAlias("ex5a", "runMain Crawl5a")
+addCommandAlias("ex5a", "run-main Crawl5a")
 
-addCommandAlias("ex5b", "runMain InvertedIndex5b")
+addCommandAlias("ex5b", "run-main InvertedIndex5b")
 
-addCommandAlias("ex6",  "runMain NGrams6")
+addCommandAlias("ex6",  "run-main NGrams6")
 
-addCommandAlias("ex7",  "runMain Joins7")
+addCommandAlias("ex7",  "run-main Joins7")
 
-addCommandAlias("ex8",  "runMain SparkStreaming8")
+// Note the differences in the next two definitions:
+addCommandAlias("ex8directory",  "run-main SparkStreaming8Main")
 
-addCommandAlias("ex9",  "runMain SparkSQL9")
+addCommandAlias("ex8socket",  "run-main SparkStreaming8Main --socket localhost:9900")
+
+addCommandAlias("ex9",  "run-main SparkSQL9")
 
 // Command aliases for the Hadoop drivers.
 // Note: there is no Hadoop version for WordCount2.
 
-addCommandAlias("hex3",  "runMain hadoop.HWordCount3")
+addCommandAlias("hex3",  "run-main hadoop.HWordCount3")
 
-addCommandAlias("hex4",  "runMain hadoop.HMatrix4")
+addCommandAlias("hex4",  "run-main hadoop.HMatrix4")
 
-addCommandAlias("hex5a", "runMain hadoop.HCrawl5aHDFS")
+addCommandAlias("hex5a", "run-main hadoop.HCrawl5aHDFS")
 
-addCommandAlias("hex5b", "runMain hadoop.HInvertedIndex5b")
+addCommandAlias("hex5b", "run-main hadoop.HInvertedIndex5b")
 
-addCommandAlias("hex6",  "runMain hadoop.HNGrams6")
+addCommandAlias("hex6",  "run-main hadoop.HNGrams6")
 
-addCommandAlias("hex7",  "runMain hadoop.HJoins7")
+addCommandAlias("hex7",  "run-main hadoop.HJoins7")
 
-addCommandAlias("hex8",  "runMain hadoop.HSparkStreaming8")
+addCommandAlias("hex8",  "run-main hadoop.HSparkStreaming8")
 
-addCommandAlias("hex9",  "runMain hadoop.HSparkSQL9")
+addCommandAlias("hex9",  "run-main hadoop.HSparkSQL9")

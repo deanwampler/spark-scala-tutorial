@@ -7,7 +7,7 @@ import org.apache.spark.SparkContext._
  * Joins7 - Perform joins of datasets.
  */
 object Joins7 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     /** The "dictionary" of book abbreviations to full names */
     val abbrevsFile = "data/abbrevs-to-names.tsv"
@@ -28,15 +28,15 @@ object Joins7 {
       CommandLineOptions.quiet)
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(argz("master").toString, "Joins (7)")
+    val sc = new SparkContext(argz("master"), "Joins (7)")
     try {
       // Load one of the religious texts, don't convert each line to lower case
       // this time, then extract the fields in the "book|chapter|verse|text" format
@@ -44,7 +44,7 @@ object Joins7 {
       // to split the line will work reliably even if the delimiters aren't present!
       // Note also the output nested tuple. Joins only work for RDDs of
       // (key,value) tuples
-      val input = sc.textFile(argz("input-path").toString)
+      val input = sc.textFile(argz("input-path"))
         .map { line =>
           val ary = line.split("\\s*\\|\\s*")
           (ary(0), (ary(1), ary(2), ary(3)))
@@ -53,7 +53,7 @@ object Joins7 {
       // The abbreviations file is tab separated, but we only want to split
       // on the first space (in the unlikely case there are embedded tabs
       // in the names!)
-      val abbrevs = sc.textFile(argz("abbreviations").toString)
+      val abbrevs = sc.textFile(argz("abbreviations"))
         .map{ line =>
           val ary = line.split("\\s+", 2)
           (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
@@ -87,7 +87,7 @@ object Joins7 {
     }
 
     // Exercise: Try different sacred text files.
-    // Exercise: Try outer joins (see http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions).
+    // Exercise: Try outer joins (see http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions).
     // Exercise (hard): The output does NOT preserve the original order of the
     //   verses! This is a consequence of how joins are implemented ("co-groups").
     //   Fix the ordering. Here is one approach:

@@ -271,7 +271,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
 <p>Here is the outline of the rest of the program, demonstrating a pattern we&#8217;ll use throughout.</p>
 <pre><code class="(null)">object WordCount2 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val sc = new SparkContext(&quot;local&quot;, &quot;Word Count (2)&quot;)
 
@@ -391,7 +391,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
 <p>As before, but with our new <code>CommandLineOptions</code> utilities added.</p>
 <pre><code class="(null)">object WordCount3 {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
@@ -537,7 +537,7 @@ object Matrix4 {
 
   case class Dimensions(m: Int, n: Int)
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(...)
     val argz   = options(args.toList)
@@ -817,7 +817,7 @@ if (input.count != verses.count) {
   verses2.saveAsTextFile(out)
 } finally { ... }</code></pre>
 
-<p>The <code>join</code> method we used is implemented by <a href="http://spark.apache.org/docs/1.0.0/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions">spark.rdd.PairRDDFunctions</a>, with many other methods for computing &#8220;co-groups&#8221;, outer joins, etc.</p>
+<p>The <code>join</code> method we used is implemented by <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions">spark.rdd.PairRDDFunctions</a>, with many other methods for computing &#8220;co-groups&#8221;, outer joins, etc.</p>
 
 <p>You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not retained in the correct order! (See the exercises in the source file.)</p>
 
@@ -904,7 +904,7 @@ ssc.addStreamingListener(EndOfStreamListener(ssc))</code></pre>
 
 <p>Construct the <code>SparkContext</code> a different way, by first defining a <code>SparkConf</code> (configuration) object. First, it is necessary to use at least 2 cores when running locally, which is specified using <code>setMaster(&quot;local[2]&quot;)</code> to avoid a <a href="http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html">problem discussed here</a>.</p>
 
-<p>Spark Streaming requires the TTL to be set, <code>spark.cleaner.ttl</code>, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See <a href="http://spark.apache.org/docs/1.0.0/configuration.html">Configuration</a> for more details.</p>
+<p>Spark Streaming requires the TTL to be set, <code>spark.cleaner.ttl</code>, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See <a href="http://spark.apache.org/docs/latest/configuration.html">Configuration</a> for more details.</p>
 
 <p>With the <code>SparkContext</code>, we create a <code>StreamingContext</code>, where we also specify the time interval. Finally, we add a listener for socket drops.</p>
 <pre><code class="(null)">try {
@@ -967,7 +967,7 @@ ssc.addStreamingListener(EndOfStreamListener(ssc))</code></pre>
   }
 }</code></pre>
 
-<p>This is just the tip of the iceberg for Streaming. See the <a href="http://spark.apache.org/docs/1.0.0/streaming-programming-guide.html">Streaming Programming Guide</a> for more information.</p>
+<p>This is just the tip of the iceberg for Streaming. See the <a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html">Streaming Programming Guide</a> for more information.</p>
 
 <h2 id="sparksql9">SparkSQL9</h2>
 
@@ -1169,7 +1169,7 @@ hql2(&quot;Create the &apos;external&apos; kjv Hive table:&quot;, s&quot;&quot;&
 <ul>
 <li><a href="http://typesafe.com/reactive-big-data">Typesafe&#8217;s Big Data Solutions</a>. Typesafe now offers more detailed Spark training and consulting services. Additional products and services are forthcoming.</li>
 <li>The Apache Spark <a href="http://spark.apache.org/">website</a>.</li>
-<li>The Apache Spark <a href="http://spark.apache.org/docs/latest/quick-start.html">Quick Start</a>. See also the examples in the <a href="https://github.com/apache/spark">Spark distribution</a> and be sure to study the <a href="http://spark.apache.org/docs/1.0.0/api.html">Scaladoc</a> pages for key types such as <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> and <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD">SchemaRDD</a>.</li>
+<li>The Apache Spark <a href="http://spark.apache.org/docs/latest/quick-start.html">Quick Start</a>. See also the examples in the <a href="https://github.com/apache/spark">Spark distribution</a> and be sure to study the <a href="http://spark.apache.org/docs/latest/api.html">Scaladoc</a> pages for key types such as <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> and <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD">SchemaRDD</a>.</li>
 <li>The <a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">SparkSQL Programmer&#8217;s Guide</a></li>
 <li><a href="http://spark-summit.org/2013">Talks from Spark Summit 2013</a>.</li>
 <li><a href="http://spark-summit.org/2014/training">Talks from Spark Summit 2014</a>.</li>

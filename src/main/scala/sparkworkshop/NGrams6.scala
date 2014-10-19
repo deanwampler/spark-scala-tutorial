@@ -6,7 +6,7 @@ import org.apache.spark.SparkContext._
 /** NGrams6 - Find the ngrams in a corpus */
 object NGrams6 {
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     /** A function to generate an Opt for handling the count argument. */
     def count(value: String): Opt = Opt(
@@ -42,16 +42,16 @@ object NGrams6 {
       ngrams("% love % %"))
 
     val argz   = options(args.toList)
-    val master = argz("master").toString
+    val master = argz("master")
     val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path").toString
+    val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
     }
 
     val sc = new SparkContext(master, "NGrams (6)")
-    val ngramsStr = argz("ngrams").toString.toLowerCase
+    val ngramsStr = argz("ngrams").toLowerCase
     // Note that the replacement strings use Scala's triple quotes; necessary
     // to ensure that the final string is "\w+" and "\s+" for the reges.
     val ngramsRE = ngramsStr.replaceAll("%", """\\w+""").replaceAll("\\s+", """\\s+""").r
@@ -66,7 +66,7 @@ object NGrams6 {
       // Load the input data. Note that NGrams across line boundaries are not
       // supported by this implementation.
 
-      val ngramz = sc.textFile(argz("input-path").toString)
+      val ngramz = sc.textFile(argz("input-path"))
         .flatMap { line =>
             val text = line.toLowerCase.split("\\s*\\|\\s*").last
             ngramsRE.findAllMatchIn(text).map(_.toString)
