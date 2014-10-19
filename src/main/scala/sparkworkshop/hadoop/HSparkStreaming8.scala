@@ -10,32 +10,31 @@ import sparkstreaming.ThreadStarter
  */
 object HSparkStreaming8 extends ThreadStarter {
   def main(args: Array[String]): Unit = {
-    val (port, dataFile, inputPath) = parseArgs(args)
-    val dataThread =
-      if (port != 0) startSocketDataThread(port, dataFile)
-      else startDirectoryDataThread(inputPath, dataFile)
+    val (port, dataFile) = parseArgs(args)
+    val dataThread = startSocketDataThread(port, dataFile)
 
     Hadoop("SparkStreaming8", "output/wc-streaming", args)
     // When the previous expression returns, we can terminate the data thread.
     dataThread.interrupt()
   }
 
-  protected def parseArgs(args: Array[String]): (Int, String, String) = {
+  protected def parseArgs(args: Array[String]): (Int, String) = {
     var port = 0
     var dataFile = "data/kjvdat.txt"
-    var inputPath = "tmp/streaming-input"
     def findArgs(argsSeq: Seq[String]): Unit = argsSeq match {
       case Nil => // done
       case ("-s" | "--socket") +: hostPort +: tail =>
         port = hostPort.split(":").last.toInt
         findArgs(tail)
       case ("-i" | "--in" | "--inpath") +: path +: tail =>
-        inputPath = path
-        findArgs(tail)
+        println("HSparkStreaming8: ERROR - Reading data from directories isn't implemented for Hadoop.")
+        println("Use the --socket option instead.")
+        sys.exit(1)
       case ("-d" | "--data") +: file +: tail =>
         dataFile = file
         findArgs(tail)
     }
-    (port, dataFile, inputPath)
+    if (port == 0) port = 9900
+    (port, dataFile)
   }
 }

@@ -12,10 +12,8 @@ object SparkSQL9 {
   // Trying using this method to dump an RDD to the console when running locally.
   // By default, it prints the first 100 lines of output, but you can call dump
   // with another number as the second argument to change that.
-  def dump(rdd: RDD[_], n: Int = 100) = rdd
-      .collect()        // Convert to a regular in-memory collection.
-      .take(n)          // Take the first n lines.
-      .foreach(println) // Print the query results.
+  def dump(rdd: RDD[_], n: Int = 100) =
+    rdd.take(n).foreach(println) // Take the first n lines, then print them.
 
   def main(args: Array[String]): Unit = {
 

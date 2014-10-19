@@ -45,7 +45,7 @@ import hiveContext._   // Make methods local, as for SQLContext
 def hql2(title: String, query: String, n: Int = 100): Unit = {
   println(title)
   println(s"Running query: $query")
-  hql(query).collect.take(n).foreach(println)
+  hql(query).take(n).foreach(println)
 }
 
 // Let's create a database for our work:
@@ -62,7 +62,7 @@ hql2("Use the work database:", "USE work")
 //    It must be an absolute path.
 // 2. Omit the trailing "/" in the LOCATION path.
 // 3. Omit semicolons at the end of the HQL (Hive SQL) string.
-// 4. The query results are in an RDD; use collect.print*...
+// 4. The query results are in an RDD.
 
 // A copy of the the KJV data in its own directory, because Hive only
 // works with directories for locations.

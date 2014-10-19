@@ -662,7 +662,16 @@ Don't forget the try the exercises at the end of the source file.
 
 For Hadoop execution, you'll need to edit the source code on cluster or edge node or the sandbox. One way is to simply use an editor on the node, i.e., `vi` or `emacs` to edit the code. Another approach is to use the secure copy command, `scp`, to copy edited sources to and from your workstation.
 
-For sandboxes, the best approach is to share one or more directories between your workstation and the VM Linux instance. This will allow you to edit the code in your workstation environment with the changes immediately available in the VM. See the documentation for your VM runner for details.
+For sandboxes, the best approach is to share this workshop's root directory between your workstation and the VM Linux instance. This will allow you to edit the code in your workstation environment with the changes immediately available in the VM. See the documentation for your VM runner for details on sharing folders.
+
+For example, in VMWare, the *Sharing* panel lets you specify workstation directories to share. In the Linux VM, run the following commands as `root` to mount all shared directories under `/home/shares` (or use a different location):
+
+```
+mkdir -p /home/shares
+mount -t vmhgfs .host:/ /home/shares
+```
+
+Now any shared workstation folders will appear under `/home/shares`.
 
 ## Matrix4
 
@@ -886,7 +895,7 @@ Each output record has the following form: `(word, (doc1, n1), (doc2, n2), ...)`
 
 It's worth studying this sequence of transformations to understand how it works. Many problems can be solves with these techniques. You might try reading a smaller input file (say the first 5 lines of the crawl output), then hack on the script to dump the [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) after each step.
 
-A few useful [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) methods for exploration include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "regular" Scala collection and then use `println`, etc. to dump the contents.
+A few useful [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) methods for exploration include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "regular" Scala collection (don't use for massive data sets!).
 
 ## NGrams6
 
@@ -1095,19 +1104,13 @@ Time: 1413724627000 ms
 ...
 ```
 
-The time stamp will increent by 2000 ms each time, because that's the size of our batch intervals. This output comes from the `print` method in the program (discussed below), which is a useful debug tool for seeing the first 10 or so values in the current batch `RDD`.
+The time stamp will increment by 2000 ms each time, because we're running with 2-second batch intervals. This particular output comes from the `print` method in the program (discussed below), which is a useful debug tool for seeing the first 10 or so values in the current batch `RDD`.
 
 At the same time, you'll see new directories appear in `output`, one per batch. They are named like `output/wc-streaming-1413724628000.out`, again with a timestamp appended to our default output argument `output/wc-streaming`. Each of these will contain the usual `_SUCCESS` and `part-0000N` files, one for each core that the job can get!
 
-Now let's run with socket input. In Activator or SBT, run `SparkStreaming8MainSocket` as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8socket`. In either case, the extra option `--socket localhost:9900` is passed to `SparkStreaming8Main` to read data from a socket at this address. It will use `DataSocketServer` for this purpose.
+Now let's run with socket input. In Activator or SBT, run `SparkStreaming8MainSocket`. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming8Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming8 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
 
 The console output and the directory output should be very similar to the output of the previous run.
-
-To run the same logic in Hadoop, there is `hadoop.HSparkStreaming8` driver, **but don't invoke it directly**, because it doesn't also run one of the `Data*server` processes. Instead, pass the `--hadoop` flag to `SparkStreaming8Main`. (You'll have)
-Do these steps again with the Hadoop version, `scripts/sparkstreaming8.sh`. This script works just like the other Hadoop scripts we described previously. It invokes `$SPARK_HOME/bin/spark-submit`. Don't forget to start `nc` again.
-
-What if kill the `nc` process? `SparkStreaming8` detects that the socket dropped and starts shutting down, which takes a few moments. The program has a "listener" that
-triggers shutdown when the socket drops. However, by default, Spark Streaming will attempt to re-establish the connection, which is probably what you would want in a real, long-running system.
 
 `SparkStreaming8` supports the following command-line options:
 
@@ -1119,7 +1122,21 @@ run-main SparkStreaming8 [ -h | --help] \
   [-q | --quiet]
 ```
 
-Where the default is `--inpath data/kjvdat.txt`. However, it is ignored if the `--socket` option is given. By default, 30 seconds is used for the terminate option, after which time it exits. Pass 0 for no termination.
+Where the default is `--inpath tmp/wc-streaming`. This is the directory that will be watched for data, which `DataDirectoryserver` will populate. However, the `--inpath` argument is ignored if the `--socket` argument is given.
+
+By default, 30 seconds is used for the terminate option, after which time it exits. Pass 0 for no termination.
+
+Note that there's no argument for the data file. That's an extra option supported by `SparkStreaming8Main` (`SparkStreaming8` is agnostic to the source!):
+
+```
+  -d | --data  file
+```
+
+The default is `data/kjvdat.txt`.
+
+To run the same logic in Hadoop, there is `hadoop.HSparkStreaming8` driver. Similarly to `SparkStreaming8Main`, it starts the `DataSocketSever` process *locally* (outside of Hadoop), then submits `SparkStreaming8` to your Hadoop environment. There is also a script driver, `scripts/sparkstreaming8.sh`.
+
+Note that the Hadoop implementation of this example doesn't support watching for new files in a directory. That's not a Spark Streaming limitation.
 
 ## How Spark Streaming Works
 
@@ -1150,22 +1167,28 @@ The `EndOfStreamListener` will be used to detect when a socket connection drops.
 ```
 ...
 val conf = new SparkConf()
-         .setMaster("local[2]")
+         .setMaster("local[*]")
          .setAppName("Spark Streaming (8)")
          .set("spark.cleaner.ttl", "60")
          .set("spark.files.overwrite", "true")
          // If you need more memory:
          // .set("spark.executor.memory", "1g")
 val sc  = new SparkContext(conf)
-val ssc = new StreamingContext(sc, Seconds(1))
-ssc.addStreamingListener(EndOfStreamListener(ssc))
 ```
 
-Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use at least 2 cores when running locally, which is specified using `setMaster("local[2]")` to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html).
+
+Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use at least 2 cores when running locally to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html). We use `*` to let it use as many cores as it can, `setMaster("local[*]")`
 
 Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/latest/configuration.html) for more details.
 
-With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval. Finally, we add a listener for socket drops.
+With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval, 2 seconds. The best choice will depend on the data rate, how soon the events need processing, etc. Then, we add a listener for socket drops:
+
+```
+val ssc = new StreamingContext(sc, Seconds(2))
+ssc.addStreamingListener(EndOfStreamListener(ssc))
+```
+
+If a socket connection wasn't specified, then use the `input-path` to read from one or more files (the default case). Otherwise use a socket. An `InputDStream` is returned in either case as `lines`. The two methods `useDirectory` and `useSocket` are listed below.
 
 ```
 try {
@@ -1174,9 +1197,7 @@ try {
     else useSocket(ssc, argz("socket"))
 ```
 
-If a socket connection wasn't specified, then use the `input-path` to read from one or more files (the default case). Otherwise use a socket. An `InputDStream` is returned in either case as `lines`. The two methods `useDirectory` and `useSocket` are listed below.
-
-From the `DStream` (Discretized Stream) that fronts either the socket or the files, an RDD will be periodically generated for each discrete chunk of (possibly empty) data in each 1-second interval.
+The `lines` value is a `DStream` (Discretized Stream) that encapsulates the logic for listening to a socket or watching for new files in a directory. At each batch interval (2 seconds in our case), an RDD will be generated to hold the events received in that interval. For low data rates, an RDD could be empty.
 
 Now we implement an incremental word count:
 
@@ -1193,8 +1214,8 @@ Now we implement an incremental word count:
   wordCounts.saveAsTextFiles(out, "out")
 
   ssc.start()
-  if (argz("no-term") == "") ssc.awaitTermination(5 * 1000)
-  else  ssc.awaitTermination()
+  if (term > 0) ssc.awaitTermination(term * 1000)
+  else ssc.awaitTermination()
 
 } finally {
   // Having the ssc.stop here is only needed when we use the timeout.
@@ -1207,7 +1228,7 @@ This works much like our previous word count logic, except for the use of `trans
 
 The `DStream` also provides the ability to do *window operations*, e.g., a moving average over the last N intervals.
 
-Lastly, we wait for termination. We set a `timeout` of 5 seconds unless the `--no-term` option was specified.
+Lastly, we wait for termination. The `term` value is the number of seconds to run before terminating. The default value is 30 seconds, but the user can specify a value of 0 to mean no termination.
 
 The code ends with `useSocket` and `useDirectory`:
 
@@ -1235,6 +1256,9 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
+See also [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and [DataSocketServer.scala](
+#code/src/main/scala/sparkworkshop/util/DataSocketServer.scala).
+
 This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
 
 ## SparkSQL9
@@ -1249,13 +1273,11 @@ Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and del
 
 This example treats the KJV text we've been using as a table with a schema. It runs several queries on the data.
 
-There is a `SparkSQL9.scala` program that you can run as before, but SQL queries are more interesting when used interactively. So, there's also a "script" form called `SparkSQL9-script.scala`, which we'll look at instead. Then we'll see how to run this code and thereby learn how to use the Spark interactive shell, even in Hadoop!
+There is a `SparkSQL9.scala` program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called `SparkSQL9-script.scala`, which we'll look at instead. (There are minor differences in how output is handled.)
 
-The codez!
+The codez:
 
 ```
-// Adapted from SparkSQL9, but written as a script for easy use with the
-// spark-shell command.
 import com.typesafe.sparkworkshop.util.Verse
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.rdd.RDD
@@ -1263,23 +1285,23 @@ import org.apache.spark.rdd.RDD
 
 The helper class `Verse` will be used to define the schema for Bible verses. Note the new imports.
 
-Next define a convenience function for collecting an `RDD` into an array and dumping its contents to the console. Since there could be a lot of "records", we'll take the first `n`, where `n` defaults to 100.
+Next, define a convenience function for taking the first `n` records of an `RDD` (`n` defaults to 100) and printing each one to the console:
 
 ```
-def dump(rdd: RDD[_], n: Int = 100) = rdd
-  .collect()        // Convert to a regular in-memory collection.
-  .take(n)          // Take the first n lines.
-  .foreach(println) // Print the query results.
+def dump(rdd: RDD[_], n: Int = 100) =
+  rdd.take(n).foreach(println) // Take the first n lines, then print them.
 ```
 
-Now create a [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) that wraps the SparkContext, just like the `StreamingContext` did. We don't show this here, but in fact you can mix SparkSQL _and_ Spark Streaming in the same program.
+Now create a [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) that wraps the `SparkContext`, just like the `StreamingContext` did. We don't show this here, but in fact you can mix SparkSQL _and_ Spark Streaming in the same program.
 
 ```
+val sc = new SparkContext(argz("master"), "Spark SQL (9)")
 val sqlc = new SQLContext(sc)
 import sqlc._
 ```
 
 The import statement brings SQL-specific functions and values in scope.
+(Scala allows importing members of objects, while Java only allows importing `static` members of classes.)
 
 Next we use a regex to parse the input verses and extract the book abbreviation, chapter number, verse number, and text. The fields are separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
 
@@ -1299,7 +1321,7 @@ val verses = sc.textFile(argz("input-path")) flatMap {
 }
 ```
 
-Register the RDD as a temporary "table", so we can write SQL queries against it. As the name implies, this "table" only exists for the life of the process. Then we write queries and dump the results!
+Register the RDD as a temporary "table", so we can write SQL queries against it. As the name implies, this "table" only exists for the life of the process. Then we write queries and save the results back to the file system.
 
 ```
 verses.registerTempTable("kjv_bible")
@@ -1321,19 +1343,19 @@ Note that the SQL dialect currently supported by the `sql` method is a subset of
 
 ## Using SQL in the Spark Shell
 
-So, how do we use this script? To run it in Hadoop, you can run the script using the following script command, which wraps Spark's own `spark-shell`:
+So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the `scripts` directory:
 
 ```
 scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala
 ```
 
-Or, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the the first time:
+Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
 
 ```
 scripts/sparkshell.sh
 ```
 
-This script does some set up, but essentially its equivalent to the following:
+Th `sparkshell.sh` script does some set up, but essentially its equivalent to the following:
 
 ```
 $SPARK_HOME/bin/spark-shell \
@@ -1360,19 +1382,19 @@ To enter the statements using copy and paste, just paste them at the `scala>` pr
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
 
-> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it isn the `hadoop` package.
+> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
 
 The key [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD) methods are `SchemaRDD.saveAsParquetFile(outpath)` and `SqlContext.parquetFile(inpath)`. The rest of the details are very similar to the previous exercise.
 
-See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9`.
+See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9-script.scala`.
 
 ## HiveSQL11
 
 [HiveSQL11.scala](#code/src/main/scala/sparkworkshop/hadoop/HiveSQL11.scala)
 
-The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL library, but Hive's.
+The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL engine, but Hive's.
 
-> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it isn the `hadoop` package.
+> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
 
 Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
 
@@ -1395,7 +1417,7 @@ val user = sys.env.get("USER") match {
 }
 ```
 
-Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.LocalHiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we collect the result into an array and print each line.
+Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.LocalHiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
 
 ```
 val sc = new SparkContext("local[2]", "Hive SQL (10)")
@@ -1405,7 +1427,7 @@ import hiveContext._   // Make methods local, like for SQLContext
 def hql2(title: String, query: String, n: Int = 100): Unit = {
   println(title)
   println(s"Running query: $query")
-  hql(query).collect.take(n).foreach(println)
+  hql(query).take(n).foreach(println)
 }
 ```
 
@@ -1431,6 +1453,10 @@ A few points to keep in mind:
 
 * **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's own REPL or scripts, they cause errors here!
 * The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `hql2`.
+
+## Wrapping Up
+
+That's it for the examples and exercises based on them. Let's wrap up with a few tips and suggestions for further information.
 
 ## Tip: Writing Serializable Closures
 
