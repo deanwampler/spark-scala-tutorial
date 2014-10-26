@@ -61,7 +61,6 @@ object SparkStreaming8Main extends sparkstreaming.ThreadStarter {
     val out    = argz("output-path")
     val data   = argz("source-data-file")
     val socket = argz("socket")
-    val usehadoop = argz("hadoop").toBoolean
     val rmWatchedDir = argz("remove-watched-dir").toBoolean
 
     // Need to remove the data argument before calling SparkStreaming8.
