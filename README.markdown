@@ -185,16 +185,16 @@ Otherwise, we don't use package prefixes, but only because they tend to be incon
 Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
 * **Intro1:** The first example is actually run using the interactive `spark-shell`, as we'll see.
-* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, this example uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a `README` that discusses the sources of the data files.) This example hard-codes various information, so we'll only run it in local mode.
-* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a small library to handle input command-line arguments, which we won't discuss in detail. This example and all subsequent examples run locally and in Hadoop.
+* **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.)
+* **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 * **Matrix4:** Demonstrates using explicit parallelism on a simplistic Matrix application.
-* **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM. (Part 1/1 for example 5.)
-* **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails). (Part 2/2 for example 5.)
+* **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
+* **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins as shown in this simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SparkSQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in previous exercises.
-* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, a popular file format with good performance. This example and the next one are in a `hadoop` package, because they use features that are difficult to run outside Hadoop.
+* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop.
+* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example. This example and the next one are in a `hadoop` subdirectory, because they uses features that require a Hadoop cluster (more details later on).
 * **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
 
 Let's now work through these exercises...
