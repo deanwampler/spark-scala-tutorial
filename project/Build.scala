@@ -76,12 +76,8 @@ object ActivatorSparkBuild extends Build {
       // running, so we make it a dependency of run.
       (run in Compile) <<= (run in Compile) dependsOn (packageBin in Compile),
       libraryDependencies ++= Dependencies.activatorspark,
-<<<<<<< HEAD
       excludeFilter in unmanagedSources := (
         HiddenFileFilter || "Intro1*" || "SparkSQL9-script*" || "HiveSQL*" || "SparkSQLParquet*"),
-=======
-      excludeFilter in unmanagedSources := (HiddenFileFilter || "Intro1*" || "HiveSQL*" || "SparkSQLParquet*"),
->>>>>>> 705ed3081b9de099e60aaf2aa500da5d5d98ccbd
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
       // Must run Spark tests sequentially because they compete for port 4040!
