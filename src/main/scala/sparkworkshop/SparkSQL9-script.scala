@@ -4,6 +4,8 @@ import com.typesafe.sparkworkshop.util.Verse
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.rdd.RDD
 
+val inputPath = "data/kjvdat.txt"
+
 // Dump an RDD to the console when running locally.
 // By default, it prints the first 100 lines of output, but you can call dump
 // with another number as the second argument to change that.
@@ -17,7 +19,7 @@ import sqlc._
 // Also strips the trailing "~" in the KJV file.
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
 // Use flatMap to effectively remove bad lines.
-val verses = sc.textFile(argz("input-path")) flatMap {
+val verses = sc.textFile(inputPath) flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
