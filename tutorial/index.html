@@ -1227,7 +1227,7 @@ scala&gt; :quit
 
 <p>Let&#8217;s discuss the code hightlights. There is additional imports for Hive:</p>
 <pre><code class="(null)">import org.apache.spark.sql._
-import org.apache.spark.sql.hive.LocalHiveContext
+import org.apache.spark.sql.hive.HiveContext
 import com.typesafe.sparkworkshop.util.Verse</code></pre>
 
 <p>We need the user name.</p>
@@ -1238,9 +1238,9 @@ import com.typesafe.sparkworkshop.util.Verse</code></pre>
     &quot;root&quot;
 }</code></pre>
 
-<p>Create a <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.LocalHiveContext">HiveContext</a>, analogous to the previous <code>SQLContext</code>. Then define a helper function to run the query using the new <code>hql</code> function, after which we print each line.</p>
+<p>Create a <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext">HiveContext</a>, analogous to the previous <code>SQLContext</code>. Then define a helper function to run the query using the new <code>hql</code> function, after which we print each line.</p>
 <pre><code class="(null)">val sc = new SparkContext(&quot;local[2]&quot;, &quot;Hive SQL (10)&quot;)
-val hiveContext = new LocalHiveContext(sc)
+val hiveContext = new HiveContext(sc)
 import hiveContext._   // Make methods local, like for SQLContext
 
 def hql2(title: String, query: String, n: Int = 100): Unit = {

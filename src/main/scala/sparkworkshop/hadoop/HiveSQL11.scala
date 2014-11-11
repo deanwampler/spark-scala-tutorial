@@ -6,7 +6,7 @@
 // import org.apache.spark.SparkContext
 // import org.apache.spark.SparkContext._
 import org.apache.spark.sql._
-import org.apache.spark.sql.hive.LocalHiveContext
+import org.apache.spark.sql.hive.HiveContext
 import com.typesafe.sparkworkshop.util.Verse
 
 /**
@@ -34,10 +34,9 @@ val user = sys.env.get("USER") match {
 // that starts up an instance of Hive where metadata is stored locally in
 // an in-process "metastore", which is stored in the ./metadata directory.
 // Similarly, the ./warehouse directory is used for the regular data
-// "warehouse".
-// If you have a Hive installation, you might try using HiveContext instead to
-// connect to your existing metastore.
-val hiveContext = new LocalHiveContext(sc)
+// "warehouse". HiveContext reads your hive-site.xml file to determine properties
+// like the hostname and port.
+val hiveContext = new HiveContext(sc)
 import hiveContext._   // Make methods local, as for SQLContext
 
 // The "hql" method let's us run the full set of Hive SQL statements.

@@ -1402,7 +1402,7 @@ Let's discuss the code hightlights. There is additional imports for Hive:
 
 ```
 import org.apache.spark.sql._
-import org.apache.spark.sql.hive.LocalHiveContext
+import org.apache.spark.sql.hive.HiveContext
 import com.typesafe.sparkworkshop.util.Verse
 ```
 
@@ -1417,11 +1417,11 @@ val user = sys.env.get("USER") match {
 }
 ```
 
-Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.LocalHiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
+Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
 
 ```
 val sc = new SparkContext("local[2]", "Hive SQL (10)")
-val hiveContext = new LocalHiveContext(sc)
+val hiveContext = new HiveContext(sc)
 import hiveContext._   // Make methods local, like for SQLContext
 
 def hql2(title: String, query: String, n: Int = 100): Unit = {
