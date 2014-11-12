@@ -786,7 +786,29 @@ This version of the program doesn't work correctly with HDFS, in part because it
 
 So, for Hadoop, select and run [hadoop.HCrawl5aHDFS](#code/src/main/scala/sparkworkshop/hadoop.HCrawl5aHDFS.scala) in the UI, use `run-main hadoop.HCrawl5aHDFS` or `hex5a` in the Activator shell. There is also a bash script [scripts/crawlhdfs5a.sh](#code/scripts/crawlhdfs5a.sh).
 
-Most of the code is straightforward. The comments explain the details.
+Also, to use this version, you have to stage the HAM and SPAM files, which this example uses, differently in HDFS. If you used the following command to put all the files into HDFS:
+
+```
+hadoop fs -put $SPARK_WORKSHOP/data data
+```
+
+where `$SPARK_WORKSHOP` is the root of this project, then you'll need to rearrange
+the Enron emails, as follows:
+
+```
+hadoop fs -mv data/enron-spam-ham/ham100/* data/enron-spam-ham
+hadoop fs -mv data/enron-spam-ham/spam100/* data/enron-spam-ham
+hadoop fs -rm -r -f data/enron-spam-ham/spam100
+hadoop fs -rm -r -f data/enron-spam-ham/ham100
+```
+
+Finanlly, run this sanity check; there should be 200 files and no directories:
+
+```
+hadoop fs -ls data/enron-spam-ham
+```
+
+Back to `Crawl5aHDFS`, most of its code is straightforward. The comments explain the details.
 
 The output format is `(email_file_name, text)`. Here is one line from the output :
 
