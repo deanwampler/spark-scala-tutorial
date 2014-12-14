@@ -13,64 +13,9 @@ If you are most interested in using Spark with Hadoop, the Hadoop vendors have p
 
 For more advanced Spark training and services from Typesafe, please visit [typesafe.com/reactive-big-data](http://www.typesafe.com/platform/reactive-big-data/spark).
 
-## Introduction: What Is Spark?
+## Setup Instructions
 
-Let's start with an overview of Spark, then discuss how to setup and use this workshop.
-
-[Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming.
-
-Spark includes support for event stream processing, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for working with data sets through SQL queries. It integrates the core Spark API with embedded SQL queries with defined schemas. It also offers [Hive](http://hive.apache.org) integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
-
-There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark's Python API. A Java API is also supported and R support is under development.
-
-## Why Spark?
-
-By 2013, it became increasingly clear that a successor was needed for the venerable [Hadoop MapReduce](http://wiki.apache.org/hadoop/MapReduce) compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.
-
-Spark was seen as the best, general-purpose alternative, so all the major Hadoop vendors announced support for it in their distributions.
-
-## Spark Clusters
-
-Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/latest/cluster-overview.html). Consider the following diagram:
-
-![](http://spark.apache.org/docs/latest/img/cluster-overview.png)
-
-Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, standalone (static cluster) mode, Mesos, and EC2.
-
-The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
-
-Because each application has its own executor process per node, applications can't share data through the *Spark Context*. External storage has to be used (e.g., the file system, a database, a message queue, etc.)
-
-## Resilient, Distributed Datasets
-
-The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in *Resilient, Distributed Datasets* (RDDs), where a logical data set is virtualized over the cluster.
-
-The user can specify that data in an RDD should be cached in memory for subsequent reuse. In contrast, MapReduce has no such mechanism, so a complex job requiring a sequence of MapReduce jobs will be penalized by a complete flush to disk of intermediate data, followed by a subsequent reloading into memory by the next job.
-
-RDDs support common data operations, such as *map*, *flatmap*, *filter*, *fold/reduce*, and *groupby*. RDDs are resilient in the sense that if a "partition" of data is lost on one node, it can be reconstructed from the original source without having to start the whole job over again.
-
-The architecture of RDDs is described in the research paper [Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf).
-
-## SparkSQL
-
-[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
-
-Several years ago, the Spark team ported the Hive query engine to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
-
-## The Spark Version
-
-This workshop uses Spark 1.1.0.
-
-The following documentation links provide more information about Spark:
-
-* [Documentation](http://spark.apache.org/docs/latest/).
-* [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package).
-
-The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
-
-## Setup for the Workshop
-
-You can work through the examples and exercises on a local workstation. I'll refer to this arrangement as *local mode*. If you have Hadoop installation available, including a virtual machine "sandbox" from one of the Hadoop vendors, you can also run most of the examples in that environment. I'll refer to this arrangement as *Hadoop mode*.
+You can work through the examples and exercises on a local workstation, so-called *local mode*. If you have Hadoop version 2 (YARN based) installation available, including a virtual machine "sandbox" from one of the Hadoop vendors, you can also run most of the examples in that environment. I'll refer to this arrangement as *Hadoop mode*.
 
 Let's discuss setup for local mode first.
 
@@ -78,7 +23,7 @@ Let's discuss setup for local mode first.
 
 Working in *local mode* makes it easy to edit, test, run, and debug applications quickly. Then, running them in Hadoop provides more real-world testing.
 
-We will build the examples and exercises using [SBT](http://www.scala-sbt.org/) or [Typesafe Activator](http://typesafe.com/activator). SBT is the de facto standard build tool for Scala. It is a command-line tool.
+We will build and run the examples and exercises using [Typesafe Activator](http://typesafe.com/activator), which includes web-based and command-line interfaces. Activator includes a build tool for Scala that we'll use to download the libraries we need and to build our examples.
 
 [Activator](https://typesafe.com/activator) is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example.
 
@@ -179,6 +124,62 @@ We're using a few conventions for the package structure and `main` class names:
 * `solns/AbcNFooBarBaz` - The solution to the "foo bar baz" exercise that's built on `AbcN`. These programs can also be invoked from the *Run* panel.
 
 Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* UI.
+
+## Introduction: What Is Spark?
+
+Let's start with an overview of Spark, then discuss how to setup and use this workshop.
+
+[Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming.
+
+Spark includes support for event stream processing, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for working with data sets through SQL queries. It integrates the core Spark API with embedded SQL queries with defined schemas. It also offers [Hive](http://hive.apache.org) integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
+
+There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark's Python API. A Java API is also supported and R support is under development.
+
+## Why Spark?
+
+By 2013, it became increasingly clear that a successor was needed for the venerable [Hadoop MapReduce](http://wiki.apache.org/hadoop/MapReduce) compute engine. MapReduce applications are difficult to write, but more importantly, MapReduce has significant performance limitations and it can't support event-streaming ("real-time") scenarios.
+
+Spark was seen as the best, general-purpose alternative, so all the major Hadoop vendors announced support for it in their distributions.
+
+## Spark Clusters
+
+Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion (and diagram) from the Spark documentation](http://spark.apache.org/docs/latest/cluster-overview.html). Consider the following diagram:
+
+![](http://spark.apache.org/docs/latest/img/cluster-overview.png)
+
+Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, standalone (static cluster) mode, Mesos, and EC2.
+
+The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
+
+Because each application has its own executor process per node, applications can't share data through the *Spark Context*. External storage has to be used (e.g., the file system, a database, a message queue, etc.)
+
+## Resilient, Distributed Datasets
+
+The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in *Resilient, Distributed Datasets* (RDDs), where a logical data set is virtualized over the cluster.
+
+The user can specify that data in an RDD should be cached in memory for subsequent reuse. In contrast, MapReduce has no such mechanism, so a complex job requiring a sequence of MapReduce jobs will be penalized by a complete flush to disk of intermediate data, followed by a subsequent reloading into memory by the next job.
+
+RDDs support common data operations, such as *map*, *flatmap*, *filter*, *fold/reduce*, and *groupby*. RDDs are resilient in the sense that if a "partition" of data is lost on one node, it can be reconstructed from the original source without having to start the whole job over again.
+
+The architecture of RDDs is described in the research paper [Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf).
+
+## SparkSQL
+
+[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
+
+Several years ago, the Spark team ported the Hive query engine to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
+
+## The Spark Version
+
+This workshop uses Spark 1.1.0.
+
+The following documentation links provide more information about Spark:
+
+* [Documentation](http://spark.apache.org/docs/latest/).
+* [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package).
+
+The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+
 
 ## The Exercises
 
