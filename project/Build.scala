@@ -4,10 +4,10 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "3.0.0"
+  val Version = "3.1.0"
   val ScalaVersion = "2.10.4"
 
-  lazy val buildSettings = Defaults.defaultSettings ++ Seq (
+  lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     name          := Name,
     version       := Version,
     scalaVersion  := ScalaVersion,
@@ -31,7 +31,7 @@ object Resolvers {
 // examples that explicitly use Hadoop.
 object Dependency {
   object Version {
-    val Spark        = "1.1.0"
+    val Spark        = "1.2.0"
     val HadoopClient = "1.0.4" // "2.4.0"
     val ScalaTest    = "2.1.4"
     val ScalaCheck   = "1.11.3"
@@ -80,6 +80,9 @@ object ActivatorSparkBuild extends Build {
         HiddenFileFilter || "Intro1*" || "SparkSQL9-script*" || "HiveSQL*" || "SparkSQLParquet*"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
+      // Must run the tests in separate JVMs to avoid mysterious
+      // scala.reflect.internal.MissingRequirementError errors.
+      fork in Test := true,
       // Must run Spark tests sequentially because they compete for port 4040!
       parallelExecution in Test := false))
 }
