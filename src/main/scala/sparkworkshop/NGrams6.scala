@@ -59,8 +59,12 @@ object NGrams6 {
     try {
 
       object CountOrdering extends Ordering[(String,Int)] {
-        def compare(a:(String,Int), b:(String,Int)) =
-          -(a._2 compare b._2)  // - so that it sorts descending
+        def compare(a:(String,Int), b:(String,Int)) = {
+          // Sort counts descending and so the test results are
+          // predictable, then phrases ascending.
+          val cntdiff = b._2 compare a._2
+          if (cntdiff != 0) cntdiff else (a._1 compare b._1)
+        }
       }
 
       // Load the input data. Note that NGrams across line boundaries are not
