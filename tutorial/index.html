@@ -531,7 +531,7 @@ import org.apache.spark.SparkContext._</code></pre>
         .map(line =&gt; TextUtil.toText(line.toLowerCase))
       input.cache</code></pre>
 
-<p>It starts out much like <code>WordCount2</code>, but it splits each line into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. The <code>|</code> is the field delimiter.</p>
+<p>It starts out much like <code>WordCount2</code>, but it uses a helper method <code>TextUtil.toText</code> to split each line from the religious texts into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. The <code>|</code> is the field delimiter. However, if other inputs are used, their text is returned unmodified.</p>
 
 <p>Only the text of each verse is kept this time. As before, the <code>input</code> reference is an <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> that we then cache. Note that calling <code>last</code> on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.</p>
 

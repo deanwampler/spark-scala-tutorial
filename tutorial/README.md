@@ -499,7 +499,7 @@ Okay, with all the invocation options out of the way, let's walk through the imp
 We start with import statements:
 
 ```
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
@@ -549,7 +549,7 @@ Now we create the `SparkContext` with the desired `master` setting. Then we proc
       input.cache
 ```
 
-It starts out much like `WordCount2`, but it splits each line into fields, where the lines are of the form: `book|chapter#|verse#|text`. The `|` is the field delimiter.
+It starts out much like `WordCount2`, but it uses a helper method `TextUtil.toText` to split each line from the religious texts into fields, where the lines are of the form: `book|chapter#|verse#|text`. The `|` is the field delimiter. However, if other inputs are used, their text is returned unmodified.
 
 Only the text of each verse is kept this time. As before, the `input` reference is an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) that we then cache. Note that calling `last` on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.
 
