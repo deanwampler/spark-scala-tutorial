@@ -29,7 +29,7 @@ object WordCount2 {
     try {
 
       val out = "output/kjv-wc2"
-      // Deleting old output (if any)
+      // Deleting old output (if any) DO NOT DO IN PRODUCTION!!      // Deleting old output (if any)
       FileUtil.rmrf(out)
 
       // Load the King James Version of the Bible, then convert

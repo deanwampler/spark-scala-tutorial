@@ -72,8 +72,8 @@ object NGrams6 {
 
       val ngramz = sc.textFile(argz("input-path"))
         .flatMap { line =>
-            val text = line.toLowerCase.split("\\s*\\|\\s*").last
-            ngramsRE.findAllMatchIn(text).map(_.toString)
+          val text = TextUtil.toText(line)
+          ngramsRE.findAllMatchIn(text).map(_.toString)
         }
         .map(ngram => (ngram, 1))
         .reduceByKey((count1, count2) => count1 + count2)

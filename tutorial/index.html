@@ -528,7 +528,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
     try {
       val input = sc.textFile(argz(&quot;input-path&quot;))
-        .map(line =&gt; line.toLowerCase.split(&quot;\\s*\\|\\s*&quot;).last)
+        .map(line =&gt; TextUtil.toText(line.toLowerCase))
       input.cache</code></pre>
 
 <p>It starts out much like <code>WordCount2</code>, but it splits each line into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. The <code>|</code> is the field delimiter.</p>
@@ -836,7 +836,7 @@ input
     case (word, path) =&gt; ((word, path), 1)
   }
   .reduceByKey{    // Count the equal (word, path) pairs, as before
-    case (count1, count2) =&gt; count1 + count2
+    (count1, count2) =&gt; count1 + count2
   }
   .map {           // Rearrange the tuples; word is now the key we want.
     case ((word, path), n) =&gt; (word, (path, n))
@@ -904,7 +904,7 @@ val n = argz(&quot;count&quot;).toInt</code></pre>
 
   val ngramz = sc.textFile(argz(&quot;input-path&quot;))
     .flatMap { line =&gt;
-        val text = line.toLowerCase.split(&quot;\\s*\\|\\s*&quot;).last
+        val text = TextUtil.toText(line.toLowerCase)
         ngramsRE.findAllMatchIn(text).map(_.toString)
     }
     .map(ngram =&gt; (ngram, 1))

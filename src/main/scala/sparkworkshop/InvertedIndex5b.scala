@@ -62,8 +62,9 @@ object InvertedIndex5b {
           case (word, path) => ((word, path), 1)
         }
         .reduceByKey{    // Count the equal (word, path) pairs, as before
-          case (count1, count2) => count1 + count2
+          (count1, count2) => count1 + count2
         }
+        // Instead, we could use placeholder "_" for each argument: .reduceByKey(_ + _)
         .map {           // Rearrange the tuples; word is now the key we want.
           case ((word, path), n) => (word, (path, n))
         }

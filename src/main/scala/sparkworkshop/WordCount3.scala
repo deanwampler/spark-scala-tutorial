@@ -41,7 +41,7 @@ object WordCount3 {
       // Note that calling "last" on the split array is robust against lines
       // that don't have the delimiter, if any.
       val input = sc.textFile(argz("input-path"))
-        .map(line => line.toLowerCase.split("\\s*\\|\\s*").last)
+        .map(line => TextUtil.toText(line.toLowerCase))
 
       // Cache the RDD in memory for fast, repeated access.
       // You don't have to do this and you shouldn't unless the data IS reused.

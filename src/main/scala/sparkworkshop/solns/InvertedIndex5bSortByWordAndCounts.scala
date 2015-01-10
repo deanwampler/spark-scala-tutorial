@@ -61,7 +61,7 @@ object InvertedIndex5bSortByWordAndCounts {
           case (word, path) => ((word, path), 1)
         }
         .reduceByKey{
-          case (count1, count2) => count1 + count2
+          (count1, count2) => count1 + count2
         }
         .map {
           case ((word, path), n) => (word, (path, n))
@@ -76,9 +76,10 @@ object InvertedIndex5bSortByWordAndCounts {
             val seq2 = seq.map {
               case (redundantWord, (path, n)) => (path, n)
             }.toSeq
-            // New: sort the sequence by count, descending
+            // New: sort the sequence by count, descending,
+            // and also by path so that tests pass predictably!
             .sortBy {
-              case (path, n) => -n
+              case (path, n) => (-n, path)
             }
             (word, seq2.mkString(", "))
         }

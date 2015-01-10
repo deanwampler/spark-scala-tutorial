@@ -545,7 +545,7 @@ Now we create the `SparkContext` with the desired `master` setting. Then we proc
 
     try {
       val input = sc.textFile(argz("input-path"))
-        .map(line => line.toLowerCase.split("\\s*\\|\\s*").last)
+        .map(line => TextUtil.toText(line.toLowerCase))
       input.cache
 ```
 
@@ -891,7 +891,7 @@ input
     case (word, path) => ((word, path), 1)
   }
   .reduceByKey{    // Count the equal (word, path) pairs, as before
-    case (count1, count2) => count1 + count2
+    (count1, count2) => count1 + count2
   }
   .map {           // Rearrange the tuples; word is now the key we want.
     case ((word, path), n) => (word, (path, n))
@@ -969,7 +969,7 @@ try {
 
   val ngramz = sc.textFile(argz("input-path"))
     .flatMap { line =>
-        val text = line.toLowerCase.split("\\s*\\|\\s*").last
+        val text = TextUtil.toText(line.toLowerCase)
         ngramsRE.findAllMatchIn(text).map(_.toString)
     }
     .map(ngram => (ngram, 1))

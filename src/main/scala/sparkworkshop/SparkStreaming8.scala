@@ -19,18 +19,11 @@ import org.apache.spark.streaming.scheduler.{
  * or NCat that comes with NMap (http://nmap.org/download.html), which is available
  * for more platforms (e.g., Windows). Use one or the other to send data to the
  * Spark Streaming process in *this* terminal window.
-<<<<<<< HEAD:src/main/scala/sparkworkshop/SparkStreaming8.scala
  * Start the NetCat/NCat process first. For NetCat (nc), use this command,
  * where you can choose a different port if you want:
  *   nc -c -l -p 9900
  * or if you get an error that "-c" isn't a valid option, just try this:
  *   nc -l 9900
-=======
- * Start the NetCat/NCat process first. For NetCat (nc), use this command:
- *   nc -c -l -p 9999
- * or if you get an error that "-c" isn't a valid option, just try this:
- *   nc -l 9999
->>>>>>> 705ed3081b9de099e60aaf2aa500da5d5d98ccbd:src/main/scala/com/typesafe/sparkworkshop/SparkStreaming8.scala
  * Back in the original terminal window, run SparkStreaming8 application with
  * the following option, using the same port:
  *   --socket localhost:9900
@@ -102,7 +95,8 @@ object SparkStreaming8 {
     val conf = new SparkConf()
              .setMaster(master)
              .setAppName("Spark Streaming (8)")
-             .set("spark.cleaner.ttl", "60")
+             // If you need to control clean up of older RDDs:
+             // .set("spark.cleaner.ttl", "60")
              .set("spark.files.overwrite", "true")
              // If you need more memory:
              // .set("spark.executor.memory", "1g")
