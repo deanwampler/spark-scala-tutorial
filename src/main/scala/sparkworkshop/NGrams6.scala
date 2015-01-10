@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
