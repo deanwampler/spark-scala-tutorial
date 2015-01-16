@@ -31,7 +31,7 @@ Activator also includes SBT, which the UI uses under the hood. You can use the *
 
 You'll need either Activator or SBT installed. We recommend Activator.
 
-To install Activator, follow the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
+If you are not *already* viewing this workshop in Activator, install it by following the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
 
 If you prefer SBT and you need to install it, follow the instructions on the [download](http://www.scala-sbt.org/download.html) page. SBT puts itself on your path. However, if you have a custom installation that isn't on your path, define the environment variable `SBT_HOME` (MacOS, Linux, or Cygwin only).
 
@@ -61,9 +61,11 @@ From now on, except where noted, the instructions apply for both your local work
 
 First, change to the root directory for this workshop.
 
-To work on your local workstation, run `activator ui`, assuming it's in your path, or use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, open [localhost:8888](http://localhost:8888) in your browser.)
+> NOTE: There is a bug in Activator version 1.2.X and earlier that causes output of the exercises to not appear in the web UI. The issue is fixed in the forthcoming version 1.3. Until it is released (mid February 2015), use the `shell` mode discussed next.
 
-If you prefer a command-line interface, either run `activator shell` or `sbt`.
+If you prefer a command-line interface, either run `activator shell` or `sbt`, depending on which tool you installed.
+
+To use Activator's UI, run `activator ui`, assuming it's in your path, or use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, open [localhost:8888](http://localhost:8888) in your browser.)
 
 If you are trying the workshop on a Hadoop cluster or edge node, or in a sandbox, change to the workshop root directory and run the command `./start.sh`. It will start Activator and load this workshop.
 
