@@ -4,7 +4,11 @@ import com.typesafe.sparkworkshop.util.Verse
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.rdd.RDD
 
-val inputPath = "data/kjvdat.txt"
+val inputRoot = "."
+// For HDFS:
+// val inputRoot = "hdfs://my_name_node_server:8020"
+
+val inputPath = s"$inputRoot/data/kjvdat.txt"
 
 // Dump an RDD to the console when running locally.
 // By default, it prints the first 100 lines of output, but you can call dump
@@ -45,14 +49,13 @@ dump(godVerses)  // print the 1st 100 lines
 // column aliasing, e.g., "COUNT(*) AS count". This makes it difficult
 // to write the following query result to Parquet, for example.
 // Nor does it appear to support WHERE clauses in some situations.
-val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-  // Collect all partitions into 1 partition. Otherwise, there are 100s
-  // output from the last query!
-  .coalesce(1)
+// Finally, "coalesce" all partitions into 1 partition. Otherwise, there are
+// 100s output from the last query!
+val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book").coalesce(1)
 dump(counts)  // print the 1st 100 lines
 
 // Exercise: Sort the output by the words. How much overhead does this add?
 // Exercise: Try a JOIN with the "abbrevs_to_names" data to convert the book
-//   abbreviations to full titles.
+//   abbreviations to full titles. (See solns/SparkSQL-script-...scala)
 // Exercise: Play with the SchemaRDD DSL.
 // Exercise: Try some of the other sacred text data files.
