@@ -1,5 +1,5 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /**
@@ -8,6 +8,7 @@ import org.apache.spark.SparkContext._
  * <li>A simpler approach is used for the algorithm.</li>
  * <li>A CommandLineOptions library is used.</li>
  * <li>The handling of the per-line data format is refined.</li>
+ * <li>We show how to use Kryo serialization for better efficiency.</li>
  * </ol>
  */
 object WordCount3 {
@@ -25,13 +26,21 @@ object WordCount3 {
     val argz   = options(args.toList)
     val master = argz("master")
     val quiet  = argz("quiet").toBoolean
+    val in     = argz("input-path")
     val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(master, "Word Count (3)")
+    // Let's use Kryo serialization. Here's how to set it up.
+    val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    // If the data had a custom type, we would want to register it. Kryo already
+    // handles common types, like String, which is all we use here:
+    // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
+
+    val sc = new SparkContext(conf)
 
     try {
       // Load the input text, convert each line to lower case, then split
@@ -40,8 +49,8 @@ object WordCount3 {
       // Keep only the text. The output is an RDD.
       // Note that calling "last" on the split array is robust against lines
       // that don't have the delimiter, if any.
-      val input = sc.textFile(argz("input-path"))
-        .map(line => TextUtil.toText(line.toLowerCase))
+      val input = sc.textFile(in)
+        .map(line => TextUtil.toText(line)) // also converts to lower case
 
       // Cache the RDD in memory for fast, repeated access.
       // You don't have to do this and you shouldn't unless the data IS reused.

@@ -532,7 +532,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
     try {
       val input = sc.textFile(argz(&quot;input-path&quot;))
-        .map(line =&gt; TextUtil.toText(line.toLowerCase))
+        .map(line =&gt; TextUtil.toText(line.toLowerCase))  // also converts to lower case
       input.cache</code></pre>
 
 <p>It starts out much like <code>WordCount2</code>, but it uses a helper method <code>TextUtil.toText</code> to split each line from the religious texts into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. The <code>|</code> is the field delimiter. However, if other inputs are used, their text is returned unmodified.</p>
@@ -908,7 +908,7 @@ val n = argz(&quot;count&quot;).toInt</code></pre>
 
   val ngramz = sc.textFile(argz(&quot;input-path&quot;))
     .flatMap { line =&gt;
-        val text = TextUtil.toText(line.toLowerCase)
+        val text = TextUtil.toText(line.toLowerCase) // also converts to lower case
         ngramsRE.findAllMatchIn(text).map(_.toString)
     }
     .map(ngram =&gt; (ngram, 1))

@@ -72,7 +72,7 @@ object NGrams6 {
 
       val ngramz = sc.textFile(argz("input-path"))
         .flatMap { line =>
-          val text = TextUtil.toText(line)
+          val text = TextUtil.toText(line) // also converts to lower case
           ngramsRE.findAllMatchIn(text).map(_.toString)
         }
         .map(ngram => (ngram, 1))

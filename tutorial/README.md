@@ -420,7 +420,7 @@ At the end of each example source file, you'll find exercises you can try. Solut
 
 [WordCount3.scala](#code/src/main/scala/sparkworkshop/WordCount3.scala)
 
-This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it.
+This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it. When we set up the `SparkContext`, we also use [Kryo Serialization](http://spark.apache.org/docs/1.2.0/tuning.html), which provides better compression and therefore better utilization of memory and network bandwidth.
 
 We'll run this example in both local mode and in Hadoop (YARN).
 
@@ -522,6 +522,7 @@ object WordCount3 {
     val argz   = options(args.toList)
     val master = argz("master")
     val quiet  = argz("quiet").toBoolean
+    val in     = argz("input-path")
     val out    = argz("output-path")
 ```
 
@@ -540,14 +541,23 @@ Next, if we're running in local mode, we delete the old output, if any:
 
 Note that this logic is only invoked in local mode, because `FileUtil` only works locally. We also delete old data from HDFS when running in Hadoop, but deletion is handled through a different mechanism, as we'll see shortly.
 
-Now we create the `SparkContext` with the desired `master` setting. Then we process the input as before, with one change...
+Now we create a `SparkConf` to configure the `SparkContext` with the desired `master` setting, application name, and the use of Kryo serialization. 
 
 ```
+    val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
     val sc = new SparkContext(master, "Word Count (3)")
+```
 
+Note the commented line. For best use of Kryo, you should "register" the classes you'll be serializing. However, Kryo already "knows" about common types, such as `String`, which is what we're using here, so we don't need this statement.
+
+Now we process the input as before, with one change...
+
+```
     try {
       val input = sc.textFile(argz("input-path"))
-        .map(line => TextUtil.toText(line.toLowerCase))
+        .map(line => TextUtil.toText(line)) // also converts to lower case
       input.cache
 ```
 
@@ -971,7 +981,7 @@ try {
 
   val ngramz = sc.textFile(argz("input-path"))
     .flatMap { line =>
-        val text = TextUtil.toText(line.toLowerCase)
+        val text = TextUtil.toText(line) // also converts to lower case
         ngramsRE.findAllMatchIn(text).map(_.toString)
     }
     .map(ngram => (ngram, 1))
