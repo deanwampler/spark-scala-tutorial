@@ -23,6 +23,7 @@ File | Description
 `ugntdat.txt` | The Greek New Testament.
 `apodat.txt` | The Apocrypha (in English).
 `abbrevs-to-names.tsv` | A map from the book abbreviations used in these texts to the full book names. Derived using data from the sacred-texts.com site.
+`gallic-mb-txt` | An English translation of Julius Caesar's famous memoir, _Gallic Wars_.
 
 There are many other texts from the world's religious traditions at the [www.sacred-texts.com](http://www.sacred-texts.com) site, but most of the others aren't formatted into one convenient file like these examples.
 
