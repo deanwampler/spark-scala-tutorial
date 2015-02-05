@@ -54,6 +54,10 @@ LOCATION 'hdfs://server/user/<USER>/data/abbrevs_to_names';
 
 Note that the field delimiter is tab, not "|".
 
+## Julius Caesar's "Gallic Wars"
+
+`gallic-mb-txt` is an English translation of Julius Caesar's famous memoir, _Gallic Wars_ about his conquest of Gaul (roughly modern France, the French part of Switzerland, and parts of Germany).
+
 ## Email Classified as SPAM and HAM
 
 A sample of SPAM/HAM classified emails from the well-known Enron email data set was adapted from [this research project](http://www.aueb.gr/users/ion/data/enron-spam/). Each file is plain text, partially formatted (i.e., with `name:value` headers) as used in email servers and clients.
