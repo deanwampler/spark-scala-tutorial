@@ -157,6 +157,8 @@ Because each application has its own executor process per node, applications can
 
 ## Resilient, Distributed Datasets
 
+![Three RDDs Partitioned Across a Cluster of Four Nodes](images/RDD.jpg)
+
 The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in *Resilient, Distributed Datasets* (RDDs), where a logical data set is virtualized over the cluster.
 
 The user can specify that data in an RDD should be cached in memory for subsequent reuse. In contrast, MapReduce has no such mechanism, so a complex job requiring a sequence of MapReduce jobs will be penalized by a complete flush to disk of intermediate data, followed by a subsequent reloading into memory by the next job.
@@ -1175,7 +1177,11 @@ Note that the Hadoop implementation of this example doesn't support watching for
 
 ## How Spark Streaming Works
 
+![DStream with N RDDs](images/DStream.jpg)
+
 Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on *deltas* of data, say all the events received within one-second intervals (which is what we used here). Deltas of one second to several minutes are most common. Each delta of events is stored in its own [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) encapsulated in a [DStream](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.dstream.DStream) ("Discretized Stream").
+
+You can also define a moving window over one or more batches, for example if you want to compute running statistics.
 
 A [StreamingContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.StreamingContext) is used to wrap the normal [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext), too.
 
