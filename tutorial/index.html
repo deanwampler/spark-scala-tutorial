@@ -169,6 +169,11 @@
 
 </div><div><h2 id="resilientdistributeddatasets">Resilient, Distributed Datasets</h2>
 
+<figure>
+<img src="../images/RDD.jpg" alt="Three RDDs Partitioned Across a Cluster of Four Nodes" />
+<figcaption>Three RDDs Partitioned Across a Cluster of Four Nodes</figcaption>
+</figure>
+
 <p>The data caching is one of the key reasons that Spark&#8217;s performance is considerably better than the performance of MapReduce. Spark stores the data for the job in <em>Resilient, Distributed Datasets</em> (RDDs), where a logical data set is virtualized over the cluster.</p>
 
 <p>The user can specify that data in an RDD should be cached in memory for subsequent reuse. In contrast, MapReduce has no such mechanism, so a complex job requiring a sequence of MapReduce jobs will be penalized by a complete flush to disk of intermediate data, followed by a subsequent reloading into memory by the next job.</p>
@@ -1040,7 +1045,14 @@ Time: 1413724627000 ms
 
 </div><div><h2 id="howsparkstreamingworks">How Spark Streaming Works</h2>
 
+<figure>
+<img src="../images/DStream.jpg" alt="DStream with N RDDs" />
+<figcaption>DStream with N RDDs</figcaption>
+</figure>
+
 <p>Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on <em>deltas</em> of data, say all the events received within one-second intervals (which is what we used here). Deltas of one second to several minutes are most common. Each delta of events is stored in its own <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> encapsulated in a <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.dstream.DStream">DStream</a> (&#8220;Discretized Stream&#8221;).</p>
+
+<p>You can also define a moving window over one or more batches, for example if you want to compute running statistics.</p>
 
 <p>A <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.StreamingContext">StreamingContext</a> is used to wrap the normal <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext">SparkContext</a>, too.</p>
 
