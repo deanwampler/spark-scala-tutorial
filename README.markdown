@@ -157,7 +157,7 @@ Because each application has its own executor process per node, applications can
 
 ## Resilient, Distributed Datasets
 
-![Three RDDs Partitioned Across a Cluster of Four Nodes](images/RDD.jpg)
+![Three RDDs Partitioned Across a Cluster of Four Nodes](https://raw.githubusercontent.com/deanwampler/spark-workshop/master/images/RDD.jpg)
 
 The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in *Resilient, Distributed Datasets* (RDDs), where a logical data set is virtualized over the cluster.
 
@@ -543,7 +543,7 @@ Next, if we're running in local mode, we delete the old output, if any:
 
 Note that this logic is only invoked in local mode, because `FileUtil` only works locally. We also delete old data from HDFS when running in Hadoop, but deletion is handled through a different mechanism, as we'll see shortly.
 
-Now we create a `SparkConf` to configure the `SparkContext` with the desired `master` setting, application name, and the use of Kryo serialization. 
+Now we create a `SparkConf` to configure the `SparkContext` with the desired `master` setting, application name, and the use of Kryo serialization.
 
 ```
     val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
@@ -1177,7 +1177,7 @@ Note that the Hadoop implementation of this example doesn't support watching for
 
 ## How Spark Streaming Works
 
-![DStream with N RDDs](images/DStream.jpg)
+![DStream with N RDDs](https://raw.githubusercontent.com/deanwampler/spark-workshop/master/images/DStream.jpg)
 
 Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on *deltas* of data, say all the events received within one-second intervals (which is what we used here). Deltas of one second to several minutes are most common. Each delta of events is stored in its own [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) encapsulated in a [DStream](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.dstream.DStream) ("Discretized Stream").
 
