@@ -51,7 +51,7 @@ object WordCount2 {
       // values are the 1s, which are added together, effectively counting
       // the occurrences of each word.
       val wc = input
-        .flatMap(line => line.split("""\W+"""))
+        .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .map(word => (word, 1))
         .reduceByKey((count1, count2) => count1 + count2)
 
