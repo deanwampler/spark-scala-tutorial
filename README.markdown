@@ -37,6 +37,8 @@ If you prefer SBT and you need to install it, follow the instructions on the [do
 
 ## Setup for Hadoop Mode
 
+> NOTE: If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. Also, this "mode" is not as well tested as I would like, so please report bugs!
+
 If you want to run the examples on Hadoop, choose one of the following options.
 
 The Hadoop vendors all provide virtual machine "sandboxes" that you can load into [VMWare](http://vmware.com), [VirtualBox](http://virtualbox.org), and other virtualization environments. Most of them now bundle Spark. Check the vendor's documentation.
