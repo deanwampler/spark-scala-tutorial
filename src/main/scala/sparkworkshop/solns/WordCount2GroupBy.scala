@@ -25,7 +25,7 @@ object WordCount2GroupBy {
       // Otherwise, you'll use RAM inefficiently.
       input.cache
 
-      // Split on non-alphanumeric sequences of characters. Since each single
+      // Split on non-alphabetic sequences of characters. Since each single
       // line is converted to a sequence of words, we use flatMap to flatten
       // the sequence of sequences into a single sequence of words.
       // These words are then mapped into tuples that add a count of 1
@@ -35,7 +35,7 @@ object WordCount2GroupBy {
       // values are the 1s, which are added together, effectively counting
       // the occurrences of each word.
       val wc = input
-        .flatMap(line => line.split("""\W+"""))
+        .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .map(word => (word, 1))
         .reduceByKey((count1, count2) => count1 + count2)
         .groupBy(tuple => tuple._2)   // group by the counts!

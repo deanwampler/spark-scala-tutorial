@@ -47,7 +47,7 @@ object InvertedIndex5bSortByWordAndCounts {
 
       if (!quiet) println(s"Writing output to: $out")
 
-      // Split on non-alphanumeric sequences of character as before.
+      // Split on non-alphabetic sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
       input
@@ -55,7 +55,7 @@ object InvertedIndex5bSortByWordAndCounts {
           case (path, text) =>
             // If we don't trim leading whitespace, the regex split creates
             // an undesired leading "" word!
-            text.trim.split("""\W+""") map (word => (word, path))
+            text.trim.split("""[^\p{IsAlphabetic}]+""") map (word => (word, path))
         }
         .map {
           case (word, path) => ((word, path), 1)

@@ -387,7 +387,7 @@ val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 input.cache
 
 val wc = input
-  .flatMap(line => line.split("""\W+"""))
+  .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
   .map(word => (word, 1))
   .reduceByKey((count1, count2) => count1 + count2)
 
@@ -397,11 +397,11 @@ wc.saveAsTextFile(out)
 
 Because Spark follows Hadoop conventions that it won't overwrite existing data, we delete any previous output, if any. Of course, you should only do this in production jobs when you know it's okay!
 
-Next we load and cache the data like we did previously.
+Next we load and cache the data like we did previously, but this time, it's questionable whether caching is useful, since we will make a single pass through the data. I left this statement here just to remind you of this feature.
 
 Now we setup a pipeline of operations to perform the word count.
 
-First the line is split into words using as the separator any run of characters that isn't alphanumeric (e.g., whitespace and punctuation). This also conveniently removes the trailing `~` characters at the end of each line that exist in the file for some reason. `input.flatMap(line => line.split(...))` maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The `flat` part flattens those nested collections into a single, "flat" collection of words.
+First the line is split into words using as the separator any run of characters that isn't alphabetic, e.g., digits, whitespace, and punctuation. (Note: using `"\\W+"` doesn't work well for non-UTF8 character sets!) This also conveniently removes the trailing `~` characters at the end of each line that exist in the file for some reason. `input.flatMap(line => line.split(...))` maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The `flat` part flattens those nested collections into a single, "flat" collection of words.
 
 The next two lines convert the single word "records" into tuples with the word and a count of `1`. In Shark, the first field in a tuple will be used as the default key for joins, group-bys, and the `reduceByKey` we use next.
 
@@ -562,20 +562,17 @@ Now we process the input as before, with one change...
     try {
       val input = sc.textFile(argz("input-path"))
         .map(line => TextUtil.toText(line)) // also converts to lower case
-      input.cache
 ```
 
-It starts out much like `WordCount2`, but it uses a helper method `TextUtil.toText` to split each line from the religious texts into fields, where the lines are of the form: `book|chapter#|verse#|text`. The `|` is the field delimiter. However, if other inputs are used, their text is returned unmodified.
-
-Only the text of each verse is kept this time. As before, the `input` reference is an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) that we then cache. Note that calling `last` on the split array is robust even for lines that don't have the delimiter, if there are any; it simply returns the whole original string.
+It starts out much like `WordCount2`, but it uses a helper method `TextUtil.toText` to split each line from the religious texts into fields, where the lines are of the form: `book|chapter#|verse#|text`. The `|` is the field delimiter. However, if other inputs are used, their text is returned unmodified. As before, the `input` reference is an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD). NOte that I omitted a subsequent call to `input.cache` as in `WordCount2`, because we are making a single pass through the data.
 
 ```
       val wc2 = input
-        .flatMap(line => line.split("""\W+"""))
+        .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .countByValue()  // Returns a Map[T, Long]
 ```
 
-Take `input` and split on non-alphanumeric sequences of character as we did in `WordCount2`, but rather than map to `(word, 1)` tuples and use `reduceByKey`, we simply treat the words as values and call `countByValue` to count the unique occurrences. Hence, this is a simpler and more efficient approach.
+Take `input` and split on non-alphabetic sequences of character as we did in `WordCount2`, but rather than map to `(word, 1)` tuples and use `reduceByKey`, we simply treat the words as values and call `countByValue` to count the unique occurrences. Hence, this is a simpler and more efficient approach.
 
 ```
       val wc2b = wc2a.map(key_value => s"${key_value._1},${key_value._2}").toSeq
@@ -888,7 +885,7 @@ The embedded comments in the rest of the code explains each step:
 ```
 if (!quiet)  println(s"Writing output to: $out")
 
-// Split on non-alphanumeric sequences of character as before.
+// Split on non-alphabetic sequences of character as before.
 // Rather than map to "(word, 1)" tuples, we treat the words by values
 // and count the unique occurrences.
 input
@@ -898,7 +895,7 @@ input
     case (path, text) =>
       // If we don't trim leading whitespace, the regex split creates
       // an undesired leading "" word!
-      text.trim.split("""\W+""") map (word => (word, path))
+      text.trim.split("""[^\p{IsAlphabetic}]+""") map (word => (word, path))
   }
   .map {
     // We're going to use the (word, path) tuple as a key for counting
@@ -1245,7 +1242,7 @@ The `lines` value is a `DStream` (Discretized Stream) that encapsulates the logi
 Now we implement an incremental word count:
 
 ```
-  val words = lines.flatMap(line => line.split("""\W+"""))
+  val words = lines.flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
 
   val pairs = words.map(word => (word, 1))
   val wordCounts = pairs.transform(rdd => rdd.reduceByKey(_ + _))

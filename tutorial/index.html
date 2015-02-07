@@ -48,7 +48,7 @@
 </div><div><h2 id="setupforhadoopmode">Setup for Hadoop Mode</h2>
 
 <blockquote>
-<p>NOTE: If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. Also, this "mode" is not as well tested as I would like, so please report bugs!</p>
+<p>NOTE: If you are here to learn Spark, you don&#8217;t need to setup these exercises for Hadoop execution. Come back to these instructions when you&#8217;re ready to try working with Spark on Hadoop. Also, this &#8220;mode&#8221; is not as well tested as I would like, so please report bugs!</p>
 </blockquote>
 
 <p>If you want to run the examples on Hadoop, choose one of the following options.</p>
@@ -382,7 +382,7 @@ val input = sc.textFile(&quot;data/kjvdat.txt&quot;).map(line =&gt; line.toLower
 input.cache
 
 val wc = input
-  .flatMap(line =&gt; line.split(&quot;&quot;&quot;\W+&quot;&quot;&quot;))
+  .flatMap(line =&gt; line.split(&quot;&quot;&quot;[^\p{IsAlphabetic}]+&quot;&quot;&quot;))
   .map(word =&gt; (word, 1))
   .reduceByKey((count1, count2) =&gt; count1 + count2)
 
@@ -391,11 +391,11 @@ wc.saveAsTextFile(out)</code></pre>
 
 <p>Because Spark follows Hadoop conventions that it won&#8217;t overwrite existing data, we delete any previous output, if any. Of course, you should only do this in production jobs when you know it&#8217;s okay!</p>
 
-<p>Next we load and cache the data like we did previously.</p>
+<p>Next we load and cache the data like we did previously, but this time, it&#8217;s questionable whether caching is useful, since we will make a single pass through the data. I left this statement here just to remind you of this feature.</p>
 
 <p>Now we setup a pipeline of operations to perform the word count.</p>
 
-<p>First the line is split into words using as the separator any run of characters that isn&#8217;t alphanumeric (e.g., whitespace and punctuation). This also conveniently removes the trailing <code>~</code> characters at the end of each line that exist in the file for some reason. <code>input.flatMap(line =&gt; line.split(...))</code> maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The <code>flat</code> part flattens those nested collections into a single, &#8220;flat&#8221; collection of words.</p>
+<p>First the line is split into words using as the separator any run of characters that isn&#8217;t alphabetic, e.g., digits, whitespace, and punctuation. (Note: using <code>&quot;\\W+&quot;</code> doesn&#8217;t work well for non-UTF8 character sets!) This also conveniently removes the trailing <code>~</code> characters at the end of each line that exist in the file for some reason. <code>input.flatMap(line =&gt; line.split(...))</code> maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The <code>flat</code> part flattens those nested collections into a single, &#8220;flat&#8221; collection of words.</p>
 
 <p>The next two lines convert the single word &#8220;records&#8221; into tuples with the word and a count of <code>1</code>. In Shark, the first field in a tuple will be used as the default key for joins, group-bys, and the <code>reduceByKey</code> we use next.</p>
 
@@ -523,7 +523,7 @@ import org.apache.spark.SparkContext._</code></pre>
 
 <p>Note that this logic is only invoked in local mode, because <code>FileUtil</code> only works locally. We also delete old data from HDFS when running in Hadoop, but deletion is handled through a different mechanism, as we&#8217;ll see shortly.</p>
 
-<p>Now we create a <code>SparkConf</code> to configure the <code>SparkContext</code> with the desired <code>master</code> setting, application name, and the use of Kryo serialization. </p>
+<p>Now we create a <code>SparkConf</code> to configure the <code>SparkContext</code> with the desired <code>master</code> setting, application name, and the use of Kryo serialization.</p>
 <pre><code class="(null)">    val conf = new SparkConf().setMaster(master).setAppName(&quot;Word Count (3)&quot;)
     conf.set(&quot;spark.serializer&quot;, &quot;org.apache.spark.serializer.KryoSerializer&quot;)
     // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
@@ -534,17 +534,14 @@ import org.apache.spark.SparkContext._</code></pre>
 <p>Now we process the input as before, with one change&#8230;</p>
 <pre><code class="(null)">    try {
       val input = sc.textFile(argz(&quot;input-path&quot;))
-        .map(line =&gt; TextUtil.toText(line)) // also converts to lower case
-      input.cache</code></pre>
+        .map(line =&gt; TextUtil.toText(line)) // also converts to lower case</code></pre>
 
-<p>It starts out much like <code>WordCount2</code>, but it uses a helper method <code>TextUtil.toText</code> to split each line from the religious texts into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. The <code>|</code> is the field delimiter. However, if other inputs are used, their text is returned unmodified.</p>
-
-<p>Only the text of each verse is kept this time. As before, the <code>input</code> reference is an <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a> that we then cache. Note that calling <code>last</code> on the split array is robust even for lines that don&#8217;t have the delimiter, if there are any; it simply returns the whole original string.</p>
+<p>It starts out much like <code>WordCount2</code>, but it uses a helper method <code>TextUtil.toText</code> to split each line from the religious texts into fields, where the lines are of the form: <code>book|chapter#|verse#|text</code>. The <code>|</code> is the field delimiter. However, if other inputs are used, their text is returned unmodified. As before, the <code>input</code> reference is an <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD">RDD</a>. NOte that I omitted a subsequent call to <code>input.cache</code> as in <code>WordCount2</code>, because we are making a single pass through the data.</p>
 <pre><code class="(null)">      val wc2 = input
-        .flatMap(line =&gt; line.split(&quot;&quot;&quot;\W+&quot;&quot;&quot;))
+        .flatMap(line =&gt; line.split(&quot;&quot;&quot;[^\p{IsAlphabetic}]+&quot;&quot;&quot;))
         .countByValue()  // Returns a Map[T, Long]</code></pre>
 
-<p>Take <code>input</code> and split on non-alphanumeric sequences of character as we did in <code>WordCount2</code>, but rather than map to <code>(word, 1)</code> tuples and use <code>reduceByKey</code>, we simply treat the words as values and call <code>countByValue</code> to count the unique occurrences. Hence, this is a simpler and more efficient approach.</p>
+<p>Take <code>input</code> and split on non-alphabetic sequences of character as we did in <code>WordCount2</code>, but rather than map to <code>(word, 1)</code> tuples and use <code>reduceByKey</code>, we simply treat the words as values and call <code>countByValue</code> to count the unique occurrences. Hence, this is a simpler and more efficient approach.</p>
 <pre><code class="(null)">      val wc2b = wc2a.map(key_value =&gt; s&quot;${key_value._1},${key_value._2}&quot;).toSeq
       val wc2 = sc.makeRDD(wc2b, 1)
 
@@ -804,7 +801,7 @@ hadoop fs -rm -r -f data/enron-spam-ham/ham100</code></pre>
 <p>The embedded comments in the rest of the code explains each step:</p>
 <pre><code class="(null)">if (!quiet)  println(s&quot;Writing output to: $out&quot;)
 
-// Split on non-alphanumeric sequences of character as before.
+// Split on non-alphabetic sequences of character as before.
 // Rather than map to &quot;(word, 1)&quot; tuples, we treat the words by values
 // and count the unique occurrences.
 input
@@ -814,7 +811,7 @@ input
     case (path, text) =&gt;
       // If we don&apos;t trim leading whitespace, the regex split creates
       // an undesired leading &quot;&quot; word!
-      text.trim.split(&quot;&quot;&quot;\W+&quot;&quot;&quot;) map (word =&gt; (word, path))
+      text.trim.split(&quot;&quot;&quot;[^\p{IsAlphabetic}]+&quot;&quot;&quot;) map (word =&gt; (word, path))
   }
   .map {
     // We&apos;re going to use the (word, path) tuple as a key for counting
@@ -1103,7 +1100,7 @@ ssc.addStreamingListener(EndOfStreamListener(ssc))</code></pre>
 <p>The <code>lines</code> value is a <code>DStream</code> (Discretized Stream) that encapsulates the logic for listening to a socket or watching for new files in a directory. At each batch interval (2 seconds in our case), an RDD will be generated to hold the events received in that interval. For low data rates, an RDD could be empty.</p>
 
 <p>Now we implement an incremental word count:</p>
-<pre><code class="(null)">  val words = lines.flatMap(line =&gt; line.split(&quot;&quot;&quot;\W+&quot;&quot;&quot;))
+<pre><code class="(null)">  val words = lines.flatMap(line =&gt; line.split(&quot;&quot;&quot;[^\p{IsAlphabetic}]+&quot;&quot;&quot;))
 
   val pairs = words.map(word =&gt; (word, 1))
   val wordCounts = pairs.transform(rdd =&gt; rdd.reduceByKey(_ + _))

@@ -113,7 +113,7 @@ object SparkStreaming8SQL {
         else useSocket(ssc, argz("socket"))
 
       // Word Count...
-      val words = lines.flatMap(line => line.split("""\W+"""))
+      val words = lines.flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
 
       val pairs = words.map(word => (word, 1))
       val wordCounts = pairs.reduceByKey(_ + _)

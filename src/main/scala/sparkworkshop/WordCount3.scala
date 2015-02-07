@@ -3,7 +3,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /**
- * Second implementation of Word Count that makes the following changes:
+ * This second implementation of Word Count that makes the following changes:
  * <ol>
  * <li>A simpler approach is used for the algorithm.</li>
  * <li>A CommandLineOptions library is used.</li>
@@ -49,19 +49,15 @@ object WordCount3 {
       // Keep only the text. The output is an RDD.
       // Note that calling "last" on the split array is robust against lines
       // that don't have the delimiter, if any.
+      // (Don't cache this time, as we're making a single pass through the data.)
       val input = sc.textFile(in)
         .map(line => TextUtil.toText(line)) // also converts to lower case
 
-      // Cache the RDD in memory for fast, repeated access.
-      // You don't have to do this and you shouldn't unless the data IS reused.
-      // Otherwise, you'll use RAM inefficiently.
-      input.cache
-
-      // Split on non-alphanumeric sequences of character as before.
+      // Split on non-alphabetic sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
       val wc2a = input
-        .flatMap(line => line.split("""\W+"""))
+        .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .countByValue()  // Returns a Map[T, Long]
 
       // ... and convert back to an RDD for output, with one "slice".

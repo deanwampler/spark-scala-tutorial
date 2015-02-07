@@ -41,11 +41,14 @@ object WordCount2 {
       // Otherwise, you'll use RAM inefficiently.
       input.cache
 
-      // Split on non-alphanumeric sequences of characters. Since each single
-      // line is converted to a sequence of words, we use flatMap to flatten
-      // the sequence of sequences into a single sequence of words.
-      // These words are then mapped into tuples that add a count of 1
-      // for the word.
+      // Split on non-alphabetic sequences of characters. Note the regex used;
+      // the similar, non-alphanumeric alternative """\W+""", does not work well
+      // with non-UTF8 character sets! 
+      // Since each single line is converted to a sequence of words, we use 
+      // flatMap to flatten the sequence of sequences into a single sequence of 
+      // words. These words are then mapped into tuples that add a count of 1
+      // for the word. Note the simplistic approach to tokenization; we just
+      // split on any run of characters that isn't alphabetic.
       // Finally, reduceByKey functions like a SQL "GROUP BY" followed by
       // a count of the elements in each group. The words are the keys and
       // values are the 1s, which are added together, effectively counting

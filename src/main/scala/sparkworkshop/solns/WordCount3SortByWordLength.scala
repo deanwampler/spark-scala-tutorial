@@ -1,11 +1,17 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
-import org.apache.spark.SparkContext
+import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /**
- * Second, simpler implementation of Word Count.
- * Solution to the exercise that orders by word length. We'll add the length
- * to the output, as the 2nd field after the word itself.
+ * Second, simpler implementation of Word Count, with a solution to the exercise
+ * that orders by word length. We'll add the length to the output, as the 2nd
+ * field after the word itself. Other changes from WordCount2:
+ * <ol>
+ * <li>A simpler approach is used for the algorithm.</li>
+ * <li>A CommandLineOptions library is used.</li>
+ * <li>The handling of the per-line data format is refined.</li>
+ * <li>We show how to use Kryo serialization for better efficiency.</li>
+ * </ol>
  */
 object WordCount3SortByWordLength {
   def main(args: Array[String]): Unit = {
@@ -23,25 +29,34 @@ object WordCount3SortByWordLength {
     val argz   = options(args.toList)
     val master = argz("master")
     val quiet  = argz("quiet").toBoolean
+    val in     = argz("input-path")
     val out    = argz("output-path")
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(master, "Word Count (3)")
+    // Let's use Kryo serialization. Here's how to set it up.
+    val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    // If the data had a custom type, we would want to register it. Kryo already
+    // handles common types, like String, which is all we use here:
+    // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
+
+    val sc = new SparkContext(conf)
 
     try {
-      // Load the King James Version of the Bible, then convert
-      // each line to lower case, creating an RDD.
-      val input = sc.textFile(argz("input-path")).map(line => line.toLowerCase)
+      // Load the input text, convert each line to lower case, then split
+      // into fields:
+      //   book|chapter|verse|text
+      // Keep only the text. The output is an RDD.
+      // Note that calling "last" on the split array is robust against lines
+      // that don't have the delimiter, if any.
+      // (Don't cache this time, as we're making a single pass through the data.)
+      val input = sc.textFile(in)
+        .map(line => TextUtil.toText(line)) // also converts to lower case
 
-      // Cache the RDD in memory for fast, repeated access.
-      // You don't have to do this and you shouldn't unless the data IS reused.
-      // Otherwise, you'll use RAM inefficiently.
-      input.cache
-
-      // Split on non-alphanumeric sequences of character as before.
+      // Split on non-alphabetic sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
       // Note that this implementation would not be a good choice at very
@@ -50,7 +65,7 @@ object WordCount3SortByWordLength {
       // Try redoing it with the WordCount3 "reduceByKey" approach. What
       // changes are required to the rest of the script?
       val wc2a = input
-        .flatMap(line => line.split("""\W+"""))
+        .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .countByValue()  // Returns a Map[T, Long]
         .toVector        // Extract into a sequence that can be sorted.
         .map{ case (word, count) => (word, word.length, count) } // add length
@@ -68,11 +83,11 @@ object WordCount3SortByWordLength {
       wc2.saveAsTextFile(out)
 
     } finally {
-      // Stop (shut down) the context.
       sc.stop()
     }
 
     // Exercise: Try different arguments for the input and output.
     //   NOTE: I've observed 0 output for some small input files!
+    // Exercise: Don't discard the book names.
   }
 }
