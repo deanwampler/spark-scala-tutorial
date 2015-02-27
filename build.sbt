@@ -48,3 +48,7 @@ addCommandAlias("hex7",  "run-main hadoop.HJoins7")
 addCommandAlias("hex8",  "run-main hadoop.HSparkStreaming8")
 
 addCommandAlias("hex9",  "run-main hadoop.HSparkSQL9")
+
+
+fork in run := true
+
