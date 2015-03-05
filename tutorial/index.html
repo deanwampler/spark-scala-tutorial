@@ -825,16 +825,15 @@ input
   .map {           // Rearrange the tuples; word is now the key we want.
     case ((word, path), n) =&gt; (word, (path, n))
   }
-  .groupBy {       // Group the same words together
-    case (word, (path, n)) =&gt; word
-  }
-  .map {           // reformat the output; make string of the groups.
-    case (word, seq) =&gt;
-      val seq2 = seq map {
-        case (redundantWord, (path, n)) =&gt; (path, n)
-      }
-      (word, seq2.mkString(&quot;, &quot;))
-  }
+  .groupByKey      // There is a also a more general groupBy
+  // reformat the output; make a string of each group,
+  // a sequence, &quot;(path1, n1) (path2, n2), (path3, n3)...&quot;
+  .mapValues(iterator =&gt; iterator.mkString(&quot;, &quot;))
+  // mapValues is like the following map, but more efficient, as we skip
+  // pattern matching on the key (&quot;word&quot;), etc.
+  // .map {
+  //   case (word, seq) =&gt; (word, seq.mkString(&quot;, &quot;))
+  // }
   .saveAsTextFile(out)
 } finally { ... }</code></pre>
 

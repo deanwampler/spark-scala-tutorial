@@ -68,16 +68,15 @@ object InvertedIndex5b {
         .map {           // Rearrange the tuples; word is now the key we want.
           case ((word, path), n) => (word, (path, n))
         }
-        .groupBy {       // Group the same words together
-          case (word, (path, n)) => word
-        }
-        .map {           // reformat the output; make string of the groups.
-          case (word, seq) =>
-            val seq2 = seq map {
-              case (redundantWord, (path, n)) => (path, n)
-            }
-            (word, seq2.mkString(", "))
-        }
+        .groupByKey      // There is a also a more general groupBy
+        // reformat the output; make a string of each group,
+        // a sequence, "(path1, n1) (path2, n2), (path3, n3)..."
+        .mapValues(iterator => iterator.mkString(", "))
+        // mapValues is like the following map, but more efficient, as we skip
+        // pattern matching on the key ("word"), etc.
+        // .map {
+        //   case (word, seq) => (word, seq.mkString(", "))
+        // }
         .saveAsTextFile(out)
     } finally {
       sc.stop()
