@@ -4,8 +4,8 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "3.2.0"
-  val ScalaVersion = "2.10.4"
+  val Version = "3.3.0"
+  val ScalaVersion = "2.10.5"
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     name          := Name,
@@ -31,7 +31,7 @@ object Resolvers {
 // examples that explicitly use Hadoop.
 object Dependency {
   object Version {
-    val Spark        = "1.2.0"
+    val Spark        = "1.2.1"
     val ScalaTest    = "2.1.4"
     val ScalaCheck   = "1.11.3"
   }
