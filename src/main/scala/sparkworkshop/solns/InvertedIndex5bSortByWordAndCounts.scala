@@ -66,22 +66,16 @@ object InvertedIndex5bSortByWordAndCounts {
         .map {
           case ((word, path), n) => (word, (path, n))
         }
-        .groupBy {
-          case (word, (path, n)) => word
-        }
+        .groupByKey      // There is a also a more general groupBy
+        // reformat the output; make a string of each group,
+        // a sequence, "(path1, n1) (path2, n2), (path3, n3)..."
         // New: sort by Key (word).
         .sortByKey(ascending = true)
-        .map {
-          case (word, seq) =>
-            val seq2 = seq.map {
-              case (redundantWord, (path, n)) => (path, n)
-            }.toSeq
-            // New: sort the sequence by count, descending,
-            // and also by path so that tests pass predictably!
-            .sortBy {
-              case (path, n) => (-n, path)
-            }
-            (word, seq2.mkString(", "))
+        // New: sort the sequence by count, descending,
+        // and also by path, which isn't strictly necessary, but doing so
+        // ensures that unit tests pass predictably!
+        .mapValues { iterator =>
+           iterator.toSeq.sortBy { case (path, n) => (-n, path) }.mkString(", ")
         }
         .saveAsTextFile(out)
     } finally {

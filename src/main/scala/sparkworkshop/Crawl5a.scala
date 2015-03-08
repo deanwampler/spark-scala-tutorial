@@ -8,83 +8,50 @@ import org.apache.spark.rdd.RDD
 
 /**
  * Simulate a web crawl to prep. data for InvertedIndex5b.
- * Crawl is designed to read the files in a directory tree. It uses the
- * file name as the key and the contents as the value. This script also
- * uses Java's local filesystem I/O library, which means the script can't
- * work in Hadoop as written, because HDFS is not POSIX compliant. However,
- * see the companion program, Crawl5aHDFS, which uses a different Spark API
- * call to ingest the data as needed.
+ * Crawl uses <code>SparkContext.wholeTextFiles</code> to read the files
+ * in a directory hierarchy and return a single RDD with records of the form:
+ *    <code>(file_name, file_contents)</code>
+ * After loading with <code>SparkContext.wholeTextFiles</code>, we post process
+ * the data in two ways. First, we the <code>file_name</code> will be an
+ * absolute path, which is normally what you would want. However, to make it
+ * easier to support running the corresponding unit test <code>Crawl5aSpec</code>
+ * anywhere, we strip all leading path elements. Second, the <code>file_contents</code>
+ * still contains linefeeds. We remove those, so that <code>InvertedIndex5b</code>
+ * can treat each line as a complete record.
  */
 object Crawl5a {
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]) = {
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
-      CommandLineOptions.inputPath("data/enron-spam-ham"),
+      CommandLineOptions.inputPath("data/enron-spam-ham/*"), // Note the "*"
       CommandLineOptions.outputPath("output/crawl"),
       CommandLineOptions.master("local"),
       CommandLineOptions.quiet)
 
     val argz    = options(args.toList)
-    val master  = argz("master")
+    val master  = argz("master").toString
     val quiet   = argz("quiet").toBoolean
-    val out     = argz("output-path")
-    val in      = argz("input-path")
-    if (master.startsWith("local")) {
-      if (!quiet) println(s" **** Deleting old output (if any), $out:")
-      FileUtil.rmrf(out)
-    } else {
-      println("ERROR: Crawl5a only supports local mode execution.")
-      sys.exit(1)
-    }
+    val out     = argz("output-path").toString
+    val in      = argz("input-path").toString
 
-    val sc = new SparkContext(master, "Crawl (5a)")
+    val separator = java.io.File.separator
+
+    val sc = new SparkContext(master, "CrawlHDFS (5a)")
 
     try {
-      val files_rdds = ingestFiles(in, sc)
-      val names_contents = files_rdds map {
-        // fold to convert lines into a long, space-separated string.
-        // keyBy to generate a new RDD with schema (file_name, file_contents)
-        case (file, rdd) => (file.getName, rdd.fold("")(_ + " " + _))
-      }
-
-      // Convert back to an RDD and write the results.
-      if (!quiet) println(s"Writing output to: $out")
-      sc.makeRDD(names_contents).saveAsTextFile(out)
-
+      val files_contents = sc.wholeTextFiles(argz("input-path"))
+      if (!quiet) println(s"Writing ${files_contents.count} lines to: $out")
+      // See class notes above.
+      files_contents.map{
+        case (id, text) =>
+          val lastSep = id.lastIndexOf(separator)
+          val id2 = if (lastSep < 0) id.trim else id.substring(lastSep+1, id.length).trim
+          val text2 = text.trim.replaceAll("""\s*\n\s*""", " ")
+          (id2, text2)
+      }.saveAsTextFile(out)
     } finally {
       sc.stop()
     }
   }
-
-  /**
-   * Walk the directory tree. Read each file into an RDD, returning a sequence
-   * of them. Skip a README, if any, and any "hidden" files (".*") that are
-   * returned as directory contents.
-   */
-  protected def ingestFiles(path: String, sc: SparkContext): Seq[(File,RDD[String])] = {
-    val filter = new FilenameFilter {
-      val skipRE = """^(\..*|README).*""".r
-      def accept(directory: File, name: String): Boolean = name match {
-        case skipRE(ignore) => false
-        case _ => true
-      }
-    }
-
-    // A more scalable approach is to use an org.apache.spark.Accumulable
-    // shared variable. The implementation here is synchronous.
-    def toRDDs(file: File, accum: Seq[(File,RDD[String])]): Seq[(File,RDD[String])] =
-      if (file.isDirectory) {
-        // Process the directory (recursively) and fold its results in...
-        file.listFiles(filter).foldLeft(accum) ( (acc, f) => toRDDs(f, acc) )
-      } else {
-        (file, sc.textFile(file.getPath)) +: accum
-      }
-
-    toRDDs(new File(path), Seq.empty[(File,RDD[String])])
-  }
-
-  // EXERCISE: Try passing the input path argument in a different format:
-  //   sbt run-main spark.Crawl5a -i 'data/enron-spam-ham/ham100/*,data/enron-spam-ham/spam100/*' -o output/crawl2
-  //   How is the output different in output/crawl2?
 }
