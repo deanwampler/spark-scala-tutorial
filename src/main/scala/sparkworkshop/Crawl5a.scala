@@ -37,7 +37,7 @@ object Crawl5a {
 
     val separator = java.io.File.separator
 
-    val sc = new SparkContext(master, "CrawlHDFS (5a)")
+    val sc = new SparkContext(master, "Crawl (5a)")
 
     try {
       val files_contents = sc.wholeTextFiles(argz("input-path"))
