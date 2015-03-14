@@ -1,7 +1,7 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, Verse}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.rdd.RDD
 
 /**
@@ -48,7 +48,7 @@ object SparkSQL9 {
       // Also strips the trailing "~" in the KJV file.
       val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
       // Use flatMap to effectively remove bad lines.
-      val verses = sc.textFile(argz("input-path")) flatMap {
+      val versesRDD = sc.textFile(argz("input-path")) flatMap {
         case lineRE(book, chapter, verse, text) =>
           Seq(Verse(book, chapter.toInt, verse.toInt, text))
         case line =>
@@ -56,11 +56,12 @@ object SparkSQL9 {
           Seq.empty[Verse]  // Will be eliminated by flattening.
       }
 
-      // Register the RDD as a temporary "table".
+      // Create a DataFrame and register as a temporary "table".
       // The following expression invokes several "implicit" conversions and
       // methods that we imported through sqlc._ The actual method is
       // defined on org.apache.spark.sql.SchemaRDDLike, which also has a method
       // "saveAsParquetFile" to write a schema-preserving Parquet file.
+      val verses = sqlc.createDataFrame(versesRDD)
       verses.registerTempTable("kjv_bible")
       verses.cache()
 
@@ -68,19 +69,18 @@ object SparkSQL9 {
       println("Number of verses that mention God: "+godVerses.count())
 
       if (!quiet) println(s"Writing verses that mention God to: $outgv")
-      godVerses.saveAsTextFile(outgv)
+      godVerses.rdd.saveAsTextFile(outgv)
 
       // NOTE: The basic SQL dialect currently supported doesn't permit
       // column aliasing, e.g., "COUNT(*) AS count". This makes it difficult
       // to write the following query result to Parquet, for example.
       // Nor does it appear to support WHERE clauses in some situations.
       val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-        // Collect all partitions into 1 partition. Otherwise, there are 100s
-        // output from the last query!
-        .coalesce(1)
 
+      // Before writing, collect all partitions into 1 partition. Otherwise,
+      // there are 100s output from the last query!
       if (!quiet) println(s"Writing count of verses per book to: $outvpb")
-      counts.saveAsTextFile(outvpb)
+      counts.rdd.coalesce(1).saveAsTextFile(outvpb)
 
     } finally {
       sc.stop()

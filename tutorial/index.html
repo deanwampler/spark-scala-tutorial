@@ -17,7 +17,7 @@
 <a href="mailto:dean.wampler@typesafe.com">dean.wampler@typesafe.com</a><br/>
 <a href="https://twitter.com/deanwampler">@deanwampler</a></p>
 
-<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> <em>Big Data</em> applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.</p>
+<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> version 1.3 applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.</p>
 
 <p>If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine &#8220;sandboxes&#8221; with Spark included. See their websites for information.</p>
 
@@ -42,6 +42,10 @@
 <p>You&#8217;ll need either Activator or SBT installed. We recommend Activator.</p>
 
 <p>If you are not <em>already</em> viewing this workshop in Activator, install it by following the instructions on the <a href="https://typesafe.com/platform/getstarted">get started</a> page. After installing it, add the installation directory to your <code>PATH</code> or define the environment variable <code>ACTIVATOR_HOME</code> (MacOS, Linux, or Cygwin only).</p>
+
+<blockquote>
+<p><strong>NOTE:</strong> Activator version 1.3 or later is required.</p>
+</blockquote>
 
 <p>If you prefer SBT and you need to install it, follow the instructions on the <a href="http://www.scala-sbt.org/download.html">download</a> page. SBT puts itself on your path. However, if you have a custom installation that isn&#8217;t on your path, define the environment variable <code>SBT_HOME</code> (MacOS, Linux, or Cygwin only).</p>
 
@@ -71,10 +75,6 @@
 <p>From now on, except where noted, the instructions apply for both your local workstation and Hadoop setup.</p>
 
 <p>First, change to the root directory for this workshop.</p>
-
-<blockquote>
-<p>NOTE: There is a bug in Activator version 1.2.X and earlier that causes output of the exercises to not appear in the web UI. The issue is fixed in the forthcoming version 1.3. Until it is released (mid February 2015), use the <code>shell</code> mode discussed next.</p>
-</blockquote>
 
 <p>If you prefer a command-line interface, either run <code>activator shell</code> or <code>sbt</code>, depending on which tool you installed.</p>
 
@@ -417,7 +417,7 @@ wc.saveAsTextFile(out)</code></pre>
 
 <p><a href="#code/src/main/scala/sparkworkshop/WordCount3.scala">WordCount3.scala</a></p>
 
-<p>This exercise also implements <em>Word Count</em>, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won&#8217;t worry about the details of this utility code, just how to use it. When we set up the <code>SparkContext</code>, we also use <a href="http://spark.apache.org/docs/1.2.0/tuning.html">Kryo Serialization</a>, which provides better compression and therefore better utilization of memory and network bandwidth.</p>
+<p>This exercise also implements <em>Word Count</em>, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won&#8217;t worry about the details of this utility code, just how to use it. When we set up the <code>SparkContext</code>, we also use <a href="http://spark.apache.org/docs/latest/tuning.html">Kryo Serialization</a>, which provides better compression and therefore better utilization of memory and network bandwidth.</p>
 
 <p>We&#8217;ll run this example in both local mode and in Hadoop (YARN).</p>
 
@@ -1217,7 +1217,7 @@ dump(counts)  // print the 1st 100 lines</code></pre>
 
 <p>Th <code>sparkshell.sh</code> script does some set up, but essentially its equivalent to the following:</p>
 <pre><code class="(null)">$SPARK_HOME/bin/spark-shell \
-  --jars target/scala-2.10/activator-spark_2.10-2.1.0.jar [arguments]</code></pre>
+  --jars target/scala-2.10/activator-spark_2.10-3.4.0.jar [arguments]</code></pre>
 
 <p>The jar file contains all the project&#8217;s build artifacts (but not the dependencies).</p>
 

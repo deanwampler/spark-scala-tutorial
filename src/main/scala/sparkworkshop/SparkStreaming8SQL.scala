@@ -126,15 +126,16 @@ object SparkStreaming8SQL {
 
       wordCounts.window(Seconds(6), Seconds(2))
         .foreachRDD { wordCount =>
-          wordCount.registerTempTable("wordcount")
-          wordCount.printSchema
+          val df = sqlc.createDataFrame(wordCount)
+          df.registerTempTable("wordcount")
+          df.printSchema
           val topWCs = sql("""
             SELECT * FROM wordcount
             ORDER BY _2 DESC LIMIT 10""")
-          topWCs.saveAsTextFile(s"out-top10")
+          topWCs.rdd.saveAsTextFile(s"out-top10")
         }
       ssc.start()
-      if (term > 0) ssc.awaitTermination(term * 1000)
+      if (term > 0) ssc.awaitTerminationOrTimeout(term * 1000)
       else ssc.awaitTermination()
     } finally {
       // Having the ssc.stop here is only needed when we use the timeout.

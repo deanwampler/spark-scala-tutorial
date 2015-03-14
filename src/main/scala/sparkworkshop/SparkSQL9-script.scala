@@ -1,7 +1,7 @@
 // Adapted from SparkSQL9, but written as a script for easy use with the
 // spark-shell command.
 import com.typesafe.sparkworkshop.util.Verse
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.rdd.RDD
 
 val inputRoot = "."
@@ -10,11 +10,11 @@ val inputRoot = "."
 
 val inputPath = s"$inputRoot/data/kjvdat.txt"
 
-// Dump an RDD to the console when running locally.
+// Dump a DataFrame to the console when running locally.
 // By default, it prints the first 100 lines of output, but you can call dump
 // with another number as the second argument to change that.
-def dump(rdd: RDD[_], n: Int = 100) =
-  rdd.take(n).foreach(println) // Take the first n lines, then print them.
+def dump(df: DataFrame, n: Int = 100) =
+  df.take(n).foreach(println) // Take the first n lines, then print them.
 
 val sqlc = new SQLContext(sc)
 import sqlc._
@@ -23,7 +23,7 @@ import sqlc._
 // Also strips the trailing "~" in the KJV file.
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
 // Use flatMap to effectively remove bad lines.
-val verses = sc.textFile(inputPath) flatMap {
+val versesRDD = sc.textFile(inputPath) flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
@@ -31,11 +31,12 @@ val verses = sc.textFile(inputPath) flatMap {
     Seq.empty[Verse]  // Will be eliminated by flattening.
 }
 
-// Register the RDD as a temporary "table".
+// Create a DataFrame and register as a temporary "table".
 // The following expression invokes several "implicit" conversions and
 // methods that we imported through sqlc._ The actual method is
 // defined on org.apache.spark.sql.SchemaRDDLike, which also has a method
 // "saveAsParquetFile" to write a schema-preserving Parquet file.
+val verses = sqlc.createDataFrame(versesRDD)
 verses.registerTempTable("kjv_bible")
 verses.cache()
 dump(verses)  // print the 1st 100 lines

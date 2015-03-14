@@ -123,7 +123,7 @@ object SparkStreaming8 {
       wordCounts.saveAsTextFiles(out, "out")
 
       ssc.start()
-      if (term > 0) ssc.awaitTermination(term * 1000)
+      if (term > 0) ssc.awaitTerminationOrTimeout(term * 1000)
       else ssc.awaitTermination()
     } finally {
       // Having the ssc.stop here is only needed when we use the timeout.

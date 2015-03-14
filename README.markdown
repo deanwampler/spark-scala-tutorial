@@ -7,7 +7,7 @@ Dean Wampler, Ph.D.
 [dean.wampler@typesafe.com](mailto:dean.wampler@typesafe.com)
 [@deanwampler](https://twitter.com/deanwampler)
 
-This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) *Big Data* applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
+This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) version 1.3 applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
 
 If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine "sandboxes" with Spark included. See their websites for information.
 
@@ -32,6 +32,8 @@ Activator also includes SBT, which the UI uses under the hood. You can use the *
 You'll need either Activator or SBT installed. We recommend Activator.
 
 If you are not *already* viewing this workshop in Activator, install it by following the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
+
+> **NOTE:** Activator version 1.3 or later is required.
 
 If you prefer SBT and you need to install it, follow the instructions on the [download](http://www.scala-sbt.org/download.html) page. SBT puts itself on your path. However, if you have a custom installation that isn't on your path, define the environment variable `SBT_HOME` (MacOS, Linux, or Cygwin only).
 
@@ -62,8 +64,6 @@ You'll also need Activator or SBT on the server or sandbox to run the examples. 
 From now on, except where noted, the instructions apply for both your local workstation and Hadoop setup.
 
 First, change to the root directory for this workshop.
-
-> NOTE: There is a bug in Activator version 1.2.X and earlier that causes output of the exercises to not appear in the web UI. The issue is fixed in the forthcoming version 1.3. Until it is released (mid February 2015), use the `shell` mode discussed next.
 
 If you prefer a command-line interface, either run `activator shell` or `sbt`, depending on which tool you installed.
 
@@ -424,7 +424,7 @@ At the end of each example source file, you'll find exercises you can try. Solut
 
 [WordCount3.scala](#code/src/main/scala/sparkworkshop/WordCount3.scala)
 
-This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it. When we set up the `SparkContext`, we also use [Kryo Serialization](http://spark.apache.org/docs/1.2.0/tuning.html), which provides better compression and therefore better utilization of memory and network bandwidth.
+This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it. When we set up the `SparkContext`, we also use [Kryo Serialization](http://spark.apache.org/docs/latest/tuning.html), which provides better compression and therefore better utilization of memory and network bandwidth.
 
 We'll run this example in both local mode and in Hadoop (YARN).
 
@@ -1374,7 +1374,7 @@ Th `sparkshell.sh` script does some set up, but essentially its equivalent to th
 
 ```
 $SPARK_HOME/bin/spark-shell \
-  --jars target/scala-2.10/activator-spark_2.10-2.1.0.jar [arguments]
+  --jars target/scala-2.10/activator-spark_2.10-3.4.0.jar [arguments]
 ```
 
 The jar file contains all the project's build artifacts (but not the dependencies).
