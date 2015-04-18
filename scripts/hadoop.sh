@@ -84,7 +84,7 @@ outputs=($output)
 $HADOOP fs -test -d $output
 if [ $? -eq 0 ]
 then
-  echo "Contents of output directory:"
+  echo "Contents of the output directory:"
 else
   echo "Contents of the output directories:"
   output2=$(dirname $output)
