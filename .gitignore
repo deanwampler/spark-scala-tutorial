@@ -19,3 +19,7 @@ dist
 derby.log
 metastore
 .DS_Store
+init.d
+.sbtserver
+project/.sbtserver
+project/.sbtserver.lock
