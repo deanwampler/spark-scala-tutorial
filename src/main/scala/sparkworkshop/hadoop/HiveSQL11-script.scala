@@ -37,19 +37,20 @@ val user = sys.env.get("USER") match {
 // "warehouse". HiveContext reads your hive-site.xml file to determine properties
 // like the hostname and port.
 val hiveContext = new HiveContext(sc)
-import hiveContext._   // Make methods local, as for SQLContext
+import hiveContext._   // Make methods local, like sql
 
-// The "hql" method let's us run the full set of Hive SQL statements.
-// We wrap it in a helper method for conveniently dumping the results:
-def hql2(title: String, query: String, n: Int = 100): Unit = {
+// The "sql" method (previously called "sql" for HiveContext) let's us run the
+// full set of Hive SQL statements. We wrap it in a helper method for
+// conveniently dumping the results:
+def sql2(title: String, query: String, n: Int = 100): Unit = {
   println(title)
   println(s"Running query: $query")
-  hql(query).take(n).foreach(println)
+  sql(query).take(n).foreach(println)
 }
 
 // Let's create a database for our work:
-hql2("Create a work database:", "CREATE DATABASE work")
-hql2("Use the work database:", "USE work")
+sql2("Create a work database:", "CREATE DATABASE work")
+sql2("Use the work database:", "USE work")
 
 // Let's create a table for our KJV data. Note that Hive lets us specify
 // the field separator for the data and we can make a table "external",
@@ -65,7 +66,7 @@ hql2("Use the work database:", "USE work")
 
 // A copy of the the KJV data in its own directory, because Hive only
 // works with directories for locations.
-hql2("Create the 'external' kjv Hive table:", s"""
+sql2("Create the 'external' kjv Hive table:", s"""
   CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
     book    STRING,
     chapter INT,
@@ -74,19 +75,19 @@ hql2("Create the 'external' kjv Hive table:", s"""
   ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
   LOCATION '/user/$user/data/hive-kjv'""")
 
-hql2("Describe the table kjv:", "DESCRIBE FORMATTED kjv")
+sql2("Describe the table kjv:", "DESCRIBE FORMATTED kjv")
 
 // Look for a [31102] line at or near the end of the output:
-hql2("How many records?", "SELECT COUNT(*) FROM kjv")
+sql2("How many records?", "SELECT COUNT(*) FROM kjv")
 
-hql2("Print the first few records:", "SELECT * FROM kjv LIMIT 10")
+sql2("Print the first few records:", "SELECT * FROM kjv LIMIT 10")
 
-hql2("Run the same GROUP BY we ran before:", """
+sql2("Run the same GROUP BY we ran before:", """
   SELECT * FROM (
     SELECT book, COUNT(*) AS count FROM kjv GROUP BY book) bc
   WHERE bc.book != ''""")
 
-hql2("Run the 'God' query we ran before:",
+sql2("Run the 'God' query we ran before:",
   "SELECT * FROM kjv WHERE text LIKE '%God%'")
 
 // Exercise: Repeat some of the exercises we did for SparkSQL9:
@@ -101,8 +102,8 @@ hql2("Run the 'God' query we ran before:",
 // for the "metastore" (Table metadata, etc.). See the "metastore" subdirectory
 // you now have! Because the table is EXTERNAL, we only delete the metadata, but
 // not the table data itself.
-hql2("Drop the table.", "DROP TABLE kjv")
-hql2("Drop the database.", "DROP DATABASE work")
+sql2("Drop the table.", "DROP TABLE kjv")
+sql2("Drop the database.", "DROP DATABASE work")
 
 // Not needed if you're using the actual Spark Shell and our configured sbt
 // console command.
