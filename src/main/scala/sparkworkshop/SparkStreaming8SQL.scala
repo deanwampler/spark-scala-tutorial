@@ -41,7 +41,7 @@ import org.apache.spark.sql.SQLContext
  */
 object SparkStreaming8SQL {
 
-  val timeout = 30 * 1000  // Stop program after 30 seconds
+  val timeout = 10         // Terminate after N seconds
   val batchSeconds = 2     // Size of batch intervals
 
   class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
@@ -96,7 +96,8 @@ object SparkStreaming8SQL {
     val conf = new SparkConf()
              .setMaster(master)
              .setAppName("Spark Streaming (8)")
-             .set("spark.cleaner.ttl", "60")
+             // If you need to control clean up of older RDDs:
+             // .set("spark.cleaner.ttl", "60")
              .set("spark.files.overwrite", "true")
              // If you need more memory:
              // .set("spark.executor.memory", "1g")

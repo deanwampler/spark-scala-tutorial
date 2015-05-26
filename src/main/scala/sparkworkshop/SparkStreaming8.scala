@@ -40,7 +40,7 @@ import org.apache.spark.streaming.scheduler.{
  */
 object SparkStreaming8 {
 
-  val timeout = 30 * 1000  // Stop program after 30 seconds
+  val timeout = 10         // Terminate after N seconds
   val batchSeconds = 2     // Size of batch intervals
 
   class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {

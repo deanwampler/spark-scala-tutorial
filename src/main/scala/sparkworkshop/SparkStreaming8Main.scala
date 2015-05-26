@@ -14,7 +14,7 @@ import java.io.File
  */
 object SparkStreaming8Main extends sparkstreaming.ThreadStarter {
 
-  val timeout = 30 * 1000  // Stop program after 30 seconds
+  val timeout = 10  // Stop program after N seconds
 
   /**
    * The source data file to write over a socket or to write repeatedly to the
@@ -41,12 +41,21 @@ object SparkStreaming8Main extends sparkstreaming.ThreadStarter {
       case "--remove-watched-dir" +: tf +: tail => (("remove-watched-dir", tf), tail)
     })
 
+  def useSQL(trueFalse: Boolean): Opt = Opt(
+    name   = "use-sql",
+    value  = trueFalse.toString,
+    help   = s"--sql  Use the SparkSQL stream processing example?",
+    parser = {
+      case "--sql" +: tail => (("use-sql", "true"), tail)
+    })
+
   def main(args: Array[String]): Unit = {
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       sourceDataFile("data/kjvdat.txt"),
       CommandLineOptions.inputPath("tmp/streaming-input"),
       removeWatchedDirectory(true),
+      useSQL(false),
       CommandLineOptions.outputPath("output/wc-streaming"),
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[*]"),
@@ -63,11 +72,12 @@ object SparkStreaming8Main extends sparkstreaming.ThreadStarter {
     val socket = argz("socket")
     val rmWatchedDir = argz("remove-watched-dir").toBoolean
 
-    // Need to remove the data argument before calling SparkStreaming8.
+    // Need to remove a few arguments before calling SparkStreaming8.
     def mkStreamArgs(argsSeq: Seq[String], newSeq: Vector[String]): Vector[String] =
       argsSeq match {
         case Nil => newSeq
         case ("-d" | "--data") +: file +: tail => mkStreamArgs(tail, newSeq)
+        case ("--sql") +: tail => mkStreamArgs(tail, newSeq)
         case head +: tail => mkStreamArgs(tail, newSeq :+ head)
       }
     val streamArgs = mkStreamArgs(args, Vector.empty[String]).toArray
@@ -85,7 +95,11 @@ object SparkStreaming8Main extends sparkstreaming.ThreadStarter {
           val port = socket.split(":").last.toInt
           startSocketDataThread(port, data)
         }
-      SparkStreaming8.main(streamArgs)
+      if (argz("use-sql").toBoolean) {
+        SparkStreaming8SQL.main(streamArgs)
+      } else {
+        SparkStreaming8.main(streamArgs)
+      }
       // When SparkStreaming8.main returns, we can terminate the data server thread:
       dataThread.interrupt()
     } finally {
