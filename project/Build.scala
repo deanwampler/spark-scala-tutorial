@@ -4,7 +4,7 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "3.4.0"
+  val Version = "4.0.0"
   val ScalaVersion = "2.11.6"
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
