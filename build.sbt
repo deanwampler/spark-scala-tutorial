@@ -1,13 +1,16 @@
 initialCommands += """
-  |import org.apache.spark.SparkContext
-  |import org.apache.spark.SparkContext._
-  |val sc = new SparkContext("local", "Intro")
-  |""".stripMargin
+  import org.apache.spark.SparkContext
+  import org.apache.spark.SparkContext._
+  import org.apache.spark.sql.SQLContext
+  val sc = new SparkContext("local", "Console")
+  val sqlContext = new SQLContext(sc)
+  import sqlContext.implicits._
+  """
 
 cleanupCommands += """
-  |println("Closing the SparkContext:")
-  |sc.stop()
-  |""".stripMargin
+  println("Closing the SparkContext:")
+  sc.stop()
+  """.stripMargin
 
 addCommandAlias("ex2",  "run-main WordCount2")
 

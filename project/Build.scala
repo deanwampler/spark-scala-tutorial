@@ -5,7 +5,7 @@ object BuildSettings {
 
   val Name = "activator-spark"
   val Version = "3.4.0"
-  val ScalaVersion = "2.10.5"
+  val ScalaVersion = "2.11.6"
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     name          := Name,
@@ -19,11 +19,13 @@ object BuildSettings {
 
 
 object Resolvers {
+  // Temporary until 1.4 is released (we need a REPL bug fix).
+  val spark = "Apache Spark Prerelease" at "https://repository.apache.org/content/repositories/orgapachespark-1104/"
   val typesafe = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   val sonatype = "Sonatype Release" at "https://oss.sonatype.org/content/repositories/releases"
   val mvnrepository = "MVN Repo" at "http://mvnrepository.com/artifact"
 
-  val allResolvers = Seq(typesafe, sonatype, mvnrepository)
+  val allResolvers = Seq(spark, typesafe, sonatype, mvnrepository)
 
 }
 
@@ -31,15 +33,15 @@ object Resolvers {
 // examples that explicitly use Hadoop.
 object Dependency {
   object Version {
-    val Spark        = "1.3.0"
+    val Spark        = "1.4.0"
     val ScalaTest    = "2.2.4"
     val ScalaCheck   = "1.12.2"
   }
 
-  val sparkCore      = "org.apache.spark"  %% "spark-core"      % Version.Spark
-  val sparkStreaming = "org.apache.spark"  %% "spark-streaming" % Version.Spark
-  val sparkSQL       = "org.apache.spark"  %% "spark-sql"       % Version.Spark
-  val sparkRepl      = "org.apache.spark"  %% "spark-repl"      % Version.Spark
+  val sparkCore      = "org.apache.spark"  %% "spark-core"      % Version.Spark  withSources()
+  val sparkStreaming = "org.apache.spark"  %% "spark-streaming" % Version.Spark  withSources()
+  val sparkSQL       = "org.apache.spark"  %% "spark-sql"       % Version.Spark  withSources()
+  val sparkRepl      = "org.apache.spark"  %% "spark-repl"      % Version.Spark  withSources()
 
   val scalaTest      = "org.scalatest"     %% "scalatest"       % Version.ScalaTest  % "test"
   val scalaCheck     = "org.scalacheck"    %% "scalacheck"      % Version.ScalaCheck % "test"
@@ -60,7 +62,7 @@ object ActivatorSparkBuild extends Build {
 
   val excludeSigFilesRE = """META-INF/.*\.(SF|DSA|RSA)""".r
   lazy val activatorspark = Project(
-    id = "Activator-Spark",
+    id = "SparkWorkshop",
     base = file("."),
     settings = buildSettings ++ Seq(
       shellPrompt := { state => "(%s)> ".format(Project.extract(state).currentProject.id) },
@@ -73,8 +75,7 @@ object ActivatorSparkBuild extends Build {
       // running, so we make it a dependency of run.
       (run in Compile) <<= (run in Compile) dependsOn (packageBin in Compile),
       libraryDependencies ++= Dependencies.activatorspark,
-      excludeFilter in unmanagedSources := (
-        HiddenFileFilter || "Intro1*" || "SparkSQL9-script*" || "HiveSQL*" || "SparkSQLParquet*"),
+      excludeFilter in unmanagedSources := (HiddenFileFilter || "*-script.scala"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
       // Must run the examples and tests in separate JVMs to avoid mysterious
