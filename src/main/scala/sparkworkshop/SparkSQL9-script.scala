@@ -32,10 +32,6 @@ val versesRDD = sc.textFile(inputPath) flatMap {
 }
 
 // Create a DataFrame and register as a temporary "table".
-// The following expression invokes several "implicit" conversions and
-// methods that we imported through sqlContext._ The actual method is
-// defined on org.apache.spark.sql.SchemaRDDLike, which also has a method
-// "saveAsParquetFile" to write a schema-preserving Parquet file.
 val verses = sqlContext.createDataFrame(versesRDD)
 verses.registerTempTable("kjv_bible")
 verses.cache()
@@ -62,14 +58,14 @@ godVersesDF.show()
 // to write the following query result to Parquet, for example.
 // Nor does it appear to support WHERE clauses in some situations.
 val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-dump(counts)  // print all the book counts
+dump(counts)  // print the 1st 100 lines, but there are only 66 books/records...
 
 // "Coalesce" all partitions into 1 partition. Otherwise, there are
 // 100s of partitions output from the last query. This isn't terrible when
 // calling dump, but watch what happens when you run the following two counts:
-val counts1 = counts.coalesce(1)
 println("counts.count (takes a while):")
 println(s"result: ${counts.count}")
+val counts1 = counts.coalesce(1)
 println("counts1.count (fast!!):")
 println(s"result: ${counts1.count}")
 
