@@ -7,7 +7,7 @@ Dean Wampler, Ph.D.
 [dean.wampler@typesafe.com](mailto:dean.wampler@typesafe.com)
 [@deanwampler](https://twitter.com/deanwampler)
 
-This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) version 1.3 applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
+This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) version 1.4 applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
 
 If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine "sandboxes" with Spark included. See their websites for information.
 
@@ -15,13 +15,13 @@ For more advanced Spark training and services from Typesafe, please visit [types
 
 ## Setup Instructions
 
-You can work through the examples and exercises on a local workstation, so-called *local mode*. If you have Hadoop version 2 (YARN based) installation available, including a virtual machine "sandbox" from one of the Hadoop vendors, you can also run most of the examples in that environment. I'll refer to this arrangement as *Hadoop mode*.
+You can work through the examples and exercises on a local workstation, so-called *local mode*. If you have Hadoop version 2 (YARN based) installation available, including a virtual machine "sandbox" from one of the Hadoop vendors, you can also run most of the examples in that environment. I'll refer to this arrangement as *Hadoop mode*. Finally, the exercises should be runnable in Mesos and Spark *Standalone* clusters with minor tweaks.
 
 Let's discuss setup for local mode first.
 
 ## Setup for Local Mode
 
-Working in *local mode* makes it easy to edit, test, run, and debug applications quickly. Then, running them in Hadoop provides more real-world testing.
+Working in *local mode* makes it easy to edit, test, run, and debug applications quickly. Then, running them in a cluster provides more real-world testing and finally production scalability and resiliency.
 
 We will build and run the examples and exercises using [Typesafe Activator](http://typesafe.com/activator), which includes web-based and command-line interfaces. Activator includes a build tool for Scala that we'll use to download the libraries we need and to build our examples.
 
@@ -29,7 +29,7 @@ We will build and run the examples and exercises using [Typesafe Activator](http
 
 Activator also includes SBT, which the UI uses under the hood. You can use the *shell* mode explicitly if you prefer running `sbt` "tasks".
 
-You'll need either Activator or SBT installed. We recommend Activator.
+You'll need either Activator or SBT installed.
 
 If you are not *already* viewing this workshop in Activator, install it by following the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
 
@@ -123,9 +123,10 @@ Assuming you encountered no problems, everything is working!
 
 We're using a few conventions for the package structure and `main` class names:
 
-* `AbcN` - The `Abc` program and the N^th^ example. With a few exceptions, it can be executed locally and in Hadoop. It defaults to local execution.
-* `hadoop/HAbcN` - A driver program to run `AbcN` in Hadoop. These small classes use a Scala library API for managing operating system *processes*. In this case, they invoke one or more shell scripts in the workshop's `scripts` directory, which in turn call the Spark driver program `$SPARK_HOME/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
-* `solns/AbcNFooBarBaz` - The solution to the "foo bar baz" exercise that's built on `AbcN`. These programs can also be invoked from the *Run* panel.
+* `FooBarN.scala` - The `FooBar` compiled program for the N^th^ example. With a few exceptions, it can be run locally and in Hadoop. It defaults to local execution.
+* `FooBarN-script.scala` - The `FooBar` script for the N^th^ example. It is run using the `spark-shell` for local mode and cluster execution, or using the `console` (interactive Spark shell or *REPL*) that's provided by the `activator shell` or `sbt` environments.
+* `hadoop/HFooBarN.scala` - A driver program to run `FooBarN` in Hadoop. These small classes use a Scala library API for managing operating system *processes*. In this case, they invoke one or more shell scripts in the workshop's `scripts` directory, which in turn call the Spark driver program `$SPARK_HOME/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
+* `solns/FooBarNSomeExercise.scala` - The solution to the "some exercise" exercise that's described in `FooBarN.scala`. These programs can also be invoked from the *Run* panel (or shell `run` command).
 
 Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* UI.
 
@@ -151,7 +152,7 @@ Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion 
 
 ![](http://spark.apache.org/docs/latest/img/cluster-overview.png)
 
-Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over [Hadoop YARN](http://hortonworks.com/hadoop/yarn/), local mode, standalone (static cluster) mode, Mesos, and EC2.
+Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over Hadoop YARN, Mesos, standalone (static cluster) mode, Mesos, EC2, and local mode.
 
 The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
@@ -171,13 +172,13 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ## SparkSQL
 
-[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds the ability to specify schema for RDDs, run SQL queries on them, and even create, delete, and query tables in [Hive](http://hive.apache.org), the original SQL tool for Hadoop. Recently, support was added for parsing JSON records, inferring their schema, and writing RDDs in JSON format.
+[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds a new `DataFrame` type that wraps RDDs with schema information and the ability to run SQL queries on them. There is an integration with [Hive](http://hive.apache.org), the original SQL tool for Hadoop, which lets you not only query Hive tables, but run DDL statements too. There is convenient support for reading and writing [Parquet](http://parquet.io) files and for reading and writing JSON-based records.
 
 Several years ago, the Spark team ported the Hive query engine to Spark, calling it [Shark](http://shark.cs.berkeley.edu/). That port is now deprecated. SparkSQL will replace it once it is feature compatible with Hive. The new query planner is called [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html).
 
 ## The Spark Version
 
-This workshop uses Spark 1.1.0.
+This workshop uses Spark 1.4.0.
 
 The following documentation links provide more information about Spark:
 
@@ -191,7 +192,7 @@ The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-sta
 
 Here is a list of the exercises. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
-* **Intro1:** The first example is actually run using the interactive `spark-shell`, as we'll see.
+* **Intro1-script:** The first example is actually run interactively, as we'll see.
 * **WordCount2:** The *Word Count* algorithm: Read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](../data/README.html) that discusses the sources of the data files.)
 * **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 * **Matrix4:** Demonstrates using explicit parallelism on a simplistic Matrix application.
@@ -200,25 +201,25 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins as shown in this simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SQL API to run basic queries over structured data, in this case, the same King James Version (KJV) of the Bible used in the previous workshop.
-* **hadoop/SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example. This example and the next one are in a `hadoop` subdirectory, because they uses features that require a Hadoop cluster (more details later on).
-* **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL!
+* **SparkSQL9:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. There is also a
+* **SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
+* **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL! This example is in a `hadoop` subdirectory, because it uses features that require a Hadoop setup (more details later on).
 
 Let's now work through these exercises...
 
-## Intro1
+## Intro1-script
 
-[Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala)
+[Intro1-script.scala](#code/src/main/scala/sparkworkshop/Intro1-script.scala)
 
 Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). It allows us to work interactively with our algorithms and data.
 
 Actually, for local mode execution, we won't use the `spark-shell` command provided by Spark. Instead, we've customized the Activator/SBT `console` (Scala REPL) to behave in a similar way. For Hadoop execution, we'll use `spark-shell`.
 
-We'll copy and paste commands from the file [Intro1.scala](#code/src/main/scala/sparkworkshop/Intro1.scala). Click the link to open the file in Activator or open it in your favorite editor/IDE.
+We'll copy and paste commands from the file [Intro1-script.scala](#code/src/main/scala/sparkworkshop/Intro1-script.scala). Click the link to open the file in Activator or open it in your favorite editor/IDE.
 
 The extensive comments in this file and the subsequent files explain the API calls in detail. You can copy and paste the comments, too.
 
-> NOTE: while the file extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. (The build is configured to not compile this file.)
+> NOTE: while the file extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. The build is configured to not compile files with names that match the pattern `*-script.scala`.
 
 To run this example on your workstation, you can't use the Activator UI. Quit Activator and use the instructions previously to start it in the *shell* mode. Once it starts and presents the prompt `(Activator-Spark)>`, enter the command `console`. It will compile some code and start the Scala REPL, ending with the prompt `scala>`. Continue with the instructions below.
 
@@ -249,6 +250,8 @@ First, there are some commented lines that every Spark program needs, but you do
 ```
 
 The [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) drives everything else. Why are there two, very similar `import` statements? The first one imports the `SparkContext` type so it wouldn't be necessary to use a fully-qualified name in the `new SparkContext` statement. The second import statement is analogous to a `static import` in Java, where we make some methods and values visible in the current scope, again without requiring qualification.
+
+> When we start the `console`, there are other Scala expressions evaluated, too, involving the SparkSQL API. We'll come back to those below.
 
 When a `SparkContext` is constructed, there are several constructors that can be used. The one shown takes a string for the "master" and an arbitrary job name. The master must be one of the following:
 
@@ -1145,9 +1148,11 @@ Note that there's no argument for the data file. That's an extra option supporte
 
 The default is `data/kjvdat.txt`.
 
-To run the same logic in Hadoop, there is `hadoop.HSparkStreaming8` driver. Similarly to `SparkStreaming8Main`, it starts the `DataSocketSever` process *locally* (outside of Hadoop), then submits `SparkStreaming8` to your Hadoop environment. There is also a script driver, `scripts/sparkstreaming8.sh`.
+There is also an alternative to `SparkStreaming8` called `SparkStreaming8SQL`, which uses a SQL query rather than the RDD API to do the calculation. To use this variant, pass the `--sql` argument when you invoke either version of `SparkStreaming8Main` or `SparkStreaming8MainSocket`.
 
-Note that the Hadoop implementation of this example doesn't support watching for new files in a directory. That's not a Spark Streaming limitation.
+To run a subset of these combinations in Hadoop, there is `hadoop.HSparkStreaming8` driver. Similarly to `SparkStreaming8Main`, it starts the `DataSocketSever` process *locally* (outside of Hadoop), then submits `SparkStreaming8` to your Hadoop environment. There is also a script driver, `scripts/sparkstreaming8.sh`.
+
+Note that the Hadoop implementation of this example doesn't support watching for new files in a directory. That's not a Spark Streaming limitation. Also, the SQL variant is not supported, but it would be easy to add this capability.
 
 ## How Spark Streaming Works
 
@@ -1278,15 +1283,18 @@ This is just the tip of the iceberg for Streaming. See the [Streaming Programmin
 
 ## SparkSQL9
 
-[SparkSQL9.scala](#code/src/main/scala/sparkworkshop/SparkSQL9.scala)
+[SparkSQL9.scala](#code/src/main/scala/sparkworkshop/SparkSQL9.scala)<br/>
+[SparkSQL9-script.scala](#code/src/main/scala/sparkworkshop/SparkSQL9-script.scala)
 
-The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a "schema" for records, defined using Scala _case classes_, and allows you to embed queries using a subset of SQL in strings, as a supplement to the regular manipulation methods on the RDD type; use the best tool for the job in the same application! There is also a builder DSL for constructing these queries, rather than using SQL strings.
+The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a new `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
 
-Furthermore, SparkSQL can read and write the new [Parquet](http://parquet.io) format that's becoming popular in Hadoop environments. SparkSQL also supports parsing JSON-formatted records, with inferred schemas, and writing RDDs in JSON.
+> Even if you prefer the Scala collections-like `RDD` API, consider using the `DataFrame` API because the performance is usually better.
 
-Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, HiveQL.
+Furthermore, SparkSQL has convenient support for reading and writing [Parquet](http://parquet.io) files, which is popular in Hadoop environments, and reading and writing JSON-formatted records, with inferred schemas.
 
-This example treats the KJV text we've been using as a table with a schema. It runs several queries on the data.
+Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, *HiveQL*.
+
+This example treats the KJV text we've been using as a table with a schema. It runs several SQL queries on the data, then performs the same calculation using the `DataFrame` API.
 
 There is a `SparkSQL9.scala` program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called `SparkSQL9-script.scala`, which we'll look at instead. (There are minor differences in how output is handled.)
 
@@ -1294,25 +1302,33 @@ The codez:
 
 ```
 import com.typesafe.sparkworkshop.util.Verse
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 ```
 
 The helper class `Verse` will be used to define the schema for Bible verses. Note the new imports.
 
-Next, define a convenience function for taking the first `n` records of an `RDD` (`n` defaults to 100) and printing each one to the console:
+Next, define the input path:
 
 ```
-def dump(rdd: RDD[_], n: Int = 100) =
-  rdd.take(n).foreach(println) // Take the first n lines, then print them.
+val inputRoot = "."
+val inputPath = s"$inputRoot/data/kjvdat.txt"
 ```
 
-Now create a [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) that wraps the `SparkContext`, just like the `StreamingContext` did. We don't show this here, but in fact you can mix SparkSQL _and_ Spark Streaming in the same program.
+For HDFS, `inputRoot` would be something like `hdfs://my_name_node_server:8020`.
+
+Now define a convenience function for taking the first `n` records of a `DataFrame`, where `n` defaults to 100, and printing each one to the console:
 
 ```
-val sc = new SparkContext(argz("master"), "Spark SQL (9)")
-val sqlc = new SQLContext(sc)
-import sqlc._
+def dump(df: DataFrame, n: Int = 100) =
+  df.take(n).foreach(println) // Take the first n lines, then print them.
+```
+
+We discussed earlier that our `console` setup automatically instantiates the `SparkContext` as a variable named `sc`. It also instantiates the wrapper [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) and imports some implicits. Note that you can still also use a `StreamingContext` to wrap the `SparkContext`, if you want, but we don't need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:
+
+```
+// val sc = new SparkContext(argz("master"), "Spark SQL (9)")
+// val sqlContext = new SQLContext(sc)
+// import sqlContext.implicits._
 ```
 
 The import statement brings SQL-specific functions and values in scope.
@@ -1323,11 +1339,8 @@ Next we use a regex to parse the input verses and extract the book abbreviation,
 We use `flatMap` over the results so that lines that fail to parse are essentially put into empty lists that will be ignored.
 
 ```
-// Regex to match the fields separated by "|".
-// Also strips the trailing "~" in the KJV file.
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
-// Use flatMap to effectively remove bad lines.
-val verses = sc.textFile(argz("input-path")) flatMap {
+val versesRDD = sc.textFile(argz("input-path")) flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
@@ -1336,25 +1349,59 @@ val verses = sc.textFile(argz("input-path")) flatMap {
 }
 ```
 
-Register the RDD as a temporary "table", so we can write SQL queries against it. As the name implies, this "table" only exists for the life of the process. Then we write queries and save the results back to the file system.
+Create a `DataFrame` from the `RDD`. Then, so we can write SQL queries against it, register it as a temporary "table". As the name implies, this "table" only exists for the life of the process. (There is also an evolving facility for defining "permanent" tables.) Then we write queries and save the results back to the file system.
 
 ```
+val verses = sqlContext.createDataFrame(versesRDD)
 verses.registerTempTable("kjv_bible")
 verses.cache()
-dump(verses)  // print the 1st 100 lines
+// print the 1st 20 lines (Use dump(verses), defined above, for more lines)
+verses.show()
+
+import sqlContext.sql  // for convenience
 
 val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
+println("The query plan:")
+godVerses.queryExecution   // Compare with godVerses.explain(true)
 println("Number of verses that mention God: "+godVerses.count())
-dump(godVerses)  // print the 1st 100 lines
+godVerses.show()
+```
+
+Here is the same calculation using the `DataFrame` API:
+
+```
+val godVersesDF = verses.filter(verses("text").contains("God"))
+println("The query plan:")
+godVersesDF.queryExecution
+println("Number of verses that mention God: "+godVersesDF.count())
+godVersesDF.show()
+```
 
 val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-  // Collect all partitions into 1 partition. Otherwise, there are 100s
-  // output from the last query!
-  .coalesce(1)
-dump(counts)  // print the 1st 100 lines
+dump(counts)  // print the 1st 100 lines, but there are only 66 books/records...
 ```
 
 Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
+
+It turns out that the previous query generated a *lot* of partitions. Using "coalesce" here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn't terrible when just calling dump, but watch what happens when you run the following two counts:
+
+```
+println("counts.count (takes a while):")
+println(s"result: ${counts.count}")
+val counts1 = counts.coalesce(1)
+println("counts1.count (fast!!):")
+println(s"result: ${counts1.count}")
+```
+
+The `DataFrame` version is quite simple:
+
+```
+val countsDF = verses.groupBy("book").count()
+dump(countsDF)
+countsDF.count
+val countsDF1 = countsDF.coalesce(1)
+countsDF1.count
+```
 
 ## Using SQL in the Spark Shell
 
@@ -1374,7 +1421,7 @@ Th `sparkshell.sh` script does some set up, but essentially its equivalent to th
 
 ```
 $SPARK_HOME/bin/spark-shell \
-  --jars target/scala-2.10/activator-spark_2.10-3.4.0.jar [arguments]
+  --jars target/scala-2.10/activator-spark_2.11-4.0.0.jar [arguments]
 ```
 
 The jar file contains all the project's build artifacts (but not the dependencies).
@@ -1391,15 +1438,13 @@ scala> :quit
 
 To enter the statements using copy and paste, just paste them at the `scala>` prompt instead of loading the file.
 
-## SparkSQLParquet10
+## SparkSQLParquet10-script
 
-[SparkSQLParquet10.scala](#code/src/main/scala/sparkworkshop/hadoop/SparkSQLParquet10.scala)
+[SparkSQLParquet10-script.scala](#code/src/main/scala/sparkworkshop/SparkSQLParquet10-script.scala)
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
 
-> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
-
-The key [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD) methods are `SchemaRDD.saveAsParquetFile(outpath)` and `SqlContext.parquetFile(inpath)`. The rest of the details are very similar to the previous exercise.
+The key [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, by default. (The format for `write.save` can be overridden to default to a different format.) Note that previously, the now deprecated `SqlContext.parquetFile(inpath)` and `DataFrame.saveAsParquetFile(outpath)` were used.
 
 See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9-script.scala`.
 
@@ -1411,7 +1456,7 @@ The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03
 
 > NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
 
-Note that the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
+For this exercise, the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
 
 Let's discuss the code hightlights. There is additional imports for Hive:
 
@@ -1437,22 +1482,22 @@ Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#
 ```
 val sc = new SparkContext("local[2]", "Hive SQL (10)")
 val hiveContext = new HiveContext(sc)
-import hiveContext._   // Make methods local, like for SQLContext
+import hiveContext._   // Make methods local, like sql
 
-def hql2(title: String, query: String, n: Int = 100): Unit = {
+def sql2(title: String, query: String, n: Int = 100): Unit = {
   println(title)
   println(s"Running query: $query")
-  hql(query).take(n).foreach(println)
+  sql(query).take(n).foreach(println)
 }
 ```
 
-We can now execute Hive DDL statements, such the following statements to create a database, "use it" as the working database, and then a table inside it.
+(Previously, this version of `sql` was called `hql`.) We can now execute Hive DDL statements, such the following statements to create a database, "use it" as the working database, and then a table inside it.
 
 ```
-hql2("Create a work database:", "CREATE DATABASE work")
-hql2("Use the work database:", "USE work")
+sql2("Create a work database:", "CREATE DATABASE work")
+sql2("Use the work database:", "USE work")
 
-hql2("Create the 'external' kjv Hive table:", s"""
+sql2("Create the 'external' kjv Hive table:", s"""
   CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
     book    STRING,
     chapter INT,
@@ -1467,7 +1512,7 @@ Here we use a triple-quoted string to specify a multi-line HiveQL statement to c
 A few points to keep in mind:
 
 * **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's own REPL or scripts, they cause errors here!
-* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `hql2`.
+* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `sql2`.
 
 ## Wrapping Up
 
@@ -1514,16 +1559,12 @@ This is a general issue for distributed programs written for the JVM. A future v
 
 To learn more, see the following resources:
 
-* [Typesafe's Big Data Solutions](http://typesafe.com/reactive-big-data). Typesafe now offers more detailed Spark training and consulting services. Additional products and services are forthcoming.
+* [Typesafe's Big Data Products and Services](http://typesafe.com/reactive-big-data). Typesafe now offers more detailed Spark training and consulting services, plus commercial support Spark on Mesos. Additional products and services are forthcoming.
 * The Apache Spark [website](http://spark.apache.org/).
 * The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/latest/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD).
 * The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
-* [Talks from Spark Summit 2013](http://spark-summit.org/2013).
-* [Talks from Spark Summit 2014](http://spark-summit.org/2014/training).
-
-**Experience Reports:**
-
-* [Spark at Twitter](http://www.slideshare.net/krishflix/seattle-spark-meetup-spark-at-twitter)
+* [Talks from Spark Summit conferences](http://spark-summit.org).
+* [Learning Spark](http://shop.oreilly.com/product/0636920028512.do), an excellent introduction from O'Reilly.
 
 **Other Spark Based Libraries:**
 
@@ -1533,7 +1574,7 @@ To learn more, see the following resources:
 ## For more about Typesafe:
 
 * See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
-* See [Typesafe Reactive Big Data](http://typesafe.com/reactive-big-data) for more information about our products and services around Big Data.
+* See [Typesafe Reactive Big Data](http://typesafe.com/reactive-big-data) for more information about our products and services around Spark and Big Data.
 * See [Typesafe](http://typesafe.com) for information about our other products and services.
 
 ## Final Thoughts
