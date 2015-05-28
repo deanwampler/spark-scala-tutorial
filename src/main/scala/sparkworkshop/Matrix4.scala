@@ -42,7 +42,7 @@ object Matrix4 {
     val dimensions = argz("dims") match {
       case dimsRE(m, n) => Dimensions(m.toInt, n.toInt)
       case s =>
-        println("""Expected matrix dimensions 'NxM', but got this: $s""")
+        println(s"""Expected matrix dimensions 'NxM', but got this: $s""")
         sys.exit(1)
     }
 

@@ -2,6 +2,7 @@ package com.typesafe.sparkworkshop.util.streaming
 import java.net.ServerSocket
 import java.io.{File, PrintWriter}
 import scala.io.Source
+import scala.util.control.NonFatal
 
 /**
  * Serves data to the SparkStreaming example by periodically writing a new
@@ -31,6 +32,8 @@ class DataDirectoryServer(
         Thread.sleep(sleepInterval)
         count += 1
       }
+    } catch {
+      case NonFatal(ex) => println(s"DataDirectoryServer: $ex")
     }
   }
 

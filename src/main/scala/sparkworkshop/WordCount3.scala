@@ -1,5 +1,5 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
-import org.apache.spark.{SparkConf, SparkContext}
+import com.typesafe.sparkworkshop.util.{ CommandLineOptions, FileUtil, TextUtil }
+import org.apache.spark.{ SparkConf, SparkContext }
 import org.apache.spark.SparkContext._
 
 /**
@@ -58,7 +58,7 @@ object WordCount3 {
       // and count the unique occurrences.
       val wc2a = input
         .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
-        .countByValue()  // Returns a Map[T, Long]
+        .countByValue() // Returns a Map[T, Long]
 
       // ... and convert back to an RDD for output, with one "slice".
       // First, convert to a comma-separated string. When you call "map" on

@@ -36,7 +36,7 @@ object InvertedIndex5b {
       val input = sc.textFile(argz("input-path")) map {
         case lineRE(name, text) => (name.trim, text.toLowerCase)
         case badLine =>
-          Console.err.println("Unexpected line: $badLine")
+          Console.err.println(s"Unexpected line: $badLine")
           // If any of these were returned, you could filter them out below.
           ("", "")
       }
