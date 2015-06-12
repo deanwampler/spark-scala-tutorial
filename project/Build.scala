@@ -19,13 +19,11 @@ object BuildSettings {
 
 
 object Resolvers {
-  // Temporary until 1.4 is released (we need a REPL bug fix).
-  val spark = "Apache Spark Prerelease" at "https://repository.apache.org/content/repositories/orgapachespark-1104/"
   val typesafe = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   val sonatype = "Sonatype Release" at "https://oss.sonatype.org/content/repositories/releases"
   val mvnrepository = "MVN Repo" at "http://mvnrepository.com/artifact"
 
-  val allResolvers = Seq(spark, typesafe, sonatype, mvnrepository)
+  val allResolvers = Seq(typesafe, sonatype, mvnrepository)
 
 }
 

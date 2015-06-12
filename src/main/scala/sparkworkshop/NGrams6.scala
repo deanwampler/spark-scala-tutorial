@@ -96,7 +96,7 @@ object NGrams6 {
     } finally {
       sc.stop()
     }
-
+ 
     // Exercise: Try different ngrams and input texts. Note that you can specify
     //   a regular expression, e.g.,
     //     run-main spark.NGrams6 --ngrams "% (lov|hat)ed? % %"
