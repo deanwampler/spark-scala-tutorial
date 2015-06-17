@@ -35,7 +35,7 @@ case class CommandLineOptions(programName: String, opts: Opt*) {
     // The actuals are already key-value pairs:
     val map2 = foundOpts.toMap
     val finalMap = map1 ++ map2
-    if (finalMap("quiet").toBoolean == false) {
+    if (finalMap.getOrElse("quiet", "false").toBoolean == false) {
       println(s"$programName:")
       finalMap foreach {
         case (key, value) => printf("  %15s: %s\n", key, value)
