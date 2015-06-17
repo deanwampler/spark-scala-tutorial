@@ -5,6 +5,8 @@ object BuildSettings {
 
   val Name = "activator-spark"
   val Version = "4.0.0"
+  // You can use either version of Scala:
+  // val ScalaVersion = "2.10.5"
   val ScalaVersion = "2.11.6"
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
