@@ -1097,7 +1097,7 @@ In either configuration, we need a second process or dedicated thread to either 
 
 So, let's run this configuration first. In Activator or SBT, run `SparkStreaming8Main` (*not* `SparkStreaming8MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
-This driver uses `DataSocketServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming8` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
+This driver uses `DataDirectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming8` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
 If you watch the console output, you'll see messages like this:
 

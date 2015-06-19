@@ -989,7 +989,7 @@ if (input.count != verses.count) {
 
 <p>So, let&#8217;s run this configuration first. In Activator or SBT, run <code>SparkStreaming8Main</code> (<em>not</em> <code>SparkStreaming8MainSocket</code>) as we&#8217;ve done for the other exercises. For the Activator <code>shell</code> or SBT prompt, the corresponding alias is now <code>ex8directory</code>, instead of <code>ex8</code>.</p>
 
-<p>This driver uses <code>DataSocketServer</code> to periodically write copies of the KJV Bible text file to a temporary directory <code>tmp/streaming-input</code>, while it also runs <code>SparkStreaming8</code> with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!</p>
+<p>This driver uses <code>DataDirectoryServer</code> to periodically write copies of the KJV Bible text file to a temporary directory <code>tmp/streaming-input</code>, while it also runs <code>SparkStreaming8</code> with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!</p>
 
 <p>If you watch the console output, you&#8217;ll see messages like this:</p>
 <pre><code class="(null)">-------------------------------------------
