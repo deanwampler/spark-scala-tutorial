@@ -58,6 +58,7 @@ object NGrams6 {
     val n = argz("count").toInt
     try {
 
+      /** Order the (ngram,count) pairs by count descending, ngram ascending. */
       object CountOrdering extends Ordering[(String,Int)] {
         def compare(a:(String,Int), b:(String,Int)) = {
           // Sort counts descending and so the test results are
@@ -77,10 +78,13 @@ object NGrams6 {
         }
         .map(ngram => (ngram, 1))
         .reduceByKey((count1, count2) => count1 + count2)
-        // The following would work for sorting by ngrams:
+        .takeOrdered(n)(CountOrdering)
+        // The following would work instead if sorting by ngrams, since
+        // the ngram is in the "key position", but it would be very
+        // inefficient to do a total ordering, then take the top n.
+        // takeOrdered(...)(...) should be used in both cases:
         // .sortByKey(false)  // false for descending
         // .take(n)           // "LIMIT n"
-        .takeOrdered(n)(CountOrdering)
 
       // Format the output as a sequence of strings, then convert back to
       // an RDD for output.
@@ -96,10 +100,10 @@ object NGrams6 {
     } finally {
       sc.stop()
     }
- 
+
     // Exercise: Try different ngrams and input texts. Note that you can specify
     //   a regular expression, e.g.,
-    //     run-main spark.NGrams6 --ngrams "% (lov|hat)ed? % %"
+    //     run-main NGrams6 --ngrams "% (lov|hat)ed? % %"
     // Exercise (Hard): Read in many documents and retain the file, so you find
     // ngrams per document.
   }

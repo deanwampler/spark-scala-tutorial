@@ -4,7 +4,10 @@ import org.apache.spark.SparkContext
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions)
 import org.apache.spark.SparkContext._
 
-/** First implementation of Word Count */
+/**
+ * First implementation of Word Count.
+ * Also implements the group by exercise.
+ */
 object WordCount2GroupBy {
   def main(args: Array[String]): Unit = {
 

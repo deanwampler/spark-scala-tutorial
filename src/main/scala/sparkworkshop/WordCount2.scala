@@ -43,9 +43,9 @@ object WordCount2 {
 
       // Split on non-alphabetic sequences of characters. Note the regex used;
       // the similar, non-alphanumeric alternative """\W+""", does not work well
-      // with non-UTF8 character sets! 
-      // Since each single line is converted to a sequence of words, we use 
-      // flatMap to flatten the sequence of sequences into a single sequence of 
+      // with non-UTF8 character sets!
+      // Since each single line is converted to a sequence of words, we use
+      // flatMap to flatten the sequence of sequences into a single sequence of
       // words. These words are then mapped into tuples that add a count of 1
       // for the word. Note the simplistic approach to tokenization; we just
       // split on any run of characters that isn't alphabetic.
@@ -57,6 +57,7 @@ object WordCount2 {
         .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .map(word => (word, 1))
         .reduceByKey((count1, count2) => count1 + count2)
+        // .reduceByKey(_ + _)
 
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,
