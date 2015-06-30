@@ -5,14 +5,15 @@ object BuildSettings {
 
   val Name = "activator-spark"
   val Version = "4.0.0"
-  // You can use either version of Scala:
-  // val ScalaVersion = "2.10.5"
-  val ScalaVersion = "2.11.6"
+  // You can use either version of Scala. We default to 2.11.7:
+  val ScalaVersion = "2.11.7"
+  val ScalaVersions = Seq("2.11.7", "2.10.5")
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     name          := Name,
     version       := Version,
     scalaVersion  := ScalaVersion,
+    crossScalaVersions := ScalaVersions,
     organization  := "com.typesafe",
     description   := "Activator Spark Template",
     scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8", "-Xlint")
