@@ -1276,7 +1276,8 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
-See also [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and [DataSocketServer.scala](
+See also [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and
+[DataSocketServer.scala](
 #code/src/main/scala/sparkworkshop/util/DataSocketServer.scala).
 
 This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
@@ -1375,10 +1376,6 @@ println("The query plan:")
 godVersesDF.queryExecution
 println("Number of verses that mention God: "+godVersesDF.count())
 godVersesDF.show()
-```
-
-val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-dump(counts)  // print the 1st 100 lines, but there are only 66 books/records...
 ```
 
 Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.

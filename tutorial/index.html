@@ -989,7 +989,7 @@ if (input.count != verses.count) {
 
 <p>So, let&#8217;s run this configuration first. In Activator or SBT, run <code>SparkStreaming8Main</code> (<em>not</em> <code>SparkStreaming8MainSocket</code>) as we&#8217;ve done for the other exercises. For the Activator <code>shell</code> or SBT prompt, the corresponding alias is now <code>ex8directory</code>, instead of <code>ex8</code>.</p>
 
-<p>This driver uses <code>DataDirectoryServer</code> to periodically write copies of the KJV Bible text file to a temporary directory <code>tmp/streaming-input</code>, while it also runs <code>SparkStreaming8</code> with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!</p>
+<p>This driver uses <code>DataDrectoryServer</code> to periodically write copies of the KJV Bible text file to a temporary directory <code>tmp/streaming-input</code>, while it also runs <code>SparkStreaming8</code> with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!</p>
 
 <p>If you watch the console output, you&#8217;ll see messages like this:</p>
 <pre><code class="(null)">-------------------------------------------
@@ -1143,7 +1143,8 @@ ssc.addStreamingListener(EndOfStreamListener(ssc))</code></pre>
   }
 }</code></pre>
 
-<p>See also <a href="#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala">SparkStreaming8Main.scala</a>, the <code>main</code> driver, and the helper classes for feeding data to the example, <a href="#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala">DataDirectoryServer.scala</a> and [DataSocketServer.scala]( </p>
+<p>See also <a href="#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala">SparkStreaming8Main.scala</a>, the <code>main</code> driver, and the helper classes for feeding data to the example, <a href="#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala">DataDirectoryServer.scala</a> and<br/>
+[DataSocketServer.scala]( </p>
 
 <h1 id="codesrcmainscalasparkworkshoputildatasocketserver.scala.">code/src/main/scala/sparkworkshop/util/DataSocketServer.scala).</h1>
 
@@ -1226,167 +1227,143 @@ godVersesDF.queryExecution
 println(&quot;Number of verses that mention God: &quot;+godVersesDF.count())
 godVersesDF.show()</code></pre>
 
-<p>val counts = sql(&#8220;SELECT book, COUNT(*) FROM kjv_bible GROUP BY book&#8221;)<br/>
-dump(counts) // print the 1st 100 lines, but there are only 66 books/records&#8230;</p>
-<pre><code class="(null)">
-Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn&apos;t permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
+<p>Note that the SQL dialect currently supported by the <code>sql</code> method is a subset of <a href="http://hive.apache.org">HiveSQL</a>. For example, it doesn&#8217;t permit column aliasing, e.g., <code>COUNT(*) AS count</code>. Nor does it appear to support <code>WHERE</code> clauses in some situations.</p>
 
-It turns out that the previous query generated a *lot* of partitions. Using &quot;coalesce&quot; here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn&apos;t terrible when just calling dump, but watch what happens when you run the following two counts:
-</code></pre>
+<p>It turns out that the previous query generated a <em>lot</em> of partitions. Using &#8220;coalesce&#8221; here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn&#8217;t terrible when just calling dump, but watch what happens when you run the following two counts:</p>
+<pre><code class="(null)">println(&quot;counts.count (takes a while):&quot;)
+println(s&quot;result: ${counts.count}&quot;)
+val counts1 = counts.coalesce(1)
+println(&quot;counts1.count (fast!!):&quot;)
+println(s&quot;result: ${counts1.count}&quot;)</code></pre>
 
-<p>(&#8220;counts.count (takes a while):&#8221;)<br/>
-println(s&#8220;result: ${counts.count}&#8221;)<br/>
-val counts1 = counts.coalesce(1)<br/>
-println(&#8220;counts1.count (fast!!):&#8221;)<br/>
-println(s&#8220;result: ${counts1.count}&#8221;)</p>
-<pre><code class="(null)">
-The `DataFrame` version is quite simple:
-</code></pre>
+<p>The <code>DataFrame</code> version is quite simple:</p>
+<pre><code class="(null)">val countsDF = verses.groupBy(&quot;book&quot;).count()
+dump(countsDF)
+countsDF.count
+val countsDF1 = countsDF.coalesce(1)
+countsDF1.count</code></pre>
 
-<p>countsDF = verses.groupBy(&#8220;book&#8221;).count()<br/>
-dump(countsDF)<br/>
-countsDF.count<br/>
-val countsDF1 = countsDF.coalesce(1)<br/>
-countsDF1.count</p>
-<pre><code class="(null)">
-## Using SQL in the Spark Shell
+</div><div><h2 id="usingsqlinthesparkshell">Using SQL in the Spark Shell</h2>
 
-So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the `scripts` directory:
-</code></pre>
+<p>So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the <code>scripts</code> directory:</p>
+<pre><code class="(null)">scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala</code></pre>
 
-<p>/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala</p>
-<pre><code class="(null)">
-Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
-</code></pre>
+<p>Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:</p>
+<pre><code class="(null)">scripts/sparkshell.sh</code></pre>
 
-<p>/sparkshell.sh</p>
-<pre><code class="(null)">
-Th `sparkshell.sh` script does some set up, but essentially its equivalent to the following:
-</code></pre>
+<p>Th <code>sparkshell.sh</code> script does some set up, but essentially its equivalent to the following:</p>
+<pre><code class="(null)">$SPARK_HOME/bin/spark-shell \
+  --jars target/scala-2.10/activator-spark_2.11-4.0.0.jar [arguments]</code></pre>
 
-<p>$SPARK_HOME/bin/spark-shell \<br/>
- &#8211;jars target/scala&#8211;2.10/activator-spark_2.11&#8211;4.0.0.jar [arguments]</p>
-<pre><code class="(null)">
-The jar file contains all the project&apos;s build artifacts (but not the dependencies).
+<p>The jar file contains all the project&#8217;s build artifacts (but not the dependencies).</p>
 
-To run this script locally, use the Activator shell&apos;s `console` command. Assuming you&apos;re at the shell&apos;s prompt `&gt;`, use the following commands to enter the Scala interpreter (&quot;REPL&quot;) and then load and run the whole file.
-</code></pre>
+<p>To run this script locally, use the Activator shell&#8217;s <code>console</code> command. Assuming you&#8217;re at the shell&#8217;s prompt <code>&gt;</code>, use the following commands to enter the Scala interpreter (&#8220;REPL&#8221;) and then load and run the whole file.</p>
+<pre><code class="(null)">(Activator-Spark)&gt; console
+scala&gt; :load src/main/scala/sparkworkshop/SparkSQL9-script.scala
+...
+scala&gt; :quit
+(Activator-Spark)&gt; exit</code></pre>
 
-<p>(Activator-Spark)&gt; console<br/>
-scala&gt; :load src/main/scala/sparkworkshop/SparkSQL9-script.scala<br/>
-&#8230;<br/>
-scala&gt; :quit<br/>
-(Activator-Spark)&gt; exit</p>
-<pre><code class="(null)">
-To enter the statements using copy and paste, just paste them at the `scala&gt;` prompt instead of loading the file.
+<p>To enter the statements using copy and paste, just paste them at the <code>scala&gt;</code> prompt instead of loading the file.</p>
 
-## SparkSQLParquet10-script
+</div><div><h2 id="sparksqlparquet10-script">SparkSQLParquet10-script</h2>
 
-[SparkSQLParquet10-script.scala](#code/src/main/scala/sparkworkshop/SparkSQLParquet10-script.scala)
+<p><a href="#code/src/main/scala/sparkworkshop/SparkSQLParquet10-script.scala">SparkSQLParquet10-script.scala</a></p>
 
-This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
+<p>This script demonstrates the methods for reading and writing files in the <a href="http://parquet.io">Parquet</a> format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.</p>
 
-The key [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, by default. (The format for `write.save` can be overridden to default to a different format.) Note that previously, the now deprecated `SqlContext.parquetFile(inpath)` and `DataFrame.saveAsParquetFile(outpath)` were used.
+<p>The key <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD">SchemaRDD</a> methods are <code>DataFrame.read.parquet(inpath)</code> and <code>DataFrame.write.save(outpath)</code> for reading and writing Parquet, by default. (The format for <code>write.save</code> can be overridden to default to a different format.) Note that previously, the now deprecated <code>SqlContext.parquetFile(inpath)</code> and <code>DataFrame.saveAsParquetFile(outpath)</code> were used.</p>
 
-See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9-script.scala`.
+<p>See the script for more details. Run it in Hadoop using the same techniques as for <code>SparkSQL9-script.scala</code>.</p>
 
-## HiveSQL11
+</div><div><h2 id="hivesql11">HiveSQL11</h2>
 
-[HiveSQL11.scala](#code/src/main/scala/sparkworkshop/hadoop/HiveSQL11.scala)
+<p><a href="#code/src/main/scala/sparkworkshop/hadoop/HiveSQL11.scala">HiveSQL11.scala</a></p>
 
-The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we&apos;re not using the Catalyst SQL engine, but Hive&apos;s.
+<p>The previous examples used the new <a href="http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html">Catalyst</a> query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we&#8217;re not using the Catalyst SQL engine, but Hive&#8217;s.</p>
 
-&gt; NOTE: Running this script requires a Hadoop installation, therefore it won&apos;t work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
+<blockquote>
+<p>NOTE: Running this script requires a Hadoop installation, therefore it won&#8217;t work in local mode, i.e., the Activator shell <code>console</code>. This is why it is in a <code>hadoop</code> sub-package.</p>
+</blockquote>
 
-For this exercise, the Hive &quot;metadata&quot; is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive&apos;s embedded [Derby SQL](http://db.apache.org/derby/) store, but it&apos;s not a production deployment option.
+<p>For this exercise, the Hive &#8220;metadata&#8221; is stored in a <code>megastore</code> directory created in the current working directory. This is written and managed by Hive&#8217;s embedded <a href="http://db.apache.org/derby/">Derby SQL</a> store, but it&#8217;s not a production deployment option.</p>
 
-Let&apos;s discuss the code hightlights. There is additional imports for Hive:
-</code></pre>
+<p>Let&#8217;s discuss the code hightlights. There is additional imports for Hive:</p>
+<pre><code class="(null)">import org.apache.spark.sql._
+import org.apache.spark.sql.hive.HiveContext
+import com.typesafe.sparkworkshop.util.Verse</code></pre>
 
-<p>org.apache.spark.sql._<br/>
-import org.apache.spark.sql.hive.HiveContext<br/>
-import com.typesafe.sparkworkshop.util.Verse</p>
-<pre><code class="(null)">
-We need the user name.
-</code></pre>
+<p>We need the user name.</p>
+<pre><code class="(null)">val user = sys.env.get(&quot;USER&quot;) match {
+  case Some(user) =&gt; user
+  case None =&gt;
+    println(&quot;ERROR: USER environment variable isn&apos;t defined. Using root!&quot;)
+    &quot;root&quot;
+}</code></pre>
 
-<p>user = sys.env.get(&#8220;USER&#8221;) match {<br/>
- case Some(user) =&gt; user<br/>
- case None =&gt;<br/>
- println(&#8220;ERROR: USER environment variable isn&#8217;t defined. Using root!&#8221;)<br/>
- &#8220;root&#8221;<br/>
-}</p>
-<pre><code class="(null)">
-Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
-</code></pre>
+<p>Create a <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext">HiveContext</a>, analogous to the previous <code>SQLContext</code>. Then define a helper function to run the query using the new <code>hql</code> function, after which we print each line.</p>
+<pre><code class="(null)">val sc = new SparkContext(&quot;local[2]&quot;, &quot;Hive SQL (10)&quot;)
+val hiveContext = new HiveContext(sc)
+import hiveContext._   // Make methods local, like sql
 
-<p>sc = new SparkContext(&#8220;local[2]&#8221;, &#8220;Hive SQL (10)&#8221;)<br/>
-val hiveContext = new HiveContext(sc)<br/>
-import hiveContext._ // Make methods local, like sql</p>
+def sql2(title: String, query: String, n: Int = 100): Unit = {
+  println(title)
+  println(s&quot;Running query: $query&quot;)
+  sql(query).take(n).foreach(println)
+}</code></pre>
 
-<p>def sql2(title: String, query: String, n: Int = 100): Unit = {<br/>
- println(title)<br/>
- println(s&#8220;Running query: $query&#8221;)<br/>
- sql(query).take(n).foreach(println)<br/>
-}</p>
-<pre><code class="(null)">
-(Previously, this version of `sql` was called `hql`.) We can now execute Hive DDL statements, such the following statements to create a database, &quot;use it&quot; as the working database, and then a table inside it.
-</code></pre>
+<p>(Previously, this version of <code>sql</code> was called <code>hql</code>.) We can now execute Hive DDL statements, such the following statements to create a database, &#8220;use it&#8221; as the working database, and then a table inside it.</p>
+<pre><code class="(null)">sql2(&quot;Create a work database:&quot;, &quot;CREATE DATABASE work&quot;)
+sql2(&quot;Use the work database:&quot;, &quot;USE work&quot;)
 
-<p>(&#8220;Create a work database:&#8221;, &#8220;CREATE DATABASE work&#8221;)<br/>
-sql2(&#8220;Use the work database:&#8221;, &#8220;USE work&#8221;)</p>
+sql2(&quot;Create the &apos;external&apos; kjv Hive table:&quot;, s&quot;&quot;&quot;
+  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+    book    STRING,
+    chapter INT,
+    verse   INT,
+    text    STRING)
+  ROW FORMAT DELIMITED FIELDS TERMINATED BY &apos;|&apos;
+  LOCATION &apos;/user/$user/data/hive-kjv&apos;&quot;&quot;&quot;)</code></pre>
 
-<p>sql2(&#8220;Create the &#8216;external&#8217; kjv Hive table:&#8221;, s&quot;&quot;&#8220;<br/>
- CREATE EXTERNAL TABLE IF NOT EXISTS kjv (<br/>
- book STRING,<br/>
- chapter INT,<br/>
- verse INT,<br/>
- text STRING)<br/>
- ROW FORMAT DELIMITED FIELDS TERMINATED BY &#8216;|&#8217;<br/>
- LOCATION &#8216;/user/$user/data/hive-kjv&#8217;&#8221;&quot;&quot;)</p>
-<pre><code class="(null)">
-Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, a Hive extension, where we just tell it use data in a particular directory (`LOCATION`). Here is why we needed the user name, because Hive expects an absolute path.
+<p>Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an <code>EXTERNAL</code> table is created, a Hive extension, where we just tell it use data in a particular directory (<code>LOCATION</code>). Here is why we needed the user name, because Hive expects an absolute path.</p>
 
-A few points to keep in mind:
+<p>A few points to keep in mind:</p>
 
-* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive&apos;s own REPL or scripts, they cause errors here!
-* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `sql2`.
+<ul>
+<li><strong>Omit semicolons</strong> at the end of the HQL (Hive SQL) string. While those would be required in Hive&#8217;s own REPL or scripts, they cause errors here!</li>
+<li>The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in <code>sql2</code>.</li>
+</ul>
 
-## Wrapping Up
+</div><div><h2 id="wrappingup">Wrapping Up</h2>
 
-That&apos;s it for the examples and exercises based on them. Let&apos;s wrap up with a few tips and suggestions for further information.
+<p>That&#8217;s it for the examples and exercises based on them. Let&#8217;s wrap up with a few tips and suggestions for further information.</p>
 
-## Tip: Writing Serializable Closures
+</div><div><h2 id="tip:writingserializableclosures">Tip: Writing Serializable Closures</h2>
 
-Let&apos;s end with a tip; how to write &quot;safe&quot; closures. When you use a closure (anonymous function), Spark will serialize it and send it around the cluster. This means that any captured variables must be serializable.
+<p>Let&#8217;s end with a tip; how to write &#8220;safe&#8221; closures. When you use a closure (anonymous function), Spark will serialize it and send it around the cluster. This means that any captured variables must be serializable.</p>
 
-A common mistake is to capture a field in an object, which forces the whole object to be serialized. Sometimes it can&apos;t be. Consider this example adapted from [this presentation](http://spark-summit.org/wp-content/uploads/2013/10/McDonough-spark-tutorial_spark-summit-2013.pdf).
-</code></pre>
+<p>A common mistake is to capture a field in an object, which forces the whole object to be serialized. Sometimes it can&#8217;t be. Consider this example adapted from <a href="http://spark-summit.org/wp-content/uploads/2013/10/McDonough-spark-tutorial_spark-summit-2013.pdf">this presentation</a>.</p>
+<pre><code class="(null)">class RDDApp {
+  val factor = 3.14159
+  val log = new Log(...)
 
-<p>RDDApp {<br/>
- val factor = 3.14159<br/>
- val log = new Log(&#8230;)</p>
+  def multiply(rdd: RDD[Int]) = {
+    rdd.map(x =&gt; x * factor).reduce(...)
+  }
+}</code></pre>
 
-<p>def multiply(rdd: RDD[Int]) = {<br/>
- rdd.map(x =&gt; x * factor).reduce(&#8230;)<br/>
- }
-}</p>
-<pre><code class="(null)">
-The closure passed to `map` captures the field `factor` in the instance of `RDDApp`. However, the JVM must serialize the whole object, and a `NotSerializableException` will result when it attempts to serialize `log`.
+<p>The closure passed to <code>map</code> captures the field <code>factor</code> in the instance of <code>RDDApp</code>. However, the JVM must serialize the whole object, and a <code>NotSerializableException</code> will result when it attempts to serialize <code>log</code>.</p>
 
-Here is the work around; assign `factor` to a local field:
-</code></pre>
+<p>Here is the work around; assign <code>factor</code> to a local field:</p>
+<pre><code class="(null)">class RDDApp {
+  val factor = 3.14159
+  val log = new Log(...)
 
-<p>RDDApp {<br/>
- val factor = 3.14159<br/>
- val log = new Log(&#8230;)</p>
-
-<p>def multiply(rdd: RDD[Int]) = {<br/>
- val factor2 = factor<br/>
- rdd.map(x =&gt; x * factor2).reduce(&#8230;)<br/>
- }
-}<br/>
-```</p>
+  def multiply(rdd: RDD[Int]) = {
+    val factor2 = factor
+    rdd.map(x =&gt; x * factor2).reduce(...)
+  }
+}</code></pre>
 
 <p>Now, only <code>factor2</code> must be serialized.</p>
 

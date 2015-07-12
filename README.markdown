@@ -1097,7 +1097,7 @@ In either configuration, we need a second process or dedicated thread to either 
 
 So, let's run this configuration first. In Activator or SBT, run `SparkStreaming8Main` (*not* `SparkStreaming8MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
-This driver uses `DataDirectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming8` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
+This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming8` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
 If you watch the console output, you'll see messages like this:
 
@@ -1276,7 +1276,8 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
-See also [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and [DataSocketServer.scala](
+See also [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and
+[DataSocketServer.scala](
 #code/src/main/scala/sparkworkshop/util/DataSocketServer.scala).
 
 This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
@@ -1375,10 +1376,6 @@ println("The query plan:")
 godVersesDF.queryExecution
 println("Number of verses that mention God: "+godVersesDF.count())
 godVersesDF.show()
-```
-
-val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-dump(counts)  // print the 1st 100 lines, but there are only 66 books/records...
 ```
 
 Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
