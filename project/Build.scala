@@ -81,7 +81,7 @@ object ActivatorSparkBuild extends Build {
       mainClass := Some("run"),
       // Must run the examples and tests in separate JVMs to avoid mysterious
       // scala.reflect.internal.MissingRequirementError errors. (TODO)
-      fork := true,
+      // fork := true,
       // Must run Spark tests sequentially because they compete for port 4040!
       parallelExecution in Test := false))
 }
