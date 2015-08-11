@@ -178,7 +178,7 @@ Several years ago, the Spark team ported the Hive query engine to Spark, calling
 
 ## The Spark Version
 
-This workshop uses Spark 1.4.0.
+This workshop uses Spark 1.4.1.
 
 The following documentation links provide more information about Spark:
 
@@ -1418,7 +1418,7 @@ Th `sparkshell.sh` script does some set up, but essentially its equivalent to th
 
 ```
 $SPARK_HOME/bin/spark-shell \
-  --jars target/scala-2.10/activator-spark_2.11-4.0.0.jar [arguments]
+  --jars target/scala-2.10/activator-spark_2.11-4.0.1.jar [arguments]
 ```
 
 The jar file contains all the project's build artifacts (but not the dependencies).
