@@ -17,7 +17,7 @@
 <a href="mailto:dean.wampler@typesafe.com">dean.wampler@typesafe.com</a><br/>
 <a href="https://twitter.com/deanwampler">@deanwampler</a></p>
 
-<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> version 1.4 applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.</p>
+<p>This workshop demonstrates how to write and run <a href="http://spark.apache.org">Apache Spark</a> applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.</p>
 
 <p>If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine &#8220;sandboxes&#8221; with Spark included. See their websites for information.</p>
 
@@ -33,11 +33,9 @@
 
 <p>Working in <em>local mode</em> makes it easy to edit, test, run, and debug applications quickly. Then, running them in a cluster provides more real-world testing and finally production scalability and resiliency.</p>
 
-<p>We will build and run the examples and exercises using <a href="http://typesafe.com/activator">Typesafe Activator</a>, which includes web-based and command-line interfaces. Activator includes a build tool for Scala that we&#8217;ll use to download the libraries we need and to build our examples.</p>
+<p>We will build and run the examples and exercises using <a href="http://www.scala-sbt.org/download.html">SBT</a> or <a href="http://typesafe.com/activator">Typesafe Activator</a>, which includes a web-based UI and the SBT command-line interface.</p>
 
 <p><a href="https://typesafe.com/activator">Activator</a> is part of the <a href="https://typesafe.com/platform/getstarted">Typesafe Reactive Platform</a>. It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you&#8217;ve loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This <em>Spark Workshop</em> is one example.</p>
-
-<p>Activator also includes SBT, which the UI uses under the hood. You can use the <em>shell</em> mode explicitly if you prefer running <code>sbt</code> &#8220;tasks&#8221;.</p>
 
 <p>You&#8217;ll need either Activator or SBT installed.</p>
 
@@ -47,12 +45,12 @@
 <p><strong>NOTE:</strong> Activator version 1.3 or later is required.</p>
 </blockquote>
 
-<p>If you prefer SBT and you need to install it, follow the instructions on the <a href="http://www.scala-sbt.org/download.html">download</a> page. SBT puts itself on your path. However, if you have a custom installation that isn&#8217;t on your path, define the environment variable <code>SBT_HOME</code> (MacOS, Linux, or Cygwin only).</p>
+<p>If you prefer SBT and you don't already have it installed, follow the instructions on the <a href="http://www.scala-sbt.org/download.html">download</a> page. SBT puts itself on your path. However, if you have a custom installation that isn&#8217;t on your path, define the environment variable <code>SBT_HOME</code> (MacOS, Linux, or Cygwin only).</p>
 
 </div><div><h2 id="setupforhadoopmode">Setup for Hadoop Mode</h2>
 
 <blockquote>
-<p>NOTE: If you are here to learn Spark, you don&#8217;t need to setup these exercises for Hadoop execution. Come back to these instructions when you&#8217;re ready to try working with Spark on Hadoop. Also, this &#8220;mode&#8221; is not as well tested as I would like, so please report bugs!</p>
+<p>NOTE: If you are here to learn Spark, you don&#8217;t need to setup these exercises for Hadoop execution. Come back to these instructions when you&#8217;re ready to try working with Spark on Hadoop. Also, this &#8220;mode&#8221; is not as well tested as I would like, so please report bugs or send patch requests!</p>
 </blockquote>
 
 <p>If you want to run the examples on Hadoop, choose one of the following options.</p>
@@ -70,13 +68,13 @@
 
 <p>You&#8217;ll also need Activator or SBT on the server or sandbox to run the examples. Recall that I recommend going through the workshop on your local workstation first, then move everything to the cluster node or sandbox to try running the examples in Hadoop.</p>
 
-</div><div><h2 id="startingactivator">Starting Activator</h2>
+</div><div><h2 id="startingactivator">Starting Activator or SBT</h2>
 
 <p>From now on, except where noted, the instructions apply for both your local workstation and Hadoop setup.</p>
 
 <p>First, change to the root directory for this workshop.</p>
 
-<p>If you prefer a command-line interface, either run <code>activator shell</code> or <code>sbt</code>, depending on which tool you installed.</p>
+<p>If you prefer a command-line interface, either run <code>activator shell</code> or <code>sbt</code>, depending on which tool you installed. In fact, you'll use this approach for several of the exercises.</p>
 
 <p>To use Activator&#8217;s UI, run <code>activator ui</code>, assuming it&#8217;s in your path, or use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, open <a href="http://localhost:8888">localhost:8888</a> in your browser.)</p>
 
@@ -195,7 +193,7 @@
 
 </div><div><h2 id="thesparkversion">The Spark Version</h2>
 
-<p>This workshop uses Spark 1.4.1.</p>
+<p>This workshop uses Spark 1.5.1.</p>
 
 <p>The following documentation links provide more information about Spark:</p>
 
