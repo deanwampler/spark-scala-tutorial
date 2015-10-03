@@ -9,7 +9,7 @@
 // task, but we'll configure it to use the same commands that spark-shell use.
 // import org.apache.spark.SparkContext
 // import org.apache.spark.SparkContext._
-// val sc = new SparkContext("local", "Intro (1)")
+// val sc = new SparkContext("local[*]", "Intro (1)")
 
 // Load the King James Version of the Bible, then convert
 // each line to lower case, creating an RDD.

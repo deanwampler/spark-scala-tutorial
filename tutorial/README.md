@@ -244,7 +244,7 @@ First, there are some commented lines that every Spark program needs, but you do
 ```
 // import org.apache.spark.SparkContext
 // import org.apache.spark.SparkContext._
-// val sc = new SparkContext("local", "Intro (1)")
+// val sc = new SparkContext("local[*]", "Intro (1)")
 ```
 
 The [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) drives everything else. Why are there two, very similar `import` statements? The first one imports the `SparkContext` type so it wouldn't be necessary to use a fully-qualified name in the `new SparkContext` statement. The second import statement is analogous to a `static import` in Java, where we make some methods and values visible in the current scope, again without requiring qualification.
@@ -254,7 +254,7 @@ The [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.
 When a `SparkContext` is constructed, there are several constructors that can be used. The one shown takes a string for the "master" and an arbitrary job name. The master must be one of the following:
 
 * `local`: Start the Spark job standalone and use a single thread to run the job.
-* `local[k]`: Use `k` threads instead. Should be less than the number of cores.
+* `local[k]`: Use `k` threads instead. Should be less than or equal to the number of cores. Use `local[*]` for all cores.
 * `mesos://host:port`: Connect to a running, Mesos-managed Spark cluster.
 * `spark://host:port`: Connect to a running, standalone Spark cluster.
 * `yarn-client` or `yarn-cluster`: Connect to a YARN cluster, which we'll use implicitly when we run in Hadoop.
@@ -317,6 +317,14 @@ A non-script program should gracefully shutdown, but we don't need to do so here
 
 If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`.
 
+## The Spark Web Console
+
+When you have a `SparkContext` running, it provides a web UI with very useful information about how your job is mapped to JVM tasks, metrics about execution, etc.
+
+Before we finish this exercise, open [localhost:4040](http://localhost:4040) and browse the UI. You will find this console very useful for learning Spark internals and when debugging problems.
+
+## Exercises
+
 There are comments at the end of this file with suggested exercises to learn the API. All the subsequent examples we'll discuss include suggested exercises, too. Solutions for some of them are provided in the `src/main/scala/sparkworkshop/solns` directory.
 
 You can exit the Scala REPL now. Type `:quit` or use `^d` (control-d).
@@ -337,7 +345,7 @@ This example does not have a Hadoop version, so we'll only run it locally.
 
 In the Activator UI, select the <a class="shortcut" href="#run">run</a> panel, then select `WordCount2` and click the "Start" button. The messages near the end of the output in the "Logs" panel lists the "output" directory, which is in the *local* file system, not HDFS.
 
-In the Activator `shell` or SBT, you can run it one of three ways:
+Alternatively, in the Activator `shell` or SBT, you can run it one of three ways:
 
 * Enter the `run` command and select the number corresponding to the `WordCount2` program.
 * Enter `run-main WordCount2`
@@ -414,7 +422,7 @@ Note that the input and output locations will be relative to the local file syst
 
 Spark also follows another Hadoop convention for file I/O; the `out` path is actually interpreted as a directory name. It will contain the same `_SUCCESS` and `part-00000` files discussed previously. In a real cluster with lots of data and lots of concurrent tasks, there would be many `part-NNNNN` files.
 
-**Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try "grepping" to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from? Look at the original file for clues.
+**Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try searching the input text file to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from? Look at the original file for clues.
 
 
 ## Exercises
@@ -552,20 +560,22 @@ Now we create a `SparkConf` to configure the `SparkContext` with the desired `ma
     val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
-    val sc = new SparkContext(master, "Word Count (3)")
+    val sc = new SparkContext(conf)
 ```
 
 Note the commented line. For best use of Kryo, you should "register" the classes you'll be serializing. However, Kryo already "knows" about common types, such as `String`, which is what we're using here, so we don't need this statement.
 
-Now we process the input as before, with one change...
+Now we process the input as before, with a few changes...
 
 ```
     try {
-      val input = sc.textFile(argz("input-path"))
+      val input = sc.textFile(in)
         .map(line => TextUtil.toText(line)) // also converts to lower case
 ```
 
-It starts out much like `WordCount2`, but it uses a helper method `TextUtil.toText` to split each line from the religious texts into fields, where the lines are of the form: `book|chapter#|verse#|text`. The `|` is the field delimiter. However, if other inputs are used, their text is returned unmodified. As before, the `input` reference is an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD). NOte that I omitted a subsequent call to `input.cache` as in `WordCount2`, because we are making a single pass through the data.
+It starts out much like `WordCount2`, but it uses a helper method `TextUtil.toText` to split each line from the religious texts into fields, where the lines are of the form: `book|chapter#|verse#|text`. The `|` is the field delimiter. However, if other inputs are used, their text is returned unmodified. As before, the `input` reference is an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD).
+
+Note that I omitted a subsequent call to `input.cache` as in `WordCount2`, because we are making a single pass through the data.
 
 ```
       val wc2 = input
@@ -591,6 +601,8 @@ Take `input` and split on non-alphabetic sequences of character as we did in `Wo
 
 The result of `countByValue` is a Scala `Map`, not an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD), so we format the key-value pairs into a sequence of strings in comma-separated value (CSV) format. The we convert this sequence back to an [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) with `makeRDD`. Finally, we save to the file system as text.
 
+> **WARNING**: Methods like `countByValue` that return a Scala collection will copy the entire object back to the driver program. This could crash your application with an [OutOfMemory](http://docs.oracle.com/javase/8/docs/api/java/lang/OutOfMemoryError.html) exception if the collection is too big!
+
 ## Running as a Hadoop Job
 
 In a previous section, we described how to run `WordCount3` either locally or in Hadoop. Let's discuss the Hadoop details now.
@@ -603,7 +615,7 @@ The output is more verbose and the execution time is longer, due to Hadoop's ove
 
 Using the Activator shell or SBT, you can also use `run-main hadoop.HWordCount3` or the alias `hex3`.
 
-For convenient, there is also a bash shell script for this example in the `scripts` directory, [scripts.wordcount3.sh](#code/scripts.wordcount3.sh):
+For convenient, there is also a bash shell script for this example in the `scripts` directory, [scripts.wordcount3.sh](#code/scripts/wordcount3.sh):
 
 ```
 #!/bin/bash
@@ -613,7 +625,7 @@ dir=$(dirname $0)
 $dir/hadoop.sh --class WordCount3 --output "$output" "$@"
 ```
 
-It calls a [scripts.hadoop.sh](#code/scripts.hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the Activator *run* command.
+It calls a [scripts/hadoop.sh](#code/scripts.hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the Activator *run* command.
 
 The other examples also have corresponding scripts and driver programs.
 
@@ -632,7 +644,7 @@ object HWordCount3 {
 
 It accepts the same options as `WordCount3`, although the `--master` option defaults to `yarn-client` this time.
 
-It delegates to a helper class [com.typesafe.sparkworkshop.util.Hadoop](#code/src/main/scala/com/typesafe/sparkworkshop/util/Hadoop.scala) to do the work. It passes as arguments the class name and the output location. The second argument is a hack: the default output path must be specified here, even though the same default value is also encoded in the application. This is because we eventually pass the value to the `hadoop.sh` script, which uses it to delete an old output directory, if any.
+It delegates to a helper class [com.typesafe.sparkworkshop.util.Hadoop](#code/src/main/scala/com/typesafe/sparkworkshop/util/Hadoop.scala) to do the work. It passes as arguments the class name and the output location. The second argument is a hack: the default output path must be specified here, even though the same default value is also encoded in the application. This is because we eventually pass the value to the [scripts.hadoop.sh](#code/scripts/hadoop.sh) script, which uses it to delete an old output directory, if any.
 
 Here is the `Hadoop` helper class:
 
@@ -667,7 +679,7 @@ object Hadoop {
 
 It tries to determine the user name and whether or not the user explicitly specified an output argument, which should override the hard-coded value.
 
-Finally, it invokes the [scripts.hadoop.sh](#code/scripts.hadoop.sh) `bash` script we mentioned above, so that we go thorugh Spark's `spark-submit` script for submitting to the Hadoop YARN cluster.
+Finally, it invokes the [scripts/hadoop.sh](#code/scripts.hadoop.sh) `bash` script we mentioned above, so that we go thorugh Spark's `spark-submit` script for submitting to the Hadoop YARN cluster.
 
 ## WordCount3 Exercises
 
@@ -896,7 +908,9 @@ input
   //   case (word, seq) => (word, seq.mkString(", "))
   // }
   .saveAsTextFile(out)
-} finally { ... }
+} finally {
+  sc.stop()
+}
 ```
 
 Each output record has the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
@@ -993,6 +1007,8 @@ The rest of the code formats the results and converts them to a new `RDD` for ou
 [Joins7.scala](#code/src/main/scala/sparkworkshop/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
+
+> **NOTE:** You will typically use the [SQL/DataFrame](http://spark.apache.org/docs/latest/sql-programming-guide.html) API to do joins instead of the [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) API, because it's both easier to write them and the optimizations under the hood are better!
 
 Here, we will join the KJV Bible data with a small "table" that maps the book abbreviations to the full names, e.g., `Gen` to `Genesis`.
 
@@ -1439,7 +1455,7 @@ To enter the statements using copy and paste, just paste them at the `scala>` pr
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
 
-The key [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, by default. (The format for `write.save` can be overridden to default to a different format.) Note that previously, the now deprecated `SqlContext.parquetFile(inpath)` and `DataFrame.saveAsParquetFile(outpath)` were used.
+The key [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, by default. (The format for `write.save` can be overridden to default to a different format.) Note that previously, the now deprecated `SqlContext.parquetFile(inpath)` and `DataFrame.saveAsParquetFile(outpath)` were used.
 
 See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9-script.scala`.
 
@@ -1554,9 +1570,10 @@ This is a general issue for distributed programs written for the JVM. A future v
 
 To learn more, see the following resources:
 
-* [Typesafe's Big Data Products and Services](http://typesafe.com/reactive-big-data). Typesafe now offers more detailed Spark training and consulting services, plus commercial support Spark on Mesos. Additional products and services are forthcoming.
+* [Typesafe's Big Data Products and Services](http://typesafe.com/reactive-big-data). Typesafe now offers commercial support for Spark on Mesos, as well as developer support, including Spark training and consulting, for all environments.
+* [Fast Data: Big Data Evolved](http://typesafe.com/fast-data). A whitepaper I wrote for Typesafe about the emerging, stream-oriented architecture for Big Data.
 * The Apache Spark [website](http://spark.apache.org/).
-* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/latest/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [SchemaRDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SchemaRDD).
+* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/latest/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame).
 * The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 * [Talks from Spark Summit conferences](http://spark-summit.org).
 * [Learning Spark](http://shop.oreilly.com/product/0636920028512.do), an excellent introduction from O'Reilly.
@@ -1570,10 +1587,11 @@ To learn more, see the following resources:
 
 * See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
 * See [Typesafe Reactive Big Data](http://typesafe.com/reactive-big-data) for more information about our products and services around Spark and Big Data.
-* See [Typesafe](http://typesafe.com) for information about our other products and services.
+* See [Fast Data: Big Data Evolved](http://typesafe.com/fast-data) for more on my vision for stream-oriented architectures for Big Data.
+* See [Typesafe](http://typesafe.com) for information about the *Typesafe Reactive Platform*, training, and services.
 
 ## Final Thoughts
 
-Thank you for working through this workshop. Feedback, including pull requests for enhancements are welcome.
+Thank you for working through this workshop. Feedback and pull requests are welcome.
 
 [Dean Wampler](mailto:dean.wampler@typesafe.com)
