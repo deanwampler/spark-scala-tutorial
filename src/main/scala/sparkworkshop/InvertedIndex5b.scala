@@ -79,6 +79,21 @@ object InvertedIndex5b {
         // }
         .saveAsTextFile(out)
     } finally {
+      // This is a good time to look at the web console again:
+      if (! quiet) {
+        println("""
+          |========================================================================
+          |
+          |    Before closing down the SparkContext, open the Spark Web Console
+          |    http://localhost:4040 and browse the information about the tasks
+          |    run for this example.
+          |
+          |    When finished, hit the <return> key to exit.
+          |
+          |========================================================================
+          """.stripMargin)
+        Console.in.read()
+      }
       sc.stop()
     }
 

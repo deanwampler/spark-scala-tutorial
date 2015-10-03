@@ -79,9 +79,10 @@ object ActivatorSparkBuild extends Build {
       excludeFilter in unmanagedSources := (HiddenFileFilter || "*-script.scala"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       mainClass := Some("run"),
-      // Must run the examples and tests in separate JVMs to avoid mysterious
-      // scala.reflect.internal.MissingRequirementError errors. (TODO)
-      // fork := true,
+      //This is important for some programs to read input from stdin
+      connectInput in run := true,
+      // Works better to run the examples and tests in separate JVMs.
+      fork := true,
       // Must run Spark tests sequentially because they compete for port 4040!
       parallelExecution in Test := false))
 }
