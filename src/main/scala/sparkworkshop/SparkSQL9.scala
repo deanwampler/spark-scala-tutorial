@@ -1,5 +1,5 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, Verse}
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
@@ -39,7 +39,12 @@ object SparkSQL9 {
       FileUtil.rmrf(outvpb)
     }
 
-    val sc = new SparkContext(argz("master"), "Spark SQL (9)")
+    val name = "Spark SQL (9)"
+    val conf = new SparkConf().
+      setMaster(master).
+      setAppName(name).
+      set("spark.app.id", name)   // To silence Metrics warning.
+    val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
     import sqlContext.sql    // Convenient for running SQL queries.

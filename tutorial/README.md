@@ -557,13 +557,28 @@ Note that this logic is only invoked in local mode, because `FileUtil` only work
 Now we create a `SparkConf` to configure the `SparkContext` with the desired `master` setting, application name, and the use of Kryo serialization.
 
 ```
-    val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
-    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
+    val name = "Word Count (3)"
+    val conf = new SparkConf().
+      setMaster(master).
+      setAppName(name).
+      set("spark.app.id", name).   // To silence Metrics warning.
+      set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     val sc = new SparkContext(conf)
 ```
 
-Note the commented line. For best use of Kryo, you should "register" the classes you'll be serializing. However, Kryo already "knows" about common types, such as `String`, which is what we're using here, so we don't need this statement.
+If the data had a custom type, we would want to register it with Kryo, which already handles common types, like `String`, which is all we use here for "records". For serializing your classes, _replace_ this line:
+
+```
+      set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+```
+
+with this line:
+
+```
+      registerKryoClasses(Array(classOf[MyCustomClass]))
+```
+
+Actually, it's harmless to leave in the `set("spark.serializer", ...)`, but it's done for you inside `registerKryoClasses`.
 
 Now we process the input as before, with a few changes...
 
@@ -752,7 +767,7 @@ object Matrix4 {
 `Dimensions` is a convenience class for capturing the default or user-specified matrix dimensions. We parse the argument string to extract `N` and `M`, then construct a `Dimension` instance.
 
 ```
-    val sc = new SparkContext("local", "Matrix (4)")
+    val sc = new SparkContext(...)
 
     try {
       // Set up a mxn matrix of numbers.
@@ -1200,20 +1215,17 @@ The `EndOfStreamListener` will be used to detect when a socket connection drops.
 
 ```
 ...
-val conf = new SparkConf()
-         .setMaster("local[*]")
-         .setAppName("Spark Streaming (8)")
-         .set("spark.cleaner.ttl", "60")
-         .set("spark.files.overwrite", "true")
-         // If you need more memory:
-         // .set("spark.executor.memory", "1g")
+val conf = new SparkConf().
+  setMaster("local[*]").
+  setAppName("Spark Streaming (8)").
+  set("spark.app.id", "Spark Streaming (8)").   // To silence Metrics warning.
+  set("spark.files.overwrite", "true")
+  // If you need more memory:
+  // .set("spark.executor.memory", "1g")
 val sc  = new SparkContext(conf)
 ```
 
-
-Construct the `SparkContext` a different way, by first defining a `SparkConf` (configuration) object. First, it is necessary to use at least 2 cores when running locally to avoid a [problem discussed here](http://apache-spark-user-list.1001560.n3.nabble.com/streaming-questions-td3281.html). We use `*` to let it use as many cores as it can, `setMaster("local[*]")`
-
-Spark Streaming requires the TTL to be set, `spark.cleaner.ttl`, which defaults to infinite. This specifies the duration in seconds for how long Spark should remember any metadata, such as the stages and tasks generated, etc. Periodic clean-ups are necessary for long-running streaming jobs. Note that an RDD that persists in memory for more than this duration will be cleared as well. See [Configuration](http://spark.apache.org/docs/latest/configuration.html) for more details.
+It is necessary to use at least 2 cores here, because each stream `Reader` will lock a core. We have run stream for input and hence one `Reader`, plus another core for the rest of our processing. So, we use `*` to let it use as many cores as it can, `setMaster("local[*]")`
 
 With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval, 2 seconds. The best choice will depend on the data rate, how soon the events need processing, etc. Then, we add a listener for socket drops:
 
@@ -1580,8 +1592,7 @@ To learn more, see the following resources:
 
 **Other Spark Based Libraries:**
 
-* [Snowplow's Spark Example Project](https://github.com/snowplow/spark-example-project).
-* [Thunder - Large-scale neural data analysis with Spark](https://github.com/freeman-lab/thunder).
+* [Spark Packages](http://spark-packages.org/).
 
 ## For more about Typesafe:
 

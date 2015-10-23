@@ -1,6 +1,6 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /**
@@ -36,7 +36,13 @@ object Joins7 {
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(argz("master"), "Joins (7)")
+    val name = "Joins (7)"
+    val conf = new SparkConf().
+      setMaster(master).
+      setAppName(name).
+      set("spark.app.id", name)   // To silence Metrics warning.
+    val sc = new SparkContext(conf)
+
     try {
       // Load one of the religious texts, don't convert each line to lower case
       // this time, then extract the fields in the "book|chapter|verse|text" format

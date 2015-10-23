@@ -1,6 +1,6 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /** NGrams6 - Find the ngrams in a corpus */
@@ -50,7 +50,13 @@ object NGrams6 {
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(master, "NGrams (6)")
+    val name = "NGrams (6)"
+    val conf = new SparkConf().
+      setMaster(master).
+      setAppName(name).
+      set("spark.app.id", name)   // To silence Metrics warning.
+    val sc = new SparkContext(conf)
+
     val ngramsStr = argz("ngrams").toLowerCase
     // Note that the replacement strings use Scala's triple quotes; necessary
     // to ensure that the final string is "\w+" and "\s+" for the reges.

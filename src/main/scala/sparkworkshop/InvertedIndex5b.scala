@@ -1,5 +1,5 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /** Inverted Index - Basis of Search Engines */
@@ -22,7 +22,12 @@ object InvertedIndex5b {
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(master, "Inverted Index (5b)")
+    val name = "Inverted Index (5b)"
+    val conf = new SparkConf().
+      setMaster(master).
+      setAppName(name).
+      set("spark.app.id", name)   // To silence Metrics warning.
+    val sc = new SparkContext(conf)
 
     try {
       // Load the input "crawl" data, where each line has the format:

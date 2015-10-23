@@ -2,9 +2,6 @@
 // Script files can't be compiled in the same way as normal code files, so
 // the SBT build is configured to ignore this file.
 
-// Not needed when using spark-shell or our sbt console setup:
-// import org.apache.spark.SparkContext
-// import org.apache.spark.SparkContext._
 import org.apache.spark.sql.SQLContext
 import com.typesafe.sparkworkshop.util.Verse
 

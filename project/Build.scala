@@ -4,10 +4,10 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "4.0.2"
+  val Version = "4.1.0"
   // You can use either version of Scala. We default to 2.11.7:
   val ScalaVersion = "2.11.7"
-  val ScalaVersions = Seq("2.11.7", "2.10.5")
+  val ScalaVersions = Seq("2.11.7", "2.10.6")
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     name          := Name,
@@ -78,6 +78,7 @@ object ActivatorSparkBuild extends Build {
       libraryDependencies ++= Dependencies.activatorspark,
       excludeFilter in unmanagedSources := (HiddenFileFilter || "*-script.scala"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
+      unmanagedResourceDirectories in Test += baseDirectory.value / "conf",
       mainClass := Some("run"),
       //This is important for some programs to read input from stdin
       connectInput in run := true,

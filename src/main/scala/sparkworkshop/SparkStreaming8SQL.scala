@@ -93,14 +93,14 @@ object SparkStreaming8SQL {
     // for pointers to debug a "BlockManager" problem when streaming. Specifically
     // for this example, it was necessary to specify 2 cores using
     // setMaster("local[2]").
-    val conf = new SparkConf()
-             .setMaster(master)
-             .setAppName("Spark Streaming (8)")
-             // If you need to control clean up of older RDDs:
-             // .set("spark.cleaner.ttl", "60")
-             .set("spark.files.overwrite", "true")
-             // If you need more memory:
-             // .set("spark.executor.memory", "1g")
+    val name = "Spark Streaming SQL (8)"
+    val conf = new SparkConf().
+      setMaster(master).
+      setAppName(name).
+      set("spark.app.id", name).   // To silence Metrics warning.
+      set("spark.files.overwrite", "true")
+      // If you need more memory:
+      // .set("spark.executor.memory", "1g")
     val sc  = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(batchSeconds))
     ssc.addStreamingListener(new EndOfStreamListener(ssc))
