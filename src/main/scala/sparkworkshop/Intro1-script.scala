@@ -41,10 +41,41 @@ val sinsPlusGodOrChrist  = sins filter filterFunc
 // Count how many we found. (Note we dropped the parentheses after "count")
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 
+// Let's do "Word Count", where we load a corpus of documents, tokenize them into
+// words and count the occurrences of all the words.
+
+// Define a helper method to look at the data. First we need to import the RDD
+// type:
+import org.apache.spark.rdd.RDD
+
+def peek(rdd: RDD[_], n: Int = 10): Unit = {
+  println("=====================")
+  rdd.take(n).foreach(println)
+  println("=====================")
+}
+
+// First, recall what "input" is:
+input
+peek(input)
+
+// Now split into words on anything that isn't an alphanumeric character:
+val words = input.flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
+peek(words)
+val wordGroups = words.groupBy(word => word)
+peek(wordGroups)
+val wordCounts1 = wordGroups.map( word_group => (word_group._1, word_group._2.size))
+peek(wordCounts1)
+
+// Another way to do the previous: Use "pattern matching" to break up the tuple
+// into two fields.
+val wordCounts2 = wordGroups.map{ case (word, group) => (word, group.size) }
+peek(wordCounts2)
+
+wordCounts1.saveAsTextFile("output/kjv-wc-groupby")
+
 // Not needed if you're using the actual Spark Shell and our configured sbt
 // console command.
 // sc.stop()
-
 
 // Exercise: Try different filters. The filter function could match on a
 //   regular expression, for example. Note also the line format in the input

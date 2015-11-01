@@ -309,13 +309,162 @@ val sinsPlusGodOrChrist  = sins filter filterFunc
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 ```
 
-A non-script program should gracefully shutdown, but we don't need to do so here. Both our configured `console` environment for local execution and `spark-shell` do this for us:
+Finally, let's do _Word Count_, where we load a corpus of documents, tokenize them into words and count the occurrences of all the words.
+
+First, we'll define a helper method to look at the data. We need to import the RDD type:
+
+```scala
+import org.apache.spark.rdd.RDD
+
+def peek(rdd: RDD[_], n: Int = 10): Unit = {
+  println("RDD type signature: "+rdd+"\n")
+  println("=====================")
+  rdd.take(n).foreach(println)
+  println("=====================")
+}
+```
+
+In the type signature `RDD[_]`, the `_` means "any type". In other words, we don't care what records this `RDD` is holding, because we're just going to call `toString` on it (indirectly). The second argument `n` is the number of records to print. It has a default value of `10`, which means if the caller doesn't provide this argument, we'll print `10` records.
+
+The `peek` function prints the type of the `RDD` by calling `toString` on it (effectively). Then it takes the first `n` records, loops through them, and prints each one on a line.
+
+Let's use `peek` to remind ourselves what the `input` value is. For this and the next few lines, I'll put in the `scala>` prompt, followed by the output:
+
+```scala
+scala> input
+res27: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[9] at map at <console>:20
+scala> peek(input)
+=====================
+gen|1|1| in the beginning god created the heaven and the earth.~
+gen|1|2| and the earth was without form, and void; and darkness was upon the face of the deep. and the spirit of god moved upon the face of the waters.~
+gen|1|3| and god said, let there be light: and there was light.~
+gen|1|4| and god saw the light, that it was good: and god divided the light from the darkness.~
+gen|1|5| and god called the light day, and the darkness he called night. and the evening and the morning were the first day.~
+gen|1|6| and god said, let there be a firmament in the midst of the waters, and let it divide the waters from the waters.~
+gen|1|7| and god made the firmament, and divided the waters which were under the firmament from the waters which were above the firmament: and it was so.~
+gen|1|8| and god called the firmament heaven. and the evening and the morning were the second day.~
+gen|1|9| and god said, let the waters under the heaven be gathered together unto one place, and let the dry land appear: and it was so.~
+gen|1|10| and god called the dry land earth; and the gathering together of the waters called he seas: and god saw that it was good.~
+=====================
+```
+
+Note that `input` is a subtype of `RDD` called `MapPartitionsRDD`. and the `RDD[String]` means the "records" are just strings. (You might see a different name than `res27`.) You might confirm for yourself that the lines shown by `peek(input)` match the input data file.
+
+Now, let's split each line into words. We'll treat any run of characters that don't include alphanumeric characters as the "delimiter":
+
+```scala
+scala> val words = input.flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
+words: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[25] at flatMap at <console>:22
+scala> peek(words)
+=====================
+gen
+in
+the
+beginning
+god
+created
+the
+heaven
+and
+the
+=====================
+```
+
+Does the output make sense to you? The type of the `RDD` hasn't changed, but the records are now individual words.
+
+Now let's use our friend from SQL `GROUPBY`, where we use the words as the "keys":
+
+```scala
+scala> val wordGroups = words.groupBy(word => word)
+wordGroups: org.apache.spark.rdd.RDD[(String, Iterable[String])] = ShuffledRDD[27] at groupBy at <console>:23
+scala> peek(wordGroups)
+=====================
+(winefat,CompactBuffer(winefat, winefat))
+(honeycomb,CompactBuffer(honeycomb, honeycomb, honeycomb, honeycomb, honeycomb, honeycomb, honeycomb, honeycomb, honeycomb))
+(bone,CompactBuffer(bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone, bone))
+(glorifying,CompactBuffer(glorifying, glorifying, glorifying))
+(nobleman,CompactBuffer(nobleman, nobleman, nobleman))
+(hodaviah,CompactBuffer(hodaviah, hodaviah, hodaviah))
+(raphu,CompactBuffer(raphu))
+(hem,CompactBuffer(hem, hem, hem, hem, hem, hem, hem))
+(onyx,CompactBuffer(onyx, onyx, onyx, onyx, onyx, onyx, onyx, onyx, onyx, onyx, onyx))
+(pigeon,CompactBuffer(pigeon, pigeon))
+=====================
+```
+
+Note that the records are now two-element `Tuples`: `(String, Iterable[String])`, where `Iterable` is a Scala abstraction for an underlying, sequential collection. We see that these iterables are `CompactBuffers`, a Spark collection that wraps an array of objects. Note that these buffers just hold repeated occurrences of the corresponding keys. This is wasteful, especially at scala! We'll learn a better way to do this calculation shortly.
+
+Finally, let's compute the size of each `CompactBuffer`, which completes the calculation of how many occurrences are there for each word:
+
+```scala
+scala> val wordCounts1 = wordGroups.map( word_group => (word_group._1, word_group._2.size))
+wordCounts1: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[28] at map at <console>:24
+
+scala> peek(wordCounts1)
+=====================
+(winefat,2)
+(honeycomb,9)
+(bone,19)
+(glorifying,3)
+(nobleman,3)
+(hodaviah,3)
+(raphu,1)
+(hem,7)
+(onyx,11)
+(pigeon,2)
+=====================
+```
+
+Note that the function passed to `map` expects a single two-element `Tuple` argument. We extract the two elements using the `_1` and `_2` methods. (Tuples index from 1, rather than 0, following historical convention.)
+
+There is a more concise syntax we can use for the method, which exploits _pattern matching_ to break up the tuple into its constituents, which are then assigned to the value names:
+
+```scala
+scala> val wordCounts2 = wordGroups.map{ case (word, group) => (word, group.size) }
+wordCounts2: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[28] at map at <console>:24
+
+scala> peek(wordCounts2)
+=====================
+(winefat,2)
+(honeycomb,9)
+(bone,19)
+(glorifying,3)
+(nobleman,3)
+(hodaviah,3)
+(raphu,1)
+(hem,7)
+(onyx,11)
+(pigeon,2)
+=====================
+```
+
+The results are exactly the same.
+
+Finally, let's save the results to the file system:
+
+```scala
+wordCounts1.saveAsTextFile("output/kjv-wc-groupby")
+```
+
+If you look in the directory `output/kjv-wc-groupby`, you'll see three files:
 
 ```
+_SUCCESS
+part-00000
+part-00001
+```
+
+The `_SUCCESS` file is empty. It's a marker used by the Hadoop File I/O libraries (which Spark uses) to signal to waiting processes that the file output has completed. The other two files each hold a _partition_ of the data. In this case, we had two partitions.
+
+We're done, but let's finish by noting that a non-script program should shutdown gracefully by calling `sc.stop()`. However, we don't need to do so here, because both our configured `console` environment for local execution and `spark-shell` do this for us:
+
+```scala
 // sc.stop()
 ```
 
 If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`.
+
+Note that if you need to exit the Scala/Spark console at this point, use `:quit` or `control-d`.
 
 ## The Spark Web Console
 
