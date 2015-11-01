@@ -411,7 +411,7 @@ scala&gt; peek(wordCounts1)
 =====================</code></pre>
 
 
-<p>Note that the function passed to <code>map</code> expects a single two-element <code>Tuple</code> argument. We extract the two elements using the <code>_1</code> and <code>_2</code> methods. (Tuples index from 1, rather than 0, following historical convention.)</p>
+<p>Note that the function passed to <code>map</code> expects a single two-element <code>Tuple</code> argument. We extract the two elements using the <code>_1</code> and <code>_2</code> methods. (Tuples index from 1, rather than 0, following historical convention.) The type of <code>wordCounts1</code> is <code>RDD[(String,Int)]</code>.</p>
 
 <p>There is a more concise syntax we can use for the method, which exploits <em>pattern matching</em> to break up the tuple into its constituents, which are then assigned to the value names:</p>
 
@@ -435,9 +435,17 @@ scala&gt; peek(wordCounts2)
 
 <p>The results are exactly the same.</p>
 
+<p>But there is actually an even easier way. Note that we aren't modifying the <em>keys</em> (the words), so we can use a convenience function <code>mapValues</code>, where only the value part (second tuple element) is passed to the anonymous function and the keys are retained:</p>
+
+<pre><code class="scala">scala&gt; val wordCounts3 = wordGroups.mapValues(group => group.size)
+wordCounts3: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[31] at mapValues at &lt;console&gt;:24
+
+scala&gt; peek(wordCounts3)
+// same as before</code></pre>
+
 <p>Finally, let&rsquo;s save the results to the file system:</p>
 
-<pre><code class="scala">wordCounts1.saveAsTextFile(&quot;output/kjv-wc-groupby&quot;)</code></pre>
+<pre><code class="scala">wordCounts3.saveAsTextFile(&quot;output/kjv-wc-groupby&quot;)</code></pre>
 
 
 <p>If you look in the directory <code>output/kjv-wc-groupby</code>, you&rsquo;ll see three files:</p>

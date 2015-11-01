@@ -71,7 +71,14 @@ peek(wordCounts1)
 val wordCounts2 = wordGroups.map{ case (word, group) => (word, group.size) }
 peek(wordCounts2)
 
-wordCounts1.saveAsTextFile("output/kjv-wc-groupby")
+// But there is actually an even easier way. Note that we aren't modifying the
+// "keys" (the words), so we can use a convenience function mapValues, where only
+// the value part (2nd tuple element) is passed to the anonymous function and
+// the keys are retained:
+val wordCounts3 = wordGroups.mapValues(group => group.size)
+peek(wordCounts3)
+
+wordCounts3.saveAsTextFile("output/kjv-wc-groupby")
 
 // Not needed if you're using the actual Spark Shell and our configured sbt
 // console command.
