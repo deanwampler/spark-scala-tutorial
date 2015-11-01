@@ -477,8 +477,6 @@ We're done, but let's finish by noting that a non-script program should shutdown
 
 If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`.
 
-Note that if you need to exit the Scala/Spark console at this point, use `:quit` or `control-d`.
-
 ## The Spark Web Console
 
 When you have a `SparkContext` running, it provides a web UI with very useful information about how your job is mapped to JVM tasks, metrics about execution, etc.
@@ -491,7 +489,7 @@ There are comments at the end of this file with suggested exercises to learn the
 
 You can exit the Scala REPL now. Type `:quit` or use `^d` (control-d).
 
-If you ran this example locally using the Activator/SBT `console`, you can exit that application using `exit` or `^d`. Do this if you want to continue using the Activator UI. Restart it as described previously.
+If you ran this example locally using the Activator/SBT `console`, you can exit that application using `exit` or `^d`. Do this if you want to continue using the Activator Web UI. Restart it as described previously. However, note that we'll need to use the console again for a few examples.
 
 ## WordCount2
 
