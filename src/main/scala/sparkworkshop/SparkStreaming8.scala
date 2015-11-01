@@ -127,8 +127,25 @@ object SparkStreaming8 {
       else ssc.awaitTermination()
     } finally {
       // Having the ssc.stop here is only needed when we use the timeout.
-      println("+++++++++++++ Stopping! +++++++++++++")
-      ssc.stop()
+      println("+++++++++++++ Stopping Streaming Context! +++++++++++++")
+      ssc.stop(stopSparkContext = false)
+
+      // This is a good time to look at the web console again:
+      if (! quiet) {
+        println("""
+          |========================================================================
+          |
+          |    Before closing down the SparkContext, open the Spark Web Console
+          |    http://localhost:4040 and browse the information about the tasks
+          |    run for this example.
+          |
+          |    When finished, hit the <return> key to exit.
+          |
+          |========================================================================
+          """.stripMargin)
+        Console.in.read()
+      }
+      sc.stop()
     }
   }
 

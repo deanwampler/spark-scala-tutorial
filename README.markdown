@@ -1503,17 +1503,10 @@ val inputPath = s"$inputRoot/data/kjvdat.txt"
 
 For HDFS, `inputRoot` would be something like `hdfs://my_name_node_server:8020`.
 
-Now define a convenience function for taking the first `n` records of a `DataFrame`, where `n` defaults to 100, and printing each one to the console:
-
-```scala
-def dump(df: DataFrame, n: Int = 100) =
-  df.take(n).foreach(println) // Take the first n lines, then print them.
-```
-
 We discussed earlier that our `console` setup automatically instantiates the `SparkContext` as a variable named `sc`. It also instantiates the wrapper [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) and imports some implicits. Note that you can still also use a `StreamingContext` to wrap the `SparkContext`, if you want, but we don't need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:
 
 ```scala
-// val sc = new SparkContext(argz("master"), "Spark SQL (9)")
+// val sc = new SparkContext("local[*]", "Spark SQL (9)")
 // val sqlContext = new SQLContext(sc)
 // import sqlContext.implicits._
 ```
@@ -1527,7 +1520,7 @@ We use `flatMap` over the results so that lines that fail to parse are essential
 
 ```scala
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
-val versesRDD = sc.textFile(argz("input-path")) flatMap {
+val versesRDD = sc.textFile(argz("input-path")).flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
@@ -1542,8 +1535,10 @@ Create a `DataFrame` from the `RDD`. Then, so we can write SQL queries against i
 val verses = sqlContext.createDataFrame(versesRDD)
 verses.registerTempTable("kjv_bible")
 verses.cache()
-// print the 1st 20 lines (Use dump(verses), defined above, for more lines)
+// print the 1st 20 lines. Pass an integer argument to show a different number
+// of lines:
 verses.show()
+verses.show(100)
 
 import sqlContext.sql  // for convenience
 
@@ -1566,13 +1561,15 @@ godVersesDF.show()
 
 Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
 
-It turns out that the previous query generated a *lot* of partitions. Using "coalesce" here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn't terrible when just calling dump, but watch what happens when you run the following two counts:
+It turns out that the previous query generated a *lot* of partitions. Using "coalesce" here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn't terrible in many contexts, but the following code compares counting with 200 (the default) vs. 1 partition:
 
 ```scala
-println("counts.count (takes a while):")
-println(s"result: ${counts.count}")
 val counts1 = counts.coalesce(1)
-println("counts1.count (fast!!):")
+val nPartitions  = counts.rdd.partitions.size
+val nPartitions1 = counts1.rdd.partitions.size
+println(s"counts.count (can take a while, # partitions = $nPartitions):")
+println(s"result: ${counts.count}")
+println(s"counts1.count (usually faster, # partitions = $nPartitions1):")
 println(s"result: ${counts1.count}")
 ```
 
@@ -1580,29 +1577,27 @@ The `DataFrame` version is quite simple:
 
 ```scala
 val countsDF = verses.groupBy("book").count()
-dump(countsDF)
+countsDF.show(100)
 countsDF.count
-val countsDF1 = countsDF.coalesce(1)
-countsDF1.count
 ```
 
 ## Using SQL in the Spark Shell
 
 So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the [scripts](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/scripts) directory:
 
-```scala
+```sh
 scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala
 ```
 
 Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
 
-```scala
+```sh
 scripts/sparkshell.sh
 ```
 
 Th `sparkshell.sh` script does some set up, but essentially its equivalent to the following:
 
-```scala
+```sh
 $SPARK_HOME/bin/spark-shell \
   --jars target/scala-2.11/activator-spark_2.11-4.0.1.jar [arguments]
 ```

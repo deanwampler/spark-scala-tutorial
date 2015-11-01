@@ -1,4 +1,4 @@
-<div><h2 id="apache-spark-workshop">Spark Workshop</h2>
+<div><h2 id="apache-spark-workshop">Apache Spark Workshop</h2>
 
 <p><img src="http://spark.apache.org/docs/latest/img/spark-logo-100x40px.png" alt="" /></p>
 
@@ -435,13 +435,17 @@ scala&gt; peek(wordCounts2)
 
 <p>The results are exactly the same.</p>
 
-<p>But there is actually an even easier way. Note that we aren't modifying the <em>keys</em> (the words), so we can use a convenience function <code>mapValues</code>, where only the value part (second tuple element) is passed to the anonymous function and the keys are retained:</p>
+<p>But there is actually an even easier way. Note that we aren&rsquo;t modifying the<br/>
+<em>keys</em> (the words), so we can use a convenience function <code>mapValues</code>, where only<br/>
+the value part (second tuple element) is passed to the anonymous function and<br/>
+the keys are retained:</p>
 
-<pre><code class="scala">scala&gt; val wordCounts3 = wordGroups.mapValues(group => group.size)
+<pre><code class="scala">scala&gt; val wordCounts3 = wordGroups.mapValues(group =&gt; group.size)
 wordCounts3: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[31] at mapValues at &lt;console&gt;:24
 
 scala&gt; peek(wordCounts3)
 // same as before</code></pre>
+
 
 <p>Finally, let&rsquo;s save the results to the file system:</p>
 
@@ -476,7 +480,7 @@ part-00001</code></pre>
 
 <p>You can exit the Scala REPL now. Type <code>:quit</code> or use <code>^d</code> (control-d).</p>
 
-<p>If you ran this example locally using the Activator/SBT <code>console</code>, you can exit that application using <code>exit</code> or <code>^d</code>. Do this if you want to continue using the Activator Web UI. Restart it as described previously. However, note that we'll need to use the console again for a few examples.</p>
+<p>If you ran this example locally using the Activator/SBT <code>console</code>, you can exit that application using <code>exit</code> or <code>^d</code>. Do this if you want to continue using the Activator Web UI. Restart it as described previously. However, note that we&rsquo;ll need to use the console again for a few examples.</p>
 
 </div><div><h2 id="wordcount2">WordCount2</h2>
 
@@ -1447,15 +1451,9 @@ val inputPath = s&quot;$inputRoot/data/kjvdat.txt&quot;</code></pre>
 
 <p>For HDFS, <code>inputRoot</code> would be something like <code>hdfs://my_name_node_server:8020</code>.</p>
 
-<p>Now define a convenience function for taking the first <code>n</code> records of a <code>DataFrame</code>, where <code>n</code> defaults to 100, and printing each one to the console:</p>
-
-<pre><code class="scala">def dump(df: DataFrame, n: Int = 100) =
-  df.take(n).foreach(println) // Take the first n lines, then print them.</code></pre>
-
-
 <p>We discussed earlier that our <code>console</code> setup automatically instantiates the <code>SparkContext</code> as a variable named <code>sc</code>. It also instantiates the wrapper <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext">SQLContext</a> and imports some implicits. Note that you can still also use a <code>StreamingContext</code> to wrap the <code>SparkContext</code>, if you want, but we don&rsquo;t need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:</p>
 
-<pre><code class="scala">// val sc = new SparkContext(argz(&quot;master&quot;), &quot;Spark SQL (9)&quot;)
+<pre><code class="scala">// val sc = new SparkContext(&quot;local[*]&quot;, &quot;Spark SQL (9)&quot;)
 // val sqlContext = new SQLContext(sc)
 // import sqlContext.implicits._</code></pre>
 
@@ -1468,7 +1466,7 @@ val inputPath = s&quot;$inputRoot/data/kjvdat.txt&quot;</code></pre>
 <p>We use <code>flatMap</code> over the results so that lines that fail to parse are essentially put into empty lists that will be ignored.</p>
 
 <pre><code class="scala">val lineRE = &quot;&quot;&quot;^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$&quot;&quot;&quot;.r
-val versesRDD = sc.textFile(argz(&quot;input-path&quot;)) flatMap {
+val versesRDD = sc.textFile(argz(&quot;input-path&quot;)).flatMap {
   case lineRE(book, chapter, verse, text) =&gt;
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =&gt;
@@ -1482,8 +1480,10 @@ val versesRDD = sc.textFile(argz(&quot;input-path&quot;)) flatMap {
 <pre><code class="scala">val verses = sqlContext.createDataFrame(versesRDD)
 verses.registerTempTable(&quot;kjv_bible&quot;)
 verses.cache()
-// print the 1st 20 lines (Use dump(verses), defined above, for more lines)
+// print the 1st 20 lines. Pass an integer argument to show a different number
+// of lines:
 verses.show()
+verses.show(100)
 
 import sqlContext.sql  // for convenience
 
@@ -1505,39 +1505,39 @@ godVersesDF.show()</code></pre>
 
 <p>Note that the SQL dialect currently supported by the <code>sql</code> method is a subset of <a href="http://hive.apache.org">HiveSQL</a>. For example, it doesn&rsquo;t permit column aliasing, e.g., <code>COUNT(*) AS count</code>. Nor does it appear to support <code>WHERE</code> clauses in some situations.</p>
 
-<p>It turns out that the previous query generated a <em>lot</em> of partitions. Using &ldquo;coalesce&rdquo; here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn&rsquo;t terrible when just calling dump, but watch what happens when you run the following two counts:</p>
+<p>It turns out that the previous query generated a <em>lot</em> of partitions. Using &ldquo;coalesce&rdquo; here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn&rsquo;t terrible in many contexts, but the following code compares counting with 200 (the default) vs. 1 partition:</p>
 
-<pre><code class="scala">println(&quot;counts.count (takes a while):&quot;)
+<pre><code class="scala">val counts1 = counts.coalesce(1)
+val nPartitions  = counts.rdd.partitions.size
+val nPartitions1 = counts1.rdd.partitions.size
+println(s&quot;counts.count (can take a while, # partitions = $nPartitions):&quot;)
 println(s&quot;result: ${counts.count}&quot;)
-val counts1 = counts.coalesce(1)
-println(&quot;counts1.count (fast!!):&quot;)
+println(s&quot;counts1.count (usually faster, # partitions = $nPartitions1):&quot;)
 println(s&quot;result: ${counts1.count}&quot;)</code></pre>
 
 
 <p>The <code>DataFrame</code> version is quite simple:</p>
 
 <pre><code class="scala">val countsDF = verses.groupBy(&quot;book&quot;).count()
-dump(countsDF)
-countsDF.count
-val countsDF1 = countsDF.coalesce(1)
-countsDF1.count</code></pre>
+countsDF.show(100)
+countsDF.count</code></pre>
 
 
 </div><div><h2 id="using-sql-in-the-spark-shell">Using SQL in the Spark Shell</h2>
 
 <p>So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the <a href="https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/scripts">scripts</a> directory:</p>
 
-<pre><code class="scala">scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala</code></pre>
+<pre><code class="sh">scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala</code></pre>
 
 
 <p>Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:</p>
 
-<pre><code class="scala">scripts/sparkshell.sh</code></pre>
+<pre><code class="sh">scripts/sparkshell.sh</code></pre>
 
 
 <p>Th <code>sparkshell.sh</code> script does some set up, but essentially its equivalent to the following:</p>
 
-<pre><code class="scala">$SPARK_HOME/bin/spark-shell \
+<pre><code class="sh">$SPARK_HOME/bin/spark-shell \
   --jars target/scala-2.11/activator-spark_2.11-4.0.1.jar [arguments]</code></pre>
 
 

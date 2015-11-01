@@ -23,19 +23,17 @@ abbrevNames.registerTempTable("abbrevs_to_names")
 // but it does assign a name to "columns" like this, which is "c1" in this case.
 // (You can omit the coalesce(1))
 val counts = sql("""
-  SELECT name, c1 FROM (
-    SELECT book, COUNT(*) FROM kjv_bible GROUP BY book) bc
+  SELECT name, count FROM (
+    SELECT book, COUNT(*) as count FROM kjv_bible GROUP BY book) bc
   JOIN abbrevs_to_names an ON bc.book = an.abbrev
   """).coalesce(1)
 counts.registerTempTable("counts")
 counts.printSchema
 counts.queryExecution
-counts.show()
-dump(counts)  // print all the lines; there are 66 books in the KJV.
+counts.show(100)  // print all the lines; there are 66 books in the KJV.
 
 // DataFrame version:
 val countsDF = verses.groupBy("book").count().
   join(abbrevNames, verses("book") === abbrevNames("abbrev")).
   select("name", "count").coalesce(1)
-countsDF.show()
-dump(countsDF)  // print all the lines; there are 66 books in the KJV.
+countsDF.show(100)

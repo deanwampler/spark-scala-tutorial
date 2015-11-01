@@ -8,12 +8,6 @@ import org.apache.spark.sql.DataFrame
 val inputRoot = "."
 val inputPath = s"$inputRoot/data/kjvdat.txt"
 
-// Dump a DataFrame to the console when running locally.
-// By default, it prints the first 100 lines of output, but you can call dump
-// with another number as the second argument to change that.
-def dump(df: DataFrame, n: Int = 100) =
-  df.take(n).foreach(println) // Take the first n lines, then print them.
-
 // The following are already invoked when we start sbt `console` or `spark-shell`
 // in the Spark distribution:
 // val sqlContext = new SQLContext(sc)
@@ -23,7 +17,7 @@ def dump(df: DataFrame, n: Int = 100) =
 // Also strips the trailing "~" in the KJV file.
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
 // Use flatMap to effectively remove bad lines.
-val versesRDD = sc.textFile(inputPath) flatMap {
+val versesRDD = sc.textFile(inputPath).flatMap {
   case lineRE(book, chapter, verse, text) =>
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
@@ -35,8 +29,10 @@ val versesRDD = sc.textFile(inputPath) flatMap {
 val verses = sqlContext.createDataFrame(versesRDD)
 verses.registerTempTable("kjv_bible")
 verses.cache()
-// print the 1st 20 lines (Use dump(verses), defined above, for more lines)
+// print the 1st 20 lines. Pass an integer argument to show a different number
+// of lines:
 verses.show()
+verses.show(100)
 
 import sqlContext.sql  // for convenience
 
@@ -58,25 +54,26 @@ godVersesDF.show()
 // to write the following query result to Parquet, for example.
 // Nor does it appear to support WHERE clauses in some situations.
 val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
-dump(counts)  // print the 1st 100 lines, but there are only 66 books/records...
+counts.show(100)  // print the 1st 100 lines, but there are only 66 books/records...
 
-// "Coalesce" all partitions into 1 partition. Otherwise, there are
-// 100s of partitions output from the last query. This isn't terrible when
-// calling dump, but watch what happens when you run the following two counts:
-println("counts.count (takes a while):")
-println(s"result: ${counts.count}")
+// Exercise: Sort the output by the book names. Sort by the counts.
+
+// Use "coalesce" when you have too many small partitions. The integer
+// passed to "coalesce" is the number of output partitions (1 in this case).
 val counts1 = counts.coalesce(1)
-println("counts1.count (fast!!):")
+val nPartitions  = counts.rdd.partitions.size
+val nPartitions1 = counts1.rdd.partitions.size
+println(s"counts.count (can take a while, # partitions = $nPartitions):")
+println(s"result: ${counts.count}")
+println(s"counts1.count (usually faster, # partitions = $nPartitions1):")
 println(s"result: ${counts1.count}")
 
 // DataFrame version:
 val countsDF = verses.groupBy("book").count()
-dump(countsDF)
+countsDF.show(100)
 countsDF.count
-val countsDF1 = countsDF.coalesce(1)
-countsDF1.count
 
-// Exercise: Sort the output by the words. How much overhead does this add?
+// Exercise: Sort the last output by the words, by counts. How much overhead does this add?
 // Exercise: Try a JOIN with the "abbrevs_to_names" data to convert the book
 //   abbreviations to full titles. (See solns/SparkSQL-..-script.scala)
 // Exercise: Play with the DataFrame DSL.

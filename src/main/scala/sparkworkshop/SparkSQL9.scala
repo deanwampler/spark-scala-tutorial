@@ -9,12 +9,6 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
  */
 object SparkSQL9 {
 
-  // Trying using this method to dump a DataFrame to the console when running locally.
-  // By default, it prints the first 100 lines of output, but you can call dump
-  // with another number as the second argument to change that.
-  def dump(df: DataFrame, n: Int = 100) =
-    df.take(n).foreach(println) // Take the first n lines, then print them.
-
   def main(args: Array[String]): Unit = {
 
     val options = CommandLineOptions(
@@ -70,7 +64,8 @@ object SparkSQL9 {
       val verses = sqlContext.createDataFrame(versesRDD)
       verses.registerTempTable("kjv_bible")
       verses.cache()
-      // print the 1st 20 lines (Use dump(verses), defined above, for more lines)
+      // print the 1st 20 lines (default: pass another integer as the argument
+      // to show() for a different number of lines).
       if (!quiet) {
         verses.show()
       }
@@ -100,17 +95,18 @@ object SparkSQL9 {
       // Nor does it appear to support WHERE clauses in some situations.
       val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
       if (!quiet) {
-        dump(counts)  // print all the book counts
+        counts.show(100)  // print all the book counts
       }
 
-      // "Coalesce" all partitions into 1 partition. Otherwise, there are
-      // 100s of partitions output from the last query. This isn't terrible when
-      // calling dump, but watch what happens when you run the following two counts:
+      // Use "coalesce" when you have too many small partitions. The integer
+      // passed to "coalesce" is the number of output partitions (1 in this case).
       val counts1 = counts.coalesce(1)
       if (!quiet) {
-        println("counts.count (takes a while):")
+        val nPartitions  = counts.rdd.partitions.size
+        val nPartitions1 = counts1.rdd.partitions.size
+        println(s"counts.count (can take a while, #$nPartitions partitions):")
         println(s"result: ${counts.count}")
-        println("counts1.count (fast!!):")
+        println(s"counts1.count (usually faster!! #$nPartitions1 partitions):")
         println(s"result: ${counts1.count}")
       }
       counts1.rdd.saveAsTextFile(outvpb)
@@ -120,8 +116,8 @@ object SparkSQL9 {
     }
 
     // For the following exercises, when you're running in local mode, consider
-    // using the "dump" method defined above to dump the output to the console
-    // instead of writing to a file.
+    // using the "show" method to write the output to the console instead of
+    // to a file.
     // Exercise: Sort the output by the words. How much overhead does this add?
     // Exercise: Try a JOIN with the "abbrevs_to_names" data to convert the book
     //   abbreviations to full titles. (See the provides solution as a script,
