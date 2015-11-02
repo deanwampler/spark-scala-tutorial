@@ -35,6 +35,25 @@ If you are not *already* viewing this workshop in Activator, install it by follo
 
 If you prefer SBT and you don't already have it installed, follow the instructions on the [download](http://www.scala-sbt.org/download.html) page. SBT puts itself on your path. However, if you have a custom installation that isn't on your path, define the environment variable `SBT_HOME` (MacOS, Linux, or Cygwin only).
 
+### NOTE for Windows users
+
+You will need to download a utility program called `winutils.exe`.
+
+If you have a Hadoop installation on your PC, see if `%HADOOP_HOME%\bin\winutils.exe` already exists.
+
+If not, download it from here: [http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe](http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe).
+
+If you have a Hadoop installation on your PC (just not `winutils.exe`...), move the downloaded `winutils.exe` to the `%HADOOP_HOME%\bin` directory.
+
+If you don't have a Hadoop installation on your PC, create a directory somewhere, e.g., `C:\hadoop`, and a `bin` subdirectory, e.g., `C:\hadoop\bin`. Move `winutils.exe` to the `bin` directory.
+
+Finally, make sure that Spark can find it. Do **one** of the following:
+
+* Define `HADOOP_HOME` to point to the parent of bin, e.g., `set HADOOP_HOME=C:\hadoop`.
+* Define `JAVA_OPTS` to point to the parent of bin, e.g., `set JAVA_OPTS=-Dhadoop.home.dir=C:\hadoop`
+
+Define either variable in the same command window that you'll use to run the the examples.
+
 ## Setup for Hadoop Mode
 
 > NOTE: If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. Also, this "mode" is not as well tested as I would like, so please report bugs or send patch requests!
