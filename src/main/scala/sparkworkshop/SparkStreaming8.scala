@@ -126,10 +126,6 @@ object SparkStreaming8 {
       if (term > 0) ssc.awaitTerminationOrTimeout(term * 1000)
       else ssc.awaitTermination()
     } finally {
-      // Having the ssc.stop here is only needed when we use the timeout.
-      println("+++++++++++++ Stopping Streaming Context! +++++++++++++")
-      ssc.stop(stopSparkContext = false)
-
       // This is a good time to look at the web console again:
       if (! quiet) {
         println("""
@@ -145,7 +141,9 @@ object SparkStreaming8 {
           """.stripMargin)
         Console.in.read()
       }
-      sc.stop()
+      // Having the ssc.stop here is only needed when we use the timeout.
+      println("+++++++++++++ Stopping Streaming Context! +++++++++++++")
+      ssc.stop(stopSparkContext = true)
     }
   }
 
