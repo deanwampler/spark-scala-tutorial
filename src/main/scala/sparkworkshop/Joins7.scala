@@ -80,7 +80,7 @@ object Joins7 {
       // Project out the flattened data we want:
       //   fullBookName|chapter|verse|text
 
-      val verses2 = verses map {
+      val verses2 = verses.map {
         // Drop the key - the abbreviated book name
         case (_, ((chapter, verse, text), fullBookName)) =>
           (fullBookName, chapter, verse, text)

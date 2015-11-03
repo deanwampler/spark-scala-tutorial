@@ -36,10 +36,10 @@ object WordCount2 {
       // each line to lower case, creating an RDD.
       val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 
-      // Cache the RDD in memory for fast, repeated access.
-      // You don't have to do this and you shouldn't unless the data IS reused.
-      // Otherwise, you'll use RAM inefficiently.
-      input.cache
+      // We could cache the RDD in memory for fast, repeated access, but
+      // we don't have to do this here because we're only going to make one
+      // pass through it. So, caching here could be inefficient.
+      // input.cache
 
       // Split on non-alphabetic sequences of characters. Note the regex used;
       // the similar, non-alphanumeric alternative """\W+""", does not work well

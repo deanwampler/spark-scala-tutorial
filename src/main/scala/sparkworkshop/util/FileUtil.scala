@@ -15,7 +15,7 @@ object FileUtil {
   def rmrf(root: File): Unit = {
     if (root.isFile) root.delete()
     else if (root.exists) {
-      root.listFiles foreach rmrf
+      root.listFiles.foreach(rmrf)
       root.delete()
     }
   }

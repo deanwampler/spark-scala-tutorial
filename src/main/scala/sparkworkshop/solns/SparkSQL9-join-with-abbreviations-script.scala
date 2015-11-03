@@ -7,7 +7,7 @@ val abbrevsNamesPath = s"$inputRoot/data/abbrevs-to-names.tsv"
 
 case class Abbrev(abbrev: String, name: String)
 
-val abbrevNamesRDD = sc.textFile(abbrevsNamesPath) flatMap { line =>
+val abbrevNamesRDD = sc.textFile(abbrevsNamesPath).flatMap { line =>
   val ary=line.split("\t")
   if (ary.length != 2) {
     Console.err.println(s"Unexpected line: $line")

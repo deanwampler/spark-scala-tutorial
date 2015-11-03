@@ -219,7 +219,7 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **Joins7:** Spark supports SQL-style joins as shown in this simple example.
 * **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
 * **SparkSQL9:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. There is also a
-* **SparkSQLParquet10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
+* **SparkSQLFileFormats10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
 * **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL! This example is in a `hadoop` subdirectory, because it uses features that require a Hadoop setup (more details later on).
 
 Let's now work through these exercises...
@@ -1635,9 +1635,9 @@ scala> :quit
 
 To enter the statements using copy and paste, just paste them at the `scala>` prompt instead of loading the file.
 
-## SparkSQLParquet10-script
+## SparkSQLFileFormats10-script
 
-[SparkSQLParquet10-script.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkSQLParquet10-script.scala)
+[SparkSQLFileFormats10-script.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkSQLFileFormats10-script.scala)
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
 

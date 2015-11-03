@@ -21,7 +21,7 @@ object TestUtil {
   def verify(actualFile: String, expectedFile: String) = {
     val actual   = Source.fromFile(actualFile).getLines.toSeq.sortBy(l => l)
     val expected = Source.fromFile(expectedFile).getLines.toSeq.sortBy(l => l)
-    (actual zip expected).zipWithIndex foreach {
+    (actual zip expected).zipWithIndex.foreach {
       case ((a, e), i) =>
         val a2 = a.sortBy(c => c)
         val e2 = e.sortBy(c => c)

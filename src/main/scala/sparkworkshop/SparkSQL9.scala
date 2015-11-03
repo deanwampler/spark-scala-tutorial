@@ -48,7 +48,7 @@ object SparkSQL9 {
       // Also strips the trailing "~" in the KJV file.
       val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
       // Use flatMap to effectively remove bad lines.
-      val versesRDD = sc.textFile(argz("input-path")) flatMap {
+      val versesRDD = sc.textFile(argz("input-path")).flatMap {
         case lineRE(book, chapter, verse, text) =>
           Seq(Verse(book, chapter.toInt, verse.toInt, text))
         case line =>
@@ -89,11 +89,8 @@ object SparkSQL9 {
       }
       godVersesDF.rdd.saveAsTextFile(outgv)
 
-      // NOTE: The basic SQL dialect currently supported doesn't permit
-      // column aliasing, e.g., "COUNT(*) AS count". This makes it difficult
-      // to write the following query result to Parquet, for example.
-      // Nor does it appear to support WHERE clauses in some situations.
-      val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
+      // Use GroupBy and column aliasing.
+      val counts = sql("SELECT book, COUNT(*) as count FROM kjv_bible GROUP BY book")
       if (!quiet) {
         counts.show(100)  // print all the book counts
       }

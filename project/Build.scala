@@ -4,7 +4,7 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "4.1.0"
+  val Version = "4.2.0"
   // You can use either version of Scala. We default to 2.11.7:
   val ScalaVersion = "2.11.7"
   val ScalaVersions = Seq("2.11.7", "2.10.6")
@@ -39,10 +39,10 @@ object Dependency {
     val ScalaCheck   = "1.12.2"
   }
 
-  val sparkCore      = "org.apache.spark"  %% "spark-core"      % Version.Spark  withSources()
-  val sparkStreaming = "org.apache.spark"  %% "spark-streaming" % Version.Spark  withSources()
-  val sparkSQL       = "org.apache.spark"  %% "spark-sql"       % Version.Spark  withSources()
-  val sparkRepl      = "org.apache.spark"  %% "spark-repl"      % Version.Spark  withSources()
+  val sparkCore      = "org.apache.spark"  %% "spark-core"      % Version.Spark
+  val sparkStreaming = "org.apache.spark"  %% "spark-streaming" % Version.Spark
+  val sparkSQL       = "org.apache.spark"  %% "spark-sql"       % Version.Spark
+  val sparkRepl      = "org.apache.spark"  %% "spark-repl"      % Version.Spark
 
   val scalaTest      = "org.scalatest"     %% "scalatest"       % Version.ScalaTest  % "test"
   val scalaCheck     = "org.scalacheck"    %% "scalacheck"      % Version.ScalaCheck % "test"

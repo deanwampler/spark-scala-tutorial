@@ -51,7 +51,7 @@ object Crawl5aLocal {
 
     try {
       val files_rdds = ingestFiles(in, sc)
-      val names_contents = files_rdds map {
+      val names_contents = files_rdds.map {
         // fold to convert lines into a long, space-separated string.
         // keyBy to generate a new RDD with schema (file_name, file_contents)
         case (file, rdd) => (file.getName, rdd.fold("")(_ + " " + _))

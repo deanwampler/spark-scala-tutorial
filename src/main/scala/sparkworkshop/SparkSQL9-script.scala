@@ -49,11 +49,8 @@ godVersesDF.queryExecution
 println("Number of verses that mention God: "+godVersesDF.count())
 godVersesDF.show()
 
-// NOTE: The basic SQL dialect currently supported doesn't permit
-// column aliasing, e.g., "COUNT(*) AS count". This makes it difficult
-// to write the following query result to Parquet, for example.
-// Nor does it appear to support WHERE clauses in some situations.
-val counts = sql("SELECT book, COUNT(*) FROM kjv_bible GROUP BY book")
+// Use GroupBy and column aliasing.
+val counts = sql("SELECT book, COUNT(*) as count FROM kjv_bible GROUP BY book")
 counts.show(100)  // print the 1st 100 lines, but there are only 66 books/records...
 
 // Exercise: Sort the output by the book names. Sort by the counts.

@@ -80,7 +80,6 @@ object WordCount3 {
 
     // Exercise: Try different arguments for the input and output.
     //   NOTE: I've observed 0 output for some small input files!
-    // Exercise: Don't discard the book names.
     // Exercise: Sort by word length.
   }
 }

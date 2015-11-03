@@ -37,7 +37,7 @@ object InvertedIndex5bSortByWordAndCounts {
       // NOTE: The args("input-path").toString is a directory; Spark finds the correct
       // data files, part-NNNNN.
       val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-      val input = sc.textFile(argz("input-path")) map {
+      val input = sc.textFile(argz("input-path")).map {
         case lineRE(name, text) => (name.trim, text.toLowerCase)
         case badLine =>
           Console.err.println(s"Unexpected line: $badLine")
@@ -55,7 +55,7 @@ object InvertedIndex5bSortByWordAndCounts {
           case (path, text) =>
             // If we don't trim leading whitespace, the regex split creates
             // an undesired leading "" word!
-            text.trim.split("""[^\p{IsAlphabetic}]+""") map (word => (word, path))
+            text.trim.split("""[^\p{IsAlphabetic}]+""").map(word => (word, path))
         }
         .map {
           case (word, path) => ((word, path), 1)

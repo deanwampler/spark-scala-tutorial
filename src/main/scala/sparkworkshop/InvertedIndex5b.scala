@@ -38,7 +38,7 @@ object InvertedIndex5b {
       // NOTE: The args("input-path").toString is a directory; Spark finds the correct
       // data files, part-NNNNN.
       val lineRE = """^\s*\(([^,]+),(.*)\)\s*$""".r
-      val input = sc.textFile(argz("input-path")) map {
+      val input = sc.textFile(argz("input-path")).map {
         case lineRE(name, text) => (name.trim, text.toLowerCase)
         case badLine =>
           Console.err.println(s"Unexpected line: $badLine")
@@ -58,7 +58,7 @@ object InvertedIndex5b {
           case (path, text) =>
             // If we don't trim leading whitespace, the regex split creates
             // an undesired leading "" word!
-            text.trim.split("""[^\p{IsAlphabetic}]+""") map (word => (word, path))
+            text.trim.split("""[^\p{IsAlphabetic}]+""").map(word => (word, path))
         }
         .map {
           // We're going to use the (word, path) tuple as a key for counting
