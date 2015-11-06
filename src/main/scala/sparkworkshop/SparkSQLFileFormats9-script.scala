@@ -1,16 +1,11 @@
-// HiveSQLParquet10.scala - A Scala script will use interactively in the Spark Shell.
-// Script files can't be compiled in the same way as normal code files, so
-// the SBT build is configured to ignore this file.
+// HiveSQLFileFormats10-script.scala - A Scala script that demonstrates support
+// for various file formats.
 
 import org.apache.spark.sql.SQLContext
 import com.typesafe.sparkworkshop.util.Verse
 
 /**
- * Example of SparkSQL's support for Parquet. This script requires a Hadoop
- * distribution, due to dependencies used for the Parquet support. See the
- * SparkSQL documentation for details.
- * For that reason, it doesn't assume you'll use the SBT console.
- * Instead, use Spark's "spark-submit" script instead.
+ * Example of SparkSQL's support for Parquet and JSON.
  */
 
 val inputDir   = "data/kjvdat.txt"
@@ -18,7 +13,7 @@ val parquetDir = "output/parquet"
 
 // Not needed with spark-shell:
 // val master = "yarn-client"
-// val sc = new SparkContext(master, "Spark SQL Parquet (10)")
+// val sc = new SparkContext(master, "Spark SQL File Formats (9)")
 // val sqlContext = new SQLContext(sc)
 // import sqlContext.implicits._
 
