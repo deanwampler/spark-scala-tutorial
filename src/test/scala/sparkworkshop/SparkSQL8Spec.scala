@@ -2,9 +2,9 @@ import org.scalatest.FunSpec
 import com.typesafe.sparkworkshop.util.FileUtil
 
 // Run in local mode and local data.
-class SparkSQL9Spec extends FunSpec {
+class SparkSQL8Spec extends FunSpec {
 
-  describe ("SparkSQL9") {
+  describe ("SparkSQL8") {
     it ("runs SQL queries against an RDD") {
       val out     = "output/kjv-spark-sql"
       val outvpb  = s"$out-verses-per-book"
@@ -15,7 +15,7 @@ class SparkSQL9Spec extends FunSpec {
       FileUtil.rmrf(outvpb)  // Delete previous runs, if necessary.
       FileUtil.rmrf(outgv)   // Delete previous runs, if necessary.
 
-      SparkSQL9.main(Array(
+      SparkSQL8.main(Array(
         "--master", "local[2]", "--quiet", "--inpath", "data/kjvdat.txt",
         "--outpath", out))
 

@@ -1,4 +1,4 @@
-// HiveSQL11.scala - A Scala script will use interactively in the Spark Shell.
+// HiveSQL10.scala - A Scala script will use interactively in the Spark Shell.
 // Script files can't be compiled in the same way as normal code files, so
 // the SBT build is configured to ignore this file.
 
@@ -90,7 +90,7 @@ sql2("Run the same GROUP BY we ran before:", """
 sql2("Run the 'God' query we ran before:",
   "SELECT * FROM kjv WHERE text LIKE '%God%'")
 
-// Exercise: Repeat some of the exercises we did for SparkSQL9:
+// Exercise: Repeat some of the exercises we did for SparkSQL8:
 //  1. Sort the output by the words. How much overhead does this add?
 //  2. Try a JOIN with the "abbrevs_to_names" data to convert the book
 //       abbreviations to full titles.

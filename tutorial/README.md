@@ -217,10 +217,10 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins as shown in this simple example.
-* **SparkStreaming8:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
-* **SparkSQL9:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. There is also a
-* **SparkSQLFileFormats10:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
-* **hadoop/HiveSQL11:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL! This example is in a `hadoop` subdirectory, because it uses features that require a Hadoop setup (more details later on).
+* **SparkSQL8:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. There is also a
+* **SparkSQLFileFormats9:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
+* **hadoop/HiveSQL10:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL! This example is in a `hadoop` subdirectory, because it uses features that require a Hadoop setup (more details later on).
+* **SparkStreaming11:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
 
 Let's now work through these exercises...
 
@@ -1285,9 +1285,233 @@ The `join` method we used is implemented by [spark.rdd.PairRDDFunctions](http://
 
 You can verify that the output file looks like the input KJV file with the book abbreviations replaced with the full names. However, as currently written, the books are not retained in the correct order! (See the exercises in the source file.)
 
-## SparkStreaming8
+## SparkSQL8
 
-[SparkStreaming8.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8.scala)
+[SparkSQL8.scala](#code/src/main/scala/sparkworkshop/SparkSQL8.scala)<br/>
+[SparkSQL8-script.scala](#code/src/main/scala/sparkworkshop/SparkSQL8-script.scala)
+
+The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a new `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
+
+> Even if you prefer the Scala collections-like `RDD` API, consider using the `DataFrame` API because the performance is usually better.
+
+Furthermore, SparkSQL has convenient support for reading and writing [Parquet](http://parquet.io) files, which is popular in Hadoop environments, and reading and writing JSON-formatted records, with inferred schemas.
+
+Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, *HiveQL*.
+
+This example treats the KJV text we've been using as a table with a schema. It runs several SQL queries on the data, then performs the same calculation using the `DataFrame` API.
+
+There is a `SparkSQL8.scala` program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called `SparkSQL8-script.scala`, which we'll look at instead. (There are minor differences in how output is handled.)
+
+The codez:
+
+```scala
+import com.typesafe.sparkworkshop.util.Verse
+import org.apache.spark.sql.DataFrame
+```
+
+The helper class `Verse` will be used to define the schema for Bible verses. Note the new imports.
+
+Next, define the input path:
+
+```scala
+val inputRoot = "."
+val inputPath = s"$inputRoot/data/kjvdat.txt"
+```
+
+For HDFS, `inputRoot` would be something like `hdfs://my_name_node_server:8020`.
+
+We discussed earlier that our `console` setup automatically instantiates the `SparkContext` as a variable named `sc`. It also instantiates the wrapper [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) and imports some implicits. Note that you can still also use a `StreamingContext` to wrap the `SparkContext`, if you want, but we don't need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:
+
+```scala
+// val sc = new SparkContext("local[*]", "Spark SQL (9)")
+// val sqlContext = new SQLContext(sc)
+// import sqlContext.implicits._
+```
+
+The import statement brings SQL-specific functions and values in scope.
+(Scala allows importing members of objects, while Java only allows importing `static` members of classes.)
+
+Next we use a regex to parse the input verses and extract the book abbreviation, chapter number, verse number, and text. The fields are separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
+
+We use `flatMap` over the results so that lines that fail to parse are essentially put into empty lists that will be ignored.
+
+```scala
+val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
+val versesRDD = sc.textFile(argz("input-path")).flatMap {
+  case lineRE(book, chapter, verse, text) =>
+    Seq(Verse(book, chapter.toInt, verse.toInt, text))
+  case line =>
+    Console.err.println("Unexpected line: $line")
+    Seq.empty[Verse]  // Will be eliminated by flattening.
+}
+```
+
+Create a `DataFrame` from the `RDD`. Then, so we can write SQL queries against it, register it as a temporary "table". As the name implies, this "table" only exists for the life of the process. (There is also an evolving facility for defining "permanent" tables.) Then we write queries and save the results back to the file system.
+
+```scala
+val verses = sqlContext.createDataFrame(versesRDD)
+verses.registerTempTable("kjv_bible")
+verses.cache()
+// print the 1st 20 lines. Pass an integer argument to show a different number
+// of lines:
+verses.show()
+verses.show(100)
+
+import sqlContext.sql  // for convenience
+
+val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
+println("The query plan:")
+godVerses.queryExecution   // Compare with godVerses.explain(true)
+println("Number of verses that mention God: "+godVerses.count())
+godVerses.show()
+```
+
+Here is the same calculation using the `DataFrame` API:
+
+```scala
+val godVersesDF = verses.filter(verses("text").contains("God"))
+println("The query plan:")
+godVersesDF.queryExecution
+println("Number of verses that mention God: "+godVersesDF.count())
+godVersesDF.show()
+```
+
+Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
+
+It turns out that the previous query generated a *lot* of partitions. Using "coalesce" here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn't terrible in many contexts, but the following code compares counting with 200 (the default) vs. 1 partition:
+
+```scala
+val counts1 = counts.coalesce(1)
+val nPartitions  = counts.rdd.partitions.size
+val nPartitions1 = counts1.rdd.partitions.size
+println(s"counts.count (can take a while, # partitions = $nPartitions):")
+println(s"result: ${counts.count}")
+println(s"counts1.count (usually faster, # partitions = $nPartitions1):")
+println(s"result: ${counts1.count}")
+```
+
+The `DataFrame` version is quite simple:
+
+```scala
+val countsDF = verses.groupBy("book").count()
+countsDF.show(100)
+countsDF.count
+```
+
+## Using SQL in the Spark Shell
+
+So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the `scripts` directory:
+
+```sh
+scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL8-script.scala
+```
+
+Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
+
+```sh
+scripts/sparkshell.sh
+```
+
+Th `sparkshell.sh` script does some set up, but essentially its equivalent to the following:
+
+```sh
+$SPARK_HOME/bin/spark-shell \
+  --jars target/scala-2.10/activator-spark_2.11-4.0.1.jar [arguments]
+```
+
+The jar file contains all the project's build artifacts (but not the dependencies).
+
+To run this script locally, use the Activator shell's `console` command. Assuming you're at the shell's prompt `>`, use the following commands to enter the Scala interpreter ("REPL") and then load and run the whole file.
+
+```scala
+(Activator-Spark)> console
+scala> :load src/main/scala/sparkworkshop/SparkSQL8-script.scala
+...
+scala> :quit
+(Activator-Spark)> exit
+```
+
+To enter the statements using copy and paste, just paste them at the `scala>` prompt instead of loading the file.
+
+## SparkSQLFileFormats9-script
+
+[SparkSQLFileFormats9-script.scala](#code/src/main/scala/sparkworkshop/SparkSQLFileFormats9-script.scala)
+
+This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) and JSON formats. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it. Then it repeats the exercise using JSON.
+
+The key [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, and `DataFrame.read.json(inpath)` and `DataFrame.write.json(outpath)` for reading and writing JSON. (The format for the first `write.save` method can be overridden to default to a different format.)
+
+See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL8-script.scala`.
+
+## HiveSQL10
+
+[HiveSQL10.scala](#code/src/main/scala/sparkworkshop/hadoop/HiveSQL10.scala)
+
+The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL engine, but Hive's.
+
+> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
+
+For this exercise, the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
+
+Let's discuss the code hightlights. There is additional imports for Hive:
+
+```scala
+import org.apache.spark.sql._
+import org.apache.spark.sql.hive.HiveContext
+import com.typesafe.sparkworkshop.util.Verse
+```
+
+We need the user name.
+
+```scala
+val user = sys.env.get("USER") match {
+  case Some(user) => user
+  case None =>
+    println("ERROR: USER environment variable isn't defined. Using root!")
+    "root"
+}
+```
+
+Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
+
+```scala
+val sc = new SparkContext("local[2]", "Hive SQL (10)")
+val hiveContext = new HiveContext(sc)
+import hiveContext._   // Make methods local, like sql
+
+def sql2(title: String, query: String, n: Int = 100): Unit = {
+  println(title)
+  println(s"Running query: $query")
+  sql(query).take(n).foreach(println)
+}
+```
+
+(Previously, this version of `sql` was called `hql`.) We can now execute Hive DDL statements, such the following statements to create a database, "use it" as the working database, and then a table inside it.
+
+```scala
+sql2("Create a work database:", "CREATE DATABASE work")
+sql2("Use the work database:", "USE work")
+
+sql2("Create the 'external' kjv Hive table:", s"""
+  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
+    book    STRING,
+    chapter INT,
+    verse   INT,
+    text    STRING)
+  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+  LOCATION '/user/$user/data/hive-kjv'""")
+```
+
+Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, a Hive extension, where we just tell it use data in a particular directory (`LOCATION`). Here is why we needed the user name, because Hive expects an absolute path.
+
+A few points to keep in mind:
+
+* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's own REPL or scripts, they cause errors here!
+* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `sql2`.
+
+## SparkStreaming11
+
+[SparkStreaming11.scala](#code/src/main/scala/sparkworkshop/SparkStreaming11.scala)
 
 The streaming capability is relatively new and this exercise uses it to construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
 
@@ -1297,15 +1521,15 @@ Note that Spark Streaming does not use the `_SUCCESS` marker file we mentioned e
 
 The second basic configuration reads data from a socket. Spark Streaming also comes with connectors for other data sources, such as [Apache Kafka](http://kafka.apache.org/) and Twitter streams. We don't explore those here.
 
-`SparkStreaming8` uses directory watching by default. A temporary directory is created and a second process writes the KJV Bible file to a temporary file in the directory every few seconds. Hence, the data will be same in every file, but stream processing with read each new file on each iteration. `SparkStreaming8` does *Word Count* on the data.
+`SparkStreaming11` uses directory watching by default. A temporary directory is created and a second process writes the KJV Bible file to a temporary file in the directory every few seconds. Hence, the data will be same in every file, but stream processing with read each new file on each iteration. `SparkStreaming11` does *Word Count* on the data.
 
 The socket option works similarly. By default, the same KJV file is written over and over again to a socket.
 
-In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala) is the actual driver program we'll run. It uses two helper classes, [com.typesafe.sparkworkshop.util.streaming.DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/streaming/DataDirectoryServer.scala) and [com.typesafe.sparkworkshop.util.streaming.DataSocketServer.scala](#code/src/main/scala/sparkworkshop/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
+In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming11Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming11Main.scala) is the actual driver program we'll run. It uses two helper classes, [com.typesafe.sparkworkshop.util.streaming.DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/streaming/DataDirectoryServer.scala) and [com.typesafe.sparkworkshop.util.streaming.DataSocketServer.scala](#code/src/main/scala/sparkworkshop/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
-So, let's run this configuration first. In Activator or SBT, run `SparkStreaming8Main` (*not* `SparkStreaming8MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
+So, let's run this configuration first. In Activator or SBT, run `SparkStreaming11Main` (*not* `SparkStreaming11MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
-This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming8` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
+This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming11` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
 If you watch the console output, you'll see messages like this:
 
@@ -1330,14 +1554,14 @@ The time stamp will increment by 2000 ms each time, because we're running with 2
 
 At the same time, you'll see new directories appear in `output`, one per batch. They are named like `output/wc-streaming-1413724628000.out`, again with a timestamp appended to our default output argument `output/wc-streaming`. Each of these will contain the usual `_SUCCESS` and `part-0000N` files, one for each core that the job can get!
 
-Now let's run with socket input. In Activator or SBT, run `SparkStreaming8MainSocket`. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming8Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming8 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
+Now let's run with socket input. In Activator or SBT, run `SparkStreaming11MainSocket`. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming11Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming11 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
 
 The console output and the directory output should be very similar to the output of the previous run.
 
-`SparkStreaming8` supports the following command-line options:
+`SparkStreaming11` supports the following command-line options:
 
 ```scala
-run-main SparkStreaming8 [ -h | --help] \
+run-main SparkStreaming11 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-s | --socket server:port] \
   [--term | --terminate N] \
@@ -1348,7 +1572,7 @@ Where the default is `--inpath tmp/wc-streaming`. This is the directory that wil
 
 By default, 30 seconds is used for the terminate option, after which time it exits. Pass 0 for no termination.
 
-Note that there's no argument for the data file. That's an extra option supported by `SparkStreaming8Main` (`SparkStreaming8` is agnostic to the source!):
+Note that there's no argument for the data file. That's an extra option supported by `SparkStreaming11Main` (`SparkStreaming11` is agnostic to the source!):
 
 ```scala
   -d | --data  file
@@ -1356,9 +1580,9 @@ Note that there's no argument for the data file. That's an extra option supporte
 
 The default is `data/kjvdat.txt`.
 
-There is also an alternative to `SparkStreaming8` called `SparkStreaming8SQL`, which uses a SQL query rather than the RDD API to do the calculation. To use this variant, pass the `--sql` argument when you invoke either version of `SparkStreaming8Main` or `SparkStreaming8MainSocket`.
+There is also an alternative to `SparkStreaming11` called `SparkStreaming11SQL`, which uses a SQL query rather than the RDD API to do the calculation. To use this variant, pass the `--sql` argument when you invoke either version of `SparkStreaming11Main` or `SparkStreaming11MainSocket`.
 
-To run a subset of these combinations in Hadoop, there is `hadoop.HSparkStreaming8` driver. Similarly to `SparkStreaming8Main`, it starts the `DataSocketSever` process *locally* (outside of Hadoop), then submits `SparkStreaming8` to your Hadoop environment. There is also a script driver, `scripts/sparkstreaming8.sh`.
+To run a subset of these combinations in Hadoop, there is `hadoop.HSparkStreaming11` driver. Similarly to `SparkStreaming11Main`, it starts the `DataSocketSever` process *locally* (outside of Hadoop), then submits `SparkStreaming11` to your Hadoop environment. There is also a script driver, `scripts/sparkstreaming8.sh`.
 
 Note that the Hadoop implementation of this example doesn't support watching for new files in a directory. That's not a Spark Streaming limitation. Also, the SQL variant is not supported, but it would be easy to add this capability.
 
@@ -1372,9 +1596,9 @@ You can also define a moving window over one or more batches, for example if you
 
 A [StreamingContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.StreamingContext) is used to wrap the normal [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext), too.
 
-## The SparkStreaming8 Code
+## The SparkStreaming11 Code
 
-Here are the key parts of the code for [SparkStreaming8.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8.scala):
+Here are the key parts of the code for [SparkStreaming11.scala](#code/src/main/scala/sparkworkshop/SparkStreaming11.scala):
 
 ```scala
 ...
@@ -1481,235 +1705,11 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
-See also [SparkStreaming8Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming8Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and
+See also [SparkStreaming11Main.scala](#code/src/main/scala/sparkworkshop/SparkStreaming11Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](#code/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and
 [DataSocketServer.scala](
 #code/src/main/scala/sparkworkshop/util/DataSocketServer.scala).
 
 This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
-
-## SparkSQL9
-
-[SparkSQL9.scala](#code/src/main/scala/sparkworkshop/SparkSQL9.scala)<br/>
-[SparkSQL9-script.scala](#code/src/main/scala/sparkworkshop/SparkSQL9-script.scala)
-
-The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a new `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
-
-> Even if you prefer the Scala collections-like `RDD` API, consider using the `DataFrame` API because the performance is usually better.
-
-Furthermore, SparkSQL has convenient support for reading and writing [Parquet](http://parquet.io) files, which is popular in Hadoop environments, and reading and writing JSON-formatted records, with inferred schemas.
-
-Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, *HiveQL*.
-
-This example treats the KJV text we've been using as a table with a schema. It runs several SQL queries on the data, then performs the same calculation using the `DataFrame` API.
-
-There is a `SparkSQL9.scala` program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called `SparkSQL9-script.scala`, which we'll look at instead. (There are minor differences in how output is handled.)
-
-The codez:
-
-```scala
-import com.typesafe.sparkworkshop.util.Verse
-import org.apache.spark.sql.DataFrame
-```
-
-The helper class `Verse` will be used to define the schema for Bible verses. Note the new imports.
-
-Next, define the input path:
-
-```scala
-val inputRoot = "."
-val inputPath = s"$inputRoot/data/kjvdat.txt"
-```
-
-For HDFS, `inputRoot` would be something like `hdfs://my_name_node_server:8020`.
-
-We discussed earlier that our `console` setup automatically instantiates the `SparkContext` as a variable named `sc`. It also instantiates the wrapper [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) and imports some implicits. Note that you can still also use a `StreamingContext` to wrap the `SparkContext`, if you want, but we don't need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:
-
-```scala
-// val sc = new SparkContext("local[*]", "Spark SQL (9)")
-// val sqlContext = new SQLContext(sc)
-// import sqlContext.implicits._
-```
-
-The import statement brings SQL-specific functions and values in scope.
-(Scala allows importing members of objects, while Java only allows importing `static` members of classes.)
-
-Next we use a regex to parse the input verses and extract the book abbreviation, chapter number, verse number, and text. The fields are separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
-
-We use `flatMap` over the results so that lines that fail to parse are essentially put into empty lists that will be ignored.
-
-```scala
-val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
-val versesRDD = sc.textFile(argz("input-path")).flatMap {
-  case lineRE(book, chapter, verse, text) =>
-    Seq(Verse(book, chapter.toInt, verse.toInt, text))
-  case line =>
-    Console.err.println("Unexpected line: $line")
-    Seq.empty[Verse]  // Will be eliminated by flattening.
-}
-```
-
-Create a `DataFrame` from the `RDD`. Then, so we can write SQL queries against it, register it as a temporary "table". As the name implies, this "table" only exists for the life of the process. (There is also an evolving facility for defining "permanent" tables.) Then we write queries and save the results back to the file system.
-
-```scala
-val verses = sqlContext.createDataFrame(versesRDD)
-verses.registerTempTable("kjv_bible")
-verses.cache()
-// print the 1st 20 lines. Pass an integer argument to show a different number
-// of lines:
-verses.show()
-verses.show(100)
-
-import sqlContext.sql  // for convenience
-
-val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
-println("The query plan:")
-godVerses.queryExecution   // Compare with godVerses.explain(true)
-println("Number of verses that mention God: "+godVerses.count())
-godVerses.show()
-```
-
-Here is the same calculation using the `DataFrame` API:
-
-```scala
-val godVersesDF = verses.filter(verses("text").contains("God"))
-println("The query plan:")
-godVersesDF.queryExecution
-println("Number of verses that mention God: "+godVersesDF.count())
-godVersesDF.show()
-```
-
-Note that the SQL dialect currently supported by the `sql` method is a subset of [HiveSQL](http://hive.apache.org). For example, it doesn't permit column aliasing, e.g., `COUNT(*) AS count`. Nor does it appear to support `WHERE` clauses in some situations.
-
-It turns out that the previous query generated a *lot* of partitions. Using "coalesce" here collapses all of them into 1 partition, which is preferred for such a small dataset. Lots of partitions isn't terrible in many contexts, but the following code compares counting with 200 (the default) vs. 1 partition:
-
-```scala
-val counts1 = counts.coalesce(1)
-val nPartitions  = counts.rdd.partitions.size
-val nPartitions1 = counts1.rdd.partitions.size
-println(s"counts.count (can take a while, # partitions = $nPartitions):")
-println(s"result: ${counts.count}")
-println(s"counts1.count (usually faster, # partitions = $nPartitions1):")
-println(s"result: ${counts1.count}")
-```
-
-The `DataFrame` version is quite simple:
-
-```scala
-val countsDF = verses.groupBy("book").count()
-countsDF.show(100)
-countsDF.count
-```
-
-## Using SQL in the Spark Shell
-
-So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the `scripts` directory:
-
-```sh
-scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL9-script.scala
-```
-
-Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
-
-```sh
-scripts/sparkshell.sh
-```
-
-Th `sparkshell.sh` script does some set up, but essentially its equivalent to the following:
-
-```sh
-$SPARK_HOME/bin/spark-shell \
-  --jars target/scala-2.10/activator-spark_2.11-4.0.1.jar [arguments]
-```
-
-The jar file contains all the project's build artifacts (but not the dependencies).
-
-To run this script locally, use the Activator shell's `console` command. Assuming you're at the shell's prompt `>`, use the following commands to enter the Scala interpreter ("REPL") and then load and run the whole file.
-
-```scala
-(Activator-Spark)> console
-scala> :load src/main/scala/sparkworkshop/SparkSQL9-script.scala
-...
-scala> :quit
-(Activator-Spark)> exit
-```
-
-To enter the statements using copy and paste, just paste them at the `scala>` prompt instead of loading the file.
-
-## SparkSQLFileFormats10-script
-
-[SparkSQLFileFormats10-script.scala](#code/src/main/scala/sparkworkshop/SparkSQLFileFormats10-script.scala)
-
-This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) format. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it.
-
-The key [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, by default. (The format for `write.save` can be overridden to default to a different format.) Note that previously, the now deprecated `SqlContext.parquetFile(inpath)` and `DataFrame.saveAsParquetFile(outpath)` were used.
-
-See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL9-script.scala`.
-
-## HiveSQL11
-
-[HiveSQL11.scala](#code/src/main/scala/sparkworkshop/hadoop/HiveSQL11.scala)
-
-The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL engine, but Hive's.
-
-> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
-
-For this exercise, the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
-
-Let's discuss the code hightlights. There is additional imports for Hive:
-
-```scala
-import org.apache.spark.sql._
-import org.apache.spark.sql.hive.HiveContext
-import com.typesafe.sparkworkshop.util.Verse
-```
-
-We need the user name.
-
-```scala
-val user = sys.env.get("USER") match {
-  case Some(user) => user
-  case None =>
-    println("ERROR: USER environment variable isn't defined. Using root!")
-    "root"
-}
-```
-
-Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
-
-```scala
-val sc = new SparkContext("local[2]", "Hive SQL (10)")
-val hiveContext = new HiveContext(sc)
-import hiveContext._   // Make methods local, like sql
-
-def sql2(title: String, query: String, n: Int = 100): Unit = {
-  println(title)
-  println(s"Running query: $query")
-  sql(query).take(n).foreach(println)
-}
-```
-
-(Previously, this version of `sql` was called `hql`.) We can now execute Hive DDL statements, such the following statements to create a database, "use it" as the working database, and then a table inside it.
-
-```scala
-sql2("Create a work database:", "CREATE DATABASE work")
-sql2("Use the work database:", "USE work")
-
-sql2("Create the 'external' kjv Hive table:", s"""
-  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
-    book    STRING,
-    chapter INT,
-    verse   INT,
-    text    STRING)
-  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-  LOCATION '/user/$user/data/hive-kjv'""")
-```
-
-Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, a Hive extension, where we just tell it use data in a particular directory (`LOCATION`). Here is why we needed the user name, because Hive expects an absolute path.
-
-A few points to keep in mind:
-
-* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's own REPL or scripts, they cause errors here!
-* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `sql2`.
 
 ## Wrapping Up
 

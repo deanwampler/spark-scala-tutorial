@@ -1,6 +1,6 @@
 #!/bin/bash
 #========================================================================
-# sparkstreaming8.sh - Invoke SparkStreaming8 on Hadoop.
+# sparkstreaming11.sh - Invoke SparkStreaming11 on Hadoop.
 # Supports the socket input configuration only, using the DataSocketServer.
 # TODO: Some of the hard-coded values could be script options.
 #========================================================================
@@ -28,8 +28,8 @@ if [[ -z $NOOP ]]
   echo run-main com.typesafe.sparkworkshop.util.streaming.DataSocketServer 9900 $datafile | $ACT &
 fi
 sleep 1
-echo "Starting SparkStreaming8"
-  $dir/hadoop.sh --class SparkStreaming8 --out "$output" --socket localhost:9900 "$@"
+echo "Starting SparkStreaming11"
+  $dir/hadoop.sh --class SparkStreaming11 --out "$output" --socket localhost:9900 "$@"
 fi
 
 

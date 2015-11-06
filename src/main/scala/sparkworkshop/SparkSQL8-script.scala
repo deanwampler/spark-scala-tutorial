@@ -1,4 +1,4 @@
-// Adapted from SparkSQL9, but written as a script for easy use with the
+// Adapted from SparkSQL8, but written as a script for easy use with the
 // spark-shell command.
 import com.typesafe.sparkworkshop.util.Verse
 import org.apache.spark.sql.DataFrame

@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
  * Example of SparkSQL, both SQL queries and the new DataFrame API,
  * using the KJV Bible text.
  */
-object SparkSQL9 {
+object SparkSQL8 {
 
   def main(args: Array[String]): Unit = {
 

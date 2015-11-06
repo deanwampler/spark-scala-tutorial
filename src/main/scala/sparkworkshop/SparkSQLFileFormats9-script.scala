@@ -24,7 +24,7 @@ val parquetDir = "output/parquet"
 
 import sqlContext.sql
 
-// Read the verses into a table, just as we did in SparkSQL9.scala:
+// Read the verses into a table, just as we did in SparkSQL8.scala:
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
 val versesRDD = sc.textFile(inputDir).flatMap {
   case lineRE(book, chapter, verse, text) =>

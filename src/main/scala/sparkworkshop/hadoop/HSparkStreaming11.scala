@@ -5,15 +5,15 @@ import sparkstreaming.ThreadStarter
 /**
  * Hadoop driver for the SparkStreaming example. It actually uses the Scala process
  * library to run a shell script that uses the spark-submit shell command!
- * See the comments in SparkStreaming8 for how to setup another process that
+ * See the comments in SparkStreaming11 for how to setup another process that
  * is the source of data.
  */
-object HSparkStreaming8 extends ThreadStarter {
+object HSparkStreaming11 extends ThreadStarter {
   def main(args: Array[String]): Unit = {
     val (port, dataFile) = parseArgs(args)
     val dataThread = startSocketDataThread(port, dataFile)
 
-    Hadoop("SparkStreaming8", "output/wc-streaming", args)
+    Hadoop("SparkStreaming11", "output/wc-streaming", args)
     // When the previous expression returns, we can terminate the data thread.
     dataThread.interrupt()
   }
@@ -27,7 +27,7 @@ object HSparkStreaming8 extends ThreadStarter {
         port = hostPort.split(":").last.toInt
         findArgs(tail)
       case ("-i" | "--in" | "--inpath") +: path +: tail =>
-        println("HSparkStreaming8: ERROR - Reading data from directories isn't implemented for Hadoop.")
+        println("HSparkStreaming11: ERROR - Reading data from directories isn't implemented for Hadoop.")
         println("Use the --socket option instead.")
         sys.exit(1)
       case ("-d" | "--data") +: file +: tail =>

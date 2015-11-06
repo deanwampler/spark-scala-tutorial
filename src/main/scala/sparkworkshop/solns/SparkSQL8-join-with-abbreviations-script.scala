@@ -1,4 +1,4 @@
-// Additional code for the exercise in SparkSQL9-script.scala
+// Additional code for the exercise in SparkSQL8-script.scala
 // to join the data with the abbreviations-to-name mapping.
 // This code assumes definitions are already in scope, such as "inputRoot"
 // and the "kjv_bible" temp table. In other words, you can't run it by itself.
