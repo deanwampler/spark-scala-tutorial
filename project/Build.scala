@@ -4,7 +4,7 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "4.2.0"
+  val Version = "4.3.0"
   // You can use either version of Scala. We default to 2.11.7:
   val ScalaVersion = "2.11.7"
   val ScalaVersions = Seq("2.11.7", "2.10.6")
