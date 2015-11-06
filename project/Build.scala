@@ -42,6 +42,7 @@ object Dependency {
   val sparkCore      = "org.apache.spark"  %% "spark-core"      % Version.Spark
   val sparkStreaming = "org.apache.spark"  %% "spark-streaming" % Version.Spark
   val sparkSQL       = "org.apache.spark"  %% "spark-sql"       % Version.Spark
+  val sparkHiveSQL   = "org.apache.spark"  %% "spark-hive"       % Version.Spark
   val sparkRepl      = "org.apache.spark"  %% "spark-repl"      % Version.Spark
 
   val scalaTest      = "org.scalatest"     %% "scalatest"       % Version.ScalaTest  % "test"
@@ -52,7 +53,7 @@ object Dependencies {
   import Dependency._
 
   val activatorspark =
-    Seq(sparkCore, sparkStreaming, sparkSQL, // sparkRepl,
+    Seq(sparkCore, sparkStreaming, sparkSQL, sparkHiveSQL, // sparkRepl,
       scalaTest, scalaCheck)
 }
 
