@@ -1283,7 +1283,7 @@ val inputPath = s&quot;$inputRoot/data/kjvdat.txt&quot;</code></pre>
 
 <p>We discussed earlier that our <code>console</code> setup automatically instantiates the <code>SparkContext</code> as a variable named <code>sc</code>. It also instantiates the wrapper <a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext">SQLContext</a> and imports some implicits. Note that you can still also use a <code>StreamingContext</code> to wrap the <code>SparkContext</code>, if you want, but we don&rsquo;t need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:</p>
 
-<pre><code>// val sc = new SparkContext(&quot;local[*]&quot;, &quot;Spark SQL (9)&quot;)
+<pre><code>// val sc = new SparkContext(&quot;local[*]&quot;, &quot;Spark SQL (8)&quot;)
 // val sqlContext = new SQLContext(sc)
 // import sqlContext.implicits._</code></pre>
 

@@ -1475,7 +1475,7 @@ val user = sys.env.get("USER") match {
 Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
 
 ```scala
-val sc = new SparkContext("local[2]", "Hive SQL (10)")
+val sc = new SparkContext("local[2]", "Hive SQL (8)")
 val hiveContext = new HiveContext(sc)
 import hiveContext._   // Make methods local, like sql
 
