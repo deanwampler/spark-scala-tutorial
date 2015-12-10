@@ -2,14 +2,13 @@
 // for various file formats.
 
 import org.apache.spark.sql.SQLContext
-import com.typesafe.sparkworkshop.util.Verse
+import com.typesafe.sparkworkshop.util.{Verse, FileUtil}
 
 /**
  * Example of SparkSQL's support for Parquet and JSON.
  */
 
 val inputDir   = "data/kjvdat.txt"
-val parquetDir = "output/parquet"
 
 // Not needed with spark-shell:
 // val master = "yarn-client"
@@ -26,15 +25,16 @@ val versesRDD = sc.textFile(inputDir).flatMap {
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
     Console.err.println(s"Unexpected line: $line")
-    Seq.empty[Verse]  // Will be eliminated by flattening.
+    Nil // or use Seq.empty[Verse]. It will be eliminated by flattening.
 }
 val verses = sqlContext.createDataFrame(versesRDD)
 verses.registerTempTable("kjv_bible")
 
 // Save as a Parquet file:
+val parquetDir = "output/parquet"
 println(s"Saving 'verses' as a Parquet file to $parquetDir.")
-println("NOTE: You'll get an error if the directory already exists!")
-verses.write.save(parquetDir)
+FileUtil.rmrf(parquetDir)
+verses.write.parquet(parquetDir)
 
 // Now read it back and use it as a table:
 println(s"Reading in the Parquet file from $parquetDir:")
@@ -52,6 +52,8 @@ jesusVerses.show
 // Requires each JSON "document" to be on a single line.
 // Let's first right some JSON (check the files!).
 val jsonDir = "output/json"
+println(s"Saving 'verses' as a JSON file to $jsonDir.")
+FileUtil.rmrf(jsonDir)
 verses.write.json(jsonDir)
 val versesJSON = sqlContext.read.json(jsonDir)
 versesJSON.show

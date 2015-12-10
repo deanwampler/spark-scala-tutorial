@@ -42,7 +42,9 @@ object WordCount2SortByWord {
         .map(word => (word, 1))
         .reduceByKey((count1, count2) => count1 + count2)
         // Add this line to sort: pass true for ascending, false for descending.
-        .sortByKey(false)
+        // Note that you can use the parameter name so readers know what "false"
+        // means:
+        .sortByKey(ascending = false)
 
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,

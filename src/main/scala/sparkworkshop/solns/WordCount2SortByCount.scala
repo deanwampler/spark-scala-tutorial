@@ -42,10 +42,16 @@ object WordCount2SortByCount {
         .map(word => (word, 1))
         .reduceByKey((count1, count2) => count1 + count2)
         .keyBy(tuple => tuple._2)  // Create a new RDD with the count as the key!
+        // To sort by count DESCENDING, word, ascending, try this:
+        // .keyBy(tuple => (-tuple._2,tuple._1))
+        // Note that the following sense of sorting would change if you use
+        // the previous change to the .keyBy call.
         // Add this line to sort: pass true for ascending, false for descending.
-        .sortByKey(false)
-        // Exercise: Note that the output will have the count listed redundantly,
-        // can you reformat the records to just have (word, count), but ordered?
+        // Note that you can use the parameter name so readers know what "false"
+        // means:
+        .sortByKey(ascending = false)
+        // Exercise: Note that the output will have the count listed redundantly.
+        // Use a final map step to retain just the (word, count).
 
       // Save, but it actually writes Hadoop-style output; to a directory,
       // with a _SUCCESS marker (empty) file, the data as a "part" file,

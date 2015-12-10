@@ -1,27 +1,9 @@
 // Additional code for the exercise in SparkSQL8-script.scala
 // to join the data with the abbreviations-to-name mapping.
-// This code assumes definitions are already in scope, such as "inputRoot"
-// and the "kjv_bible" temp table. In other words, you can't run it by itself.
+// This code assumes the "kjv_bible" and abbrevs_to_names temp
+// tables are already defined. In other words, you can't run this
+// script by itself.
 
-val abbrevsNamesPath = s"$inputRoot/data/abbrevs-to-names.tsv"
-
-case class Abbrev(abbrev: String, name: String)
-
-val abbrevNamesRDD = sc.textFile(abbrevsNamesPath).flatMap { line =>
-  val ary=line.split("\t")
-  if (ary.length != 2) {
-    Console.err.println(s"Unexpected line: $line")
-    Seq.empty[Abbrev]
-  } else {
-    Seq(Abbrev(ary(0), ary(1)))
-  }
-}
-val abbrevNames = sqlContext.createDataFrame(abbrevNamesRDD)
-abbrevNames.registerTempTable("abbrevs_to_names")
-
-// SparkSQL doesn't yet support column aliases, like "COUNT(*) as count",
-// but it does assign a name to "columns" like this, which is "c1" in this case.
-// (You can omit the coalesce(1))
 val counts = sql("""
   SELECT name, count FROM (
     SELECT book, COUNT(*) as count FROM kjv_bible GROUP BY book) bc

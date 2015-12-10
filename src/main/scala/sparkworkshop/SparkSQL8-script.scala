@@ -22,7 +22,7 @@ val versesRDD = sc.textFile(inputPath).flatMap {
     Seq(Verse(book, chapter.toInt, verse.toInt, text))
   case line =>
     Console.err.println(s"Unexpected line: $line")
-    Seq.empty[Verse]  // Will be eliminated by flattening.
+    Nil // or use Seq.empty[Verse]. It will be eliminated by flattening.
 }
 
 // Create a DataFrame and register as a temporary "table".
@@ -71,7 +71,62 @@ countsDF.show(100)
 countsDF.count
 
 // Exercise: Sort the last output by the words, by counts. How much overhead does this add?
+
+// Aggregations, a la data warehousing:
+verses.groupBy("book").agg(
+  max(verses("chapter")),
+  max(verses("verse")),
+  count(verses("*"))
+).sort($"count(1)".desc, $"book").show(100)
+
+// Alternative way of referencing columns in "verses":
+verses.groupBy("book").agg(
+  max($"chapter"),
+  max($"verse"),
+  count($"*")
+).sort($"count(1)".desc, $"book").show(100)
+
+// With just a single column, cube and rollup make less sense,
+// but in a bigger dataset, you could do cubes and rollups, too.
+verses.cube("book").agg(
+  max($"chapter"),
+  max($"verse"),
+  count($"*")
+).sort($"count(1)".desc, $"book").show(100)
+
+verses.rollup("book").agg(
+  max($"chapter"),
+  max($"verse"),
+  count($"*")
+).sort($"count(1)".desc, $"book").show(100)
+
+// Map a field to a method to apply to it, but limited to at most
+// one method per field.
+verses.rollup("book").agg(Map(
+  "chapter" -> "max",
+  "verse" -> "max",
+  "*" -> "count"
+)).sort($"count(1)".desc, $"book").show(100)
+
 // Exercise: Try a JOIN with the "abbrevs_to_names" data to convert the book
-//   abbreviations to full titles. (See solns/SparkSQL-..-script.scala)
-// Exercise: Play with the DataFrame DSL.
-// Exercise: Try some of the other sacred text data files.
+// abbreviations to full titles, using either a SQL query or the DataFrame API.
+// (See solns/SparkSQL-..-script.scala)
+// Here is some setup code to load and parse the dataset:
+
+val abbrevsNamesPath = s"$inputRoot/data/abbrevs-to-names.tsv"
+
+case class Abbrev(abbrev: String, name: String)
+
+val abbrevNamesRDD = sc.textFile(abbrevsNamesPath).flatMap { line =>
+  val ary=line.split("\t")
+  if (ary.length != 2) {
+    Console.err.println(s"Unexpected line: $line")
+    Nil // or use Seq.empty[Abbrev]. It will be eliminated by flattening.
+  } else {
+    Seq(Abbrev(ary(0), ary(1)))
+  }
+}
+val abbrevNames = sqlContext.createDataFrame(abbrevNamesRDD)
+abbrevNames.registerTempTable("abbrevs_to_names")
+
+// Exercise: Play with other methods in the DataFrame DSL.

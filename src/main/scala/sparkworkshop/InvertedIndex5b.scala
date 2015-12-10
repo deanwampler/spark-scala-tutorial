@@ -44,7 +44,7 @@ object InvertedIndex5b {
           Console.err.println(s"Unexpected line: $badLine")
           // If any of these were returned, you could filter them out below.
           ("", "")
-      }
+      }  // RDD[(String,String)] of (path,text) pairs
 
       if (!quiet) println(s"Writing output to: $out")
 
@@ -59,28 +59,30 @@ object InvertedIndex5b {
             // If we don't trim leading whitespace, the regex split creates
             // an undesired leading "" word!
             text.trim.split("""[^\p{IsAlphabetic}]+""").map(word => (word, path))
-        }
+        }  // RDD[(String,String)] of (word,path) pairs
         .map {
           // We're going to use the (word, path) tuple as a key for counting
           // all of them that are the same. So, create a new tuple with the
           // pair as the key and an initial count of "1".
           case (word, path) => ((word, path), 1)
-        }
+        }  // RDD[((String,String),Int)] of ((word,path),1) pairs
         .reduceByKey{    // Count the equal (word, path) pairs, as before
           (count1, count2) => count1 + count2
-        }
-        // Instead, we could use placeholder "_" for each argument: .reduceByKey(_ + _)
+        }  // RDD[((String,String),Int)], now with unique (word,path) and int value >= 1
+        // In the function passed to reduceByKey, we could use placeholder "_", one
+        // for each argument: .reduceByKey(_ + _)
         .map {           // Rearrange the tuples; word is now the key we want.
           case ((word, path), n) => (word, (path, n))
-        }
+        }  // RDD[(String,(String,Int))]
         .groupByKey      // There is a also a more general groupBy
+        // RDD[(String, Iterable[(String,Int)]]
         // reformat the output; make a string of each group,
-        // a sequence, "(path1, n1) (path2, n2), (path3, n3)..."
+        // a sequence, "(path1, n1), (path2, n2), (path3, n3), ..."
         .mapValues(iterator => iterator.mkString(", "))
         // mapValues is like the following map, but more efficient, as we skip
         // pattern matching on the key ("word"), etc.
         // .map {
-        //   case (word, seq) => (word, seq.mkString(", "))
+        //   case (word, iterator) => (word, iterator.mkString(", "))
         // }
         .saveAsTextFile(out)
     } finally {
