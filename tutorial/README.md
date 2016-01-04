@@ -31,7 +31,7 @@ You'll need either Activator or SBT installed.
 
 If you are not *already* viewing this workshop in Activator, install it by following the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
 
-> **NOTE:** Activator version 1.3 or later is required.
+> **NOTE:** If you use Activator, version 1.3 or later is required.
 
 If you prefer SBT and you don't already have it installed, follow the instructions on the [download](http://www.scala-sbt.org/download.html) page. SBT puts itself on your path. However, if you have a custom installation that isn't on your path, define the environment variable `SBT_HOME` (MacOS, Linux, or Cygwin only).
 
