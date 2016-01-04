@@ -1,7 +1,7 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
 import com.typesafe.sparkworkshop.util.Matrix
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Use an explicitly-parallel algorithm to sum perform statistics on
@@ -46,7 +46,7 @@ object Matrix4StdDev {
         sys.exit(1)
     }
 
-    val sc = new SparkContext(argz("master"), "Matrix (4)")
+    val sc = new SparkContext(argz("master"), "Matrix (4)", new SparkConf())
 
     try {
       // Set up a mxn matrix of numbers.

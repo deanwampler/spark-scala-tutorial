@@ -37,7 +37,9 @@ object WordCount3SortByWordLength {
     }
 
     // Let's use Kryo serialization. Here's how to set it up.
-    val conf = new SparkConf().setMaster(master).setAppName("Word Count (3)")
+    val conf = new SparkConf()
+      .setMaster(master)
+      .setAppName("Word Count (3) - Sort By Word Length")
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     // If the data had a custom type, we would want to register it. Kryo already
     // handles common types, like String, which is all we use here:

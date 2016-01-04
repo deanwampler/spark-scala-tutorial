@@ -1,6 +1,6 @@
 import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
 import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 /**
@@ -117,7 +117,7 @@ object Joins7Ordered {
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(master, "Joins (7)")
+    val sc = new SparkContext(master, "Joins (7)", new SparkConf())
     try {
       // Load one of the religious texts, don't convert each line to lower case
       // this time, then extract the fields in the "book|chapter|verse|text" format

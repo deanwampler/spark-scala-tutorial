@@ -1,5 +1,5 @@
 import com.typesafe.sparkworkshop.util.FileUtil
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 // Implicit conversions, such as methods defined in
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions)
 import org.apache.spark.SparkContext._
@@ -11,7 +11,7 @@ import org.apache.spark.SparkContext._
 object WordCount2SortByWord {
   def main(args: Array[String]): Unit = {
 
-    val sc = new SparkContext("local", "Word Count (2)")
+    val sc = new SparkContext("local", "Word Count (2) - Sort By Word", new SparkConf())
 
     try {
 

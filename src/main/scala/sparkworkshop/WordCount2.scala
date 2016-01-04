@@ -1,7 +1,7 @@
 // package com.foo.bar    // You could put the code in a package...
 
 import com.typesafe.sparkworkshop.util.FileUtil
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 // Implicit conversions, such as methods defined in
 // org.apache.spark.rdd.PairRDDFunctions
 // (http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions)
@@ -20,9 +20,8 @@ object WordCount2 {
   def main(args: Array[String]): Unit = {
 
     // The first argument specifies the "master" (see the tutorial notes).
-    // The second argument is a name for the job. Additional arguments
-    // are optional.
-    val sc = new SparkContext("local", "Word Count (2)")
+    // The second argument is a name for the job.
+    val sc = new SparkContext("local", "Word Count (2)", new SparkConf())
 
     // Put the "stop" inside a finally clause, so it's invoked even when
     // something fails that forces an abnormal termination.
