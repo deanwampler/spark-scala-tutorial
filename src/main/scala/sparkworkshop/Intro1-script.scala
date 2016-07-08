@@ -22,7 +22,7 @@ input.cache
 val sins = input.filter(line => line.contains("sin"))
 
 // The () are optional in Scala for no-argument methods
-val count = sins.count()         // How many sins?
+val sinCount = sins.count()      // How many sins?
 val array = sins.collect()       // Convert the RDD into a collection (array)
 array.take(20) foreach println   // Take the first 20, and print them 1/line.
 sins.take(20) foreach println    // ... but we don't have to "collect" first;
