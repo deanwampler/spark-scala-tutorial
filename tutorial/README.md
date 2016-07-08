@@ -195,7 +195,7 @@ Several years ago, the Spark team ported the Hive query engine to Spark, calling
 
 ## The Spark Version
 
-This workshop uses Spark 1.5.1.
+This workshop uses Spark 1.6.2.
 
 The following documentation links provide more information about Spark:
 

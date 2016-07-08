@@ -4,7 +4,7 @@ import sbt.Keys._
 object BuildSettings {
 
   val Name = "activator-spark"
-  val Version = "4.3.2"
+  val Version = "4.3.3"
   // You can use either version of Scala. We default to 2.11.7:
   val ScalaVersion = "2.11.7"
   val ScalaVersions = Seq("2.11.7", "2.10.6")
@@ -34,7 +34,7 @@ object Resolvers {
 // examples that explicitly use Hadoop.
 object Dependency {
   object Version {
-    val Spark        = "1.6.0"
+    val Spark        = "1.6.2"
     val ScalaTest    = "2.2.4"
     val ScalaCheck   = "1.12.2"
   }
@@ -42,7 +42,7 @@ object Dependency {
   val sparkCore      = "org.apache.spark"  %% "spark-core"      % Version.Spark
   val sparkStreaming = "org.apache.spark"  %% "spark-streaming" % Version.Spark
   val sparkSQL       = "org.apache.spark"  %% "spark-sql"       % Version.Spark
-  val sparkHiveSQL   = "org.apache.spark"  %% "spark-hive"       % Version.Spark
+  val sparkHiveSQL   = "org.apache.spark"  %% "spark-hive"      % Version.Spark
   val sparkRepl      = "org.apache.spark"  %% "spark-repl"      % Version.Spark
 
   val scalaTest      = "org.scalatest"     %% "scalatest"       % Version.ScalaTest  % "test"
