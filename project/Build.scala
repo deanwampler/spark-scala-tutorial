@@ -67,7 +67,6 @@ object ActivatorSparkBuild extends Build {
     id = "SparkWorkshop",
     base = file("."),
     settings = buildSettings ++ Seq(
-      shellPrompt := { state => "(%s)> ".format(Project.extract(state).currentProject.id) },
       maxErrors          := 5,
       triggeredMessage   := Watched.clearWhenTriggered,
       // runScriptSetting,
