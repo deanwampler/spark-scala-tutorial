@@ -67,7 +67,7 @@ fi
 # See below, where once the output directories exist, we correctly find them.
 $HADOOP fs -rm -r -f $output
 
-project_jar=$(find $root/target/scala-2.* -name 'activator-spark_*.jar' | grep -v 'tests.jar')
+project_jar=$(find $root/target/scala-2.* -name 'spark-scala-tutorial_*.jar' | grep -v 'tests.jar')
 
 echo running: $SPARK_SUBMIT --class $main $project_jar --out $output $@
 echo ""

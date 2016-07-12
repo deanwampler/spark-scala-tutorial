@@ -12,7 +12,7 @@ help() {
   usage: $0 [--master master] [--jars jars] [other_spark_options]
   where:
     --master master       Defaults to "local[*]"
-    --jars jars           Comma-separated list. We prepend the "activator-spark*.jar"
+    --jars jars           Comma-separated list. We prepend the project jar already.
     other_spark_options   Any other Spark Shell options
 EOF
 }
@@ -30,7 +30,7 @@ export SPARK_SHELL=$(find_spark_shell)
 [[ -z $SPARK_SHELL ]] && exit 1
 # echo "Using spark shell command: $SPARK_SHELL"
 
-project_jar=$(find $root/target/scala-2.* -name 'activator-spark_*.jar' | grep -v 'tests.jar')
+project_jar=$(find $root/target/scala-2.* -name 'spark-scala-tutorial_*.jar' | grep -v 'tests.jar')
 jars="$project_jar"
 args=()
 while [ $# -gt 0 ]

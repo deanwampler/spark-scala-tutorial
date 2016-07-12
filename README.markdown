@@ -824,7 +824,7 @@ dir=$(dirname $0)
 $dir/hadoop.sh --class WordCount3 --output "$output" "$@"
 ```
 
-It calls a [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the Activator *run* command.
+It calls a [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the SBT *run* command.
 
 The other examples also have corresponding scripts and driver programs.
 
@@ -919,9 +919,9 @@ run-main Matrix4 [ -h | --help] \
 
 The one new optin is for specifying the dimensions, where the string `NxM` is parsed to mean `N` rows and `M` columns. The default is `5x10`.
 
-Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4` and you can run with the default arguments using the Activator *Run* panel.
+Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4`.
 
-For Hadoop, select and run [hadoop.HMatrix4](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HMatrix4.scala) in the UI, use `run-main hadoop.HMatrix4` or `hex4` in the Activator shell, and there is a bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh).
+For Hadoop, run [hadoop.HMatrix4](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HMatrix4.scala) using `run-main hadoop.HMatrix4`, the `hex4` alias, our use the bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh).
 
 We won't cover all the code from now on; we'll skip the familiar stuff:
 
@@ -1006,7 +1006,7 @@ run-main Crawl5a [ -h | --help] \
   [-q | --quiet]
 ```
 
-As before, there is also a `ex5a` short cut for `run-main Crawl5a` and you can run with the default arguments using the Activator *Run* panel.
+Run with `run-main Crawl5a`, or the `ex5a` alias.
 
 `Crawl5a` uses a convenient `SparkContext` method `wholeTextFiles`, which is given a directory "glob". The default we use is `data/enron-spam-ham/*`, which expands to `data/enron-spam-ham/ham100` and `data/enron-spam-ham/spam100`. This method returns records of the form `(file_name, file_contents)`, where the `file_name` is the absolute path to a file found in one of the directories, and `file_contents` contains its contents, including nested linefeeds. To make it easier to run unit tests, `Crawl5a` strips off the leading path elements in the file name (not normally recommended) and it removes the embedded linefeeds, so that each final record is on a single line.
 
@@ -1036,7 +1036,7 @@ run-main InvertedIndex5b [ -h | --help] \
   [-q | --quiet]
 ```
 
-For Hadoop, select and run [hadoop.HInvertedIndex5b](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HInvertedIndex5b.scala) in the UI, use `run-main hadoop.HInvertedIndex5b` or `hex5b` in the Activator shell. There is also a bash script [scripts/invertedindex5b.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/invertedindex5b.sh).
+For Hadoop, run [hadoop.HInvertedIndex5b](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HInvertedIndex5b.scala) using `run-main hadoop.HInvertedIndex5b` or the `hex5b` alias. There is also a bash script [scripts/invertedindex5b.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/invertedindex5b.sh).
 
 The code outside the `try` clause follows the usual pattern, so we'll focus on the contents of the `try` clause:
 
@@ -1149,7 +1149,7 @@ Where
 -n | --ngrams string  Match string (default "% love % %"). Quote the string!
 ```
 
-For Hadoop, select and run [hadoop.HNGrams6](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HNGrams6.scala) in the UI, use `run-main hadoop.HNGrams6` or `hex6` in the Activator shell. There is also a bash script [scripts/ngrams6.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/ngrams6.sh).
+For Hadoop, run [hadoop.HNGrams6](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HNGrams6.scala) using `run-main hadoop.HNGrams6` or the `hex6` alias. There is also a bash script [scripts/ngrams6.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/ngrams6.sh).
 
 I'm in yür codez:
 
@@ -1224,7 +1224,7 @@ run-main Joins7 [ -h | --help] \
 
 Where the `--abbreviations` is the path to the file with book abbreviations to book names. It defaults to `data/abbrevs-to-names.tsv`. Note that the format is tab-separated values, which the script must handle correctly.
 
-For Hadoop, select and run [hadoop.HJoins7](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop.HJoins7.scala) in the UI, use `run-main hadoop.HJoins7` or `hex7` in the Activator shell. There is also a bash script [scripts/joins7.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/joins7.sh).
+For Hadoop, run [hadoop.HJoins7](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop.HJoins7.scala) using `run-main hadoop.HJoins7` or the `hex7` alias. There is also a bash script [scripts/joins7.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/joins7.sh).
 
 Here r yür codez:
 
@@ -1305,7 +1305,7 @@ Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and del
 
 This example treats the KJV text we've been using as a table with a schema. It runs several SQL queries on the data, then performs the same calculation using the `DataFrame` API.
 
-There is a [SparkSQL8.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8.scala) program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called [SparkSQL8-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8-script.scala), which we'll look at instead. (There are minor differences in how output is handled.)
+There is a [SparkSQL8.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8.scala) program that you can run as before using SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called [SparkSQL8-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8-script.scala), which we'll look at instead. (There are minor differences in how output is handled.)
 
 The codez:
 
@@ -1421,19 +1421,18 @@ Th `sparkshell.sh` script does some set up, but essentially its equivalent to th
 
 ```sh
 $SPARK_HOME/bin/spark-shell \
-  --jars target/scala-2.11/activator-spark_2.11-4.0.1.jar [arguments]
+  --jars target/scala-2.11/spark-scala-tutorial_2.11-X.Y.Z.jar [arguments]
 ```
 
 The jar file contains all the project's build artifacts (but not the dependencies).
 
-To run this script locally, use the Activator shell's `console` command. Assuming you're at the shell's prompt `>`, use the following commands to enter the Scala interpreter ("REPL") and then load and run the whole file.
+To run this script locally, use the SBT `console`, then use the Scala interpreter's `:load` command to load the file and evaluate its contents:
 
-```scala
-(Activator-Spark)> console
+```
 scala> :load src/main/scala/sparktutorial/SparkSQL8-script.scala
 ...
 scala> :quit
-(Activator-Spark)> exit
+>
 ```
 
 To enter the statements using copy and paste, just paste them at the `scala>` prompt instead of loading the file.
@@ -1454,7 +1453,7 @@ See the script for more details. Run it in Hadoop using the same techniques as f
 
 The previous examples used the new [Catalyst](httpdatabricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL engine, but Hive's.
 
-> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the Activator shell `console`. This is why it is in a `hadoop` sub-package.
+> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the SBT `console`. This is why it is in a `hadoop` sub-package.
 
 For this exercise, the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
 
@@ -1532,7 +1531,7 @@ The socket option works similarly. By default, the same KJV file is written over
 
 In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11Main.scala) is the actual driver program we'll run. It uses two helper classes, [util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataDirectoryServer.scala) and [util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
-So, let's run this configuration first. In Activator or SBT, run `SparkStreaming11Main` (*not* `SparkStreaming11MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
+So, let's run this configuration first. In SBT, run `SparkStreaming11Main` (*not* `SparkStreaming11MainSocket`) as we've done for the other exercises. For the SBT, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
 This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming11` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
@@ -1559,7 +1558,7 @@ The time stamp will increment by 2000 ms each time, because we're running with 2
 
 At the same time, you'll see new directories appear in `output`, one per batch. They are named like `output/wc-streaming-1413724628000.out`, again with a timestamp appended to our default output argument `output/wc-streaming`. Each of these will contain the usual `_SUCCESS` and `part-0000N` files, one for each core that the job can get!
 
-Now let's run with socket input. In Activator or SBT, run `SparkStreaming11MainSocket`. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming11Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming11 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
+Now let's run with socket input. In SBT, run `SparkStreaming11MainSocket`. The corresponding alias is `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming11Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming11 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
 
 The console output and the directory output should be very similar to the output of the previous run.
 
@@ -1775,7 +1774,6 @@ To learn more, see the following resources:
 
 ### For more about Lightbend:
 
-* See [Lightbend Activator](http://lightbend.com/activator) to find other Activator templates.
 * See [Lightbend Reactive Big Data](http://lightbend.com/reactive-big-data) for more information about our products and services around Spark and Big Data.
 * See [Fast Data: Big Data Evolved](http://lightbend.com/fast-data) for more on my vision for stream-oriented architectures for Big Data.
 * See [Lightbend](http://lightbend.com) for information about the *Lightbend Reactive Platform*, training, and services.

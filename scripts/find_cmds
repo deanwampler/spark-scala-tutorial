@@ -1,6 +1,6 @@
 #!/bin/bash
 #====================================================================
-# find_cmds - Find the 3 commands used in these scripts.
+# find_cmds - Find the shell commands used in these scripts.
 # Source this script.
 #====================================================================
 
@@ -54,9 +54,6 @@ find_spark_shell() {
 }
 find_hadoop() {
   findcmd hadoop $@ '$HADOOP_HOME' '$HADOOPHOME' '$HADOOP'
-}
-find_activator() {
-  findcmd activator $@ '$ACTIVATOR_HOME' '$ACTIVATORHOME' '$ACTIVATOR'
 }
 find_sbt() {
   findcmd sbt $@ '$SBT_HOME' '$SBTHOME' '$SBT'

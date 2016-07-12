@@ -14,13 +14,8 @@ output=output/socket-streaming
 dir=$(dirname $0)
 echo "Output will be written to: $output"
 
-export ACT=$(find_activator --silent "$HOME/activator/activator")
-if [[ -n $ACT ]]
-  ACT="$ACT shell"
-then
-  ACT=$(find_sbt)
-  [[ -z $ACT ]] && exit 1
-fi
+export ACT=$(find_sbt)
+[[ -z $ACT ]] && exit 1
 
 echo "Starting the DataSocketServer:"
 echo "  echo run-main com.typesafe.sparkworkshop.util.streaming.DataSocketServer 9900 $datafile | $ACT"

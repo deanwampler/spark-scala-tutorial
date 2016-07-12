@@ -9,7 +9,7 @@ help() {
 
   where:
     -h | --help        Print help and exit.
-    --mem N            The default memory for Activator is 4096 (MB), which is also used
+    --mem N            The default memory for Spark is 4096 (MB), which is also used
                        to run the non-Hadoop Spark examples. Use a larger integer value
                        N if you experience out of memory errors.
     options            Any additional options to pass to SBT.

@@ -3,8 +3,8 @@ import sbt.Keys._
 
 object BuildSettings {
 
-  val Name = "activator-spark"
-  val Version = "4.3.3"
+  val Name = "spark-scala-tutorial"
+  val Version = "5.0.0"
   // You can use either version of Scala. We default to 2.11.7:
   val ScalaVersion = "2.11.7"
   val ScalaVersions = Seq("2.11.7", "2.10.6")
@@ -15,7 +15,7 @@ object BuildSettings {
     scalaVersion  := ScalaVersion,
     crossScalaVersions := ScalaVersions,
     organization  := "com.lightbend",
-    description   := "Activator Spark Template",
+    description   := "Spark Spark Tutorial",
     scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8", "-Xlint")
   )
 }
@@ -52,7 +52,7 @@ object Dependency {
 object Dependencies {
   import Dependency._
 
-  val activatorspark =
+  val sparkdeps =
     Seq(sparkCore, sparkStreaming, sparkSQL, sparkHiveSQL, // sparkRepl,
       scalaTest, scalaCheck)
 }
@@ -63,7 +63,7 @@ object ActivatorSparkBuild extends Build {
   import BuildSettings._
 
   val excludeSigFilesRE = """META-INF/.*\.(SF|DSA|RSA)""".r
-  lazy val activatorspark = Project(
+  lazy val spark_scala_tutorial = Project(
     id = "SparkWorkshop",
     base = file("."),
     settings = buildSettings ++ Seq(
@@ -75,7 +75,7 @@ object ActivatorSparkBuild extends Build {
       // For the Hadoop variants to work, we must rebuild the package before
       // running, so we make it a dependency of run.
       (run in Compile) <<= (run in Compile) dependsOn (packageBin in Compile),
-      libraryDependencies ++= Dependencies.activatorspark,
+      libraryDependencies ++= Dependencies.sparkdeps,
       excludeFilter in unmanagedSources := (HiddenFileFilter || "*-script.scala"),
       unmanagedResourceDirectories in Compile += baseDirectory.value / "conf",
       unmanagedResourceDirectories in Test += baseDirectory.value / "conf",
