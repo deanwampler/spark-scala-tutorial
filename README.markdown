@@ -3,15 +3,15 @@
 ![](http://spark.apache.org/docs/latest/img/spark-logo-100x40px.png)
 
 Dean Wampler, Ph.D.
-[Typesafe](http://typesafe.com)
-[dean.wampler@typesafe.com](mailto:dean.wampler@typesafe.com)
+[Lightbend](http://lightbend.com)
+[dean.wampler@lightbend.com](mailto:dean.wampler@lightbend.com)
 [@deanwampler](https://twitter.com/deanwampler)
 
-This workshop demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
+This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
 
 If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine "sandboxes" with Spark included. See their websites for information.
 
-For more advanced Spark training and services from Typesafe, please visit [typesafe.com/reactive-big-data](http://www.typesafe.com/platform/reactive-big-data/spark).
+For more advanced Spark training and services from Lightbend, please visit [lightbend.com/reactive-big-data](http://www.lightbend.com/platform/reactive-big-data/spark).
 
 ## Setup Instructions
 
@@ -23,13 +23,13 @@ Let's discuss setup for local mode first.
 
 Working in *local mode* makes it easy to edit, test, run, and debug applications quickly. Then, running them in a cluster provides more real-world testing and finally production scalability and resiliency.
 
-We will build and run the examples and exercises using [SBT](http://www.scala-sbt.org/download.html) or [Typesafe Activator](http://typesafe.com/activator), which includes a web-based UI and the SBT command-line interface.
+We will build and run the examples and exercises using [SBT](http://www.scala-sbt.org/download.html) or [Lightbend Activator](http://lightbend.com/activator), which includes a web-based UI and the SBT command-line interface.
 
-[Activator](https://typesafe.com/activator) is part of the [Typesafe Reactive Platform](https://typesafe.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example.
+[Activator](https://lightbend.com/activator) is part of the [Lightbend Reactive Platform](https://lightbend.com/platform/getstarted). It is a web-based environment for finding and using example templates for many different JVM-based toolkits and example applications. Once you've loaded one or more templates, you can browse and build the code, then run the tests and the application itself. This *Spark Workshop* is one example.
 
 You'll need either Activator or SBT installed.
 
-If you are not *already* viewing this workshop in Activator, install it by following the instructions on the [get started](https://typesafe.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
+If you are not *already* viewing this tutorial in Activator, install it by following the instructions on the [get started](https://lightbend.com/platform/getstarted) page. After installing it, add the installation directory to your `PATH` or define the environment variable `ACTIVATOR_HOME` (MacOS, Linux, or Cygwin only).
 
 > **NOTE:** If you use Activator, version 1.3 or later is required.
 
@@ -66,7 +66,7 @@ If you have a Hadoop cluster installation or a "vanilla" virtual machine sandbox
 
 Assuming you don't have administration rights, it's sufficient to expand the archive in your home directory on the cluster node or edge node you intend to use, or within the sandbox. Then add the `bin` directory under the Spark installation directory to your `PATH` or define the environment variable `SPARK_HOME` to match the installation directory, *not* the `bin` directory.
 
-You'll need to copy this workshop to the same server or sandbox. Copy the data to HDFS using the following command, which copies the workshop's `data` directory to `/user/$USER/data`:
+You'll need to copy this tutorial to the same server or sandbox. Copy the data to HDFS using the following command, which copies the tutorial's `data` directory to `/user/$USER/data`:
 
 ```sh
 hadoop fs -put data data
@@ -74,19 +74,19 @@ hadoop fs -put data data
 
 If you want to put the `data` directory somewhere else, you can, but you'll need to always specify that input location when you run the examples in Hadoop.
 
-You'll also need Activator or SBT on the server or sandbox to run the examples. Recall that I recommend going through the workshop on your local workstation first, then move everything to the cluster node or sandbox to try running the examples in Hadoop.
+You'll also need Activator or SBT on the server or sandbox to run the examples. Recall that I recommend going through the tutorial on your local workstation first, then move everything to the cluster node or sandbox to try running the examples in Hadoop.
 
 ## Starting Activator or SBT
 
 From now on, except where noted, the instructions apply for both your local workstation and Hadoop setup.
 
-First, change to the root directory for this workshop.
+First, change to the root directory for this tutorial.
 
 If you prefer a command-line interface, either run `activator shell` or `sbt`, depending on which tool you installed. In fact, you'll use this approach for several of the exercises.
 
 To use Activator's UI, run `activator ui`, assuming it's in your path, or use the fully-qualified path to it. It will start Activator and open the web-based UI in your browser automatically. (If not, open [localhost:8888](http://localhost:8888) in your browser.)
 
-If you are trying the workshop on a Hadoop cluster or edge node, or in a sandbox, change to the workshop root directory and run the command `./start.sh`. It will start Activator and load this workshop.
+If you are trying the tutorial on a Hadoop cluster or edge node, or in a sandbox, change to the tutorial root directory and run the command `./start.sh`. It will start Activator and load this tutorial.
 
 By default, it will start the Activator web-based UI, but you'll have to open your browser to the correct URL yourself, since you'll view the UI on a different machine, i.e., your workstation. The script prints a message to the login console showing the correct URL, including a different port number, 9999, than above. (A different port is used because 8888 is sometimes used for other purposes in Hadoop clusters.)
 
@@ -112,7 +112,7 @@ Click the *Start* button. The *Logs* panel shows the output as it runs.
 
 If you're using the shell/sbt prompt, invoke `run-main WordCount3`.)
 
-Note the `output` directory listed in the log messages. Use your workstation's file browser or a command window to view the output in the directory, which will be `/root/spark-workshop/output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data. The `_SUCCESS` files are empty. They are written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know it's safe to read the data.
+Note the `output` directory listed in the log messages. Use your workstation's file browser or a command window to view the output in the directory, which will be `/root/spark-tutorial/output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data. The `_SUCCESS` files are empty. They are written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know it's safe to read the data.
 
 ## Running a Hadoop Example
 
@@ -134,7 +134,7 @@ Either way, the same `_SUCCESS` and `part-00000` files will be found, although t
 
 Assuming you encountered no problems, everything is working!
 
-> NOTE: The normal Hadoop and Spark convention is to never overwrite existing data. However, that would force us to manually delete old data before rerunning programs, an inconvenience while learning. So, to make the workshop easier, the programs delete existing data first.
+> NOTE: The normal Hadoop and Spark convention is to never overwrite existing data. However, that would force us to manually delete old data before rerunning programs, an inconvenience while learning. So, to make the tutorial easier, the programs delete existing data first.
 
 ## Naming Conventions
 
@@ -142,14 +142,14 @@ We're using a few conventions for the package structure and `main` class names:
 
 * `FooBarN.scala` - The `FooBar` compiled program for the N^th^ example. With a few exceptions, it can be run locally and in Hadoop. It defaults to local execution.
 * `FooBarN-script.scala` - The `FooBar` script for the N^th^ example. It is run using the `spark-shell` for local mode and cluster execution, or using the `console` (interactive Spark shell or *REPL*) that's provided by the `activator shell` or `sbt` environments.
-* `hadoop/HFooBarN.scala` - A driver program to run `FooBarN` in Hadoop. These small classes use a Scala library API for managing operating system *processes*. In this case, they invoke one or more shell scripts in the workshop's `scripts` directory, which in turn call the Spark driver program `$SPARK_HOME/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
+* `hadoop/HFooBarN.scala` - A driver program to run `FooBarN` in Hadoop. These small classes use a Scala library API for managing operating system *processes*. In this case, they invoke one or more shell scripts in the tutorial's `scripts` directory, which in turn call the Spark driver program `$SPARK_HOME/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
 * `solns/FooBarNSomeExercise.scala` - The solution to the "some exercise" exercise that's described in `FooBarN.scala`. These programs can also be invoked from the *Run* panel (or shell `run` command).
 
 Otherwise, we don't use package prefixes, but only because they tend to be inconvenient with the Activator's *Run* UI.
 
 ## Introduction: What Is Spark?
 
-Let's start with an overview of Spark, then discuss how to setup and use this workshop.
+Let's start with an overview of Spark, then discuss how to setup and use this tutorial.
 
 [Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming.
 
@@ -195,14 +195,14 @@ Several years ago, the Spark team ported the Hive query engine to Spark, calling
 
 ## The Spark Version
 
-This workshop uses Spark 1.6.2.
+This tutorial uses Spark 1.6.2.
 
 The following documentation links provide more information about Spark:
 
 * [Documentation](http://spark.apache.org/docs/latest/).
 * [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the workshop.
+The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the tutorial.
 
 
 ## The Exercises
@@ -217,7 +217,7 @@ Here is a list of the exercises. In subsequent sections, we'll dive into the det
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
 * **Joins7:** Spark supports SQL-style joins as shown in this simple example.
-* **SparkSQL8:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous workshop. There is also a
+* **SparkSQL8:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous tutorial. There is also a
 * **SparkSQLFileFormats9:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
 * **hadoop/HiveSQL10:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL! This example is in a `hadoop` subdirectory, because it uses features that require a Hadoop setup (more details later on).
 * **SparkStreaming11:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
@@ -226,13 +226,13 @@ Let's now work through these exercises...
 
 ## Intro1-script
 
-[Intro1-script.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/Intro1-script.scala)
+[Intro1-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Intro1-script.scala)
 
 Our first exercise demonstrates the useful *Spark Shell*, which is a customized version of Scala's REPL (read, eval, print, loop). It allows us to work interactively with our algorithms and data.
 
 Actually, for local mode execution, we won't use the `spark-shell` command provided by Spark. Instead, we've customized the Activator/SBT `console` (Scala REPL) to behave in a similar way. For Hadoop execution, we'll use `spark-shell`.
 
-We'll copy and paste commands from the file [Intro1-script.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/Intro1-script.scala). Click the link to open the file in Activator or open it in your favorite editor/IDE.
+We'll copy and paste commands from the file [Intro1-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Intro1-script.scala). Click the link to open the file in Activator or open it in your favorite editor/IDE.
 
 The extensive comments in this file and the subsequent files explain the API calls in detail. You can copy and paste the comments, too.
 
@@ -242,13 +242,13 @@ To run this example on your workstation, you can't use the Activator UI. Quit Ac
 
 ## Hadoop Execution
 
-In your sandbox or cluster node, change to the root node of the workshop and run the following command:
+In your sandbox or cluster node, change to the root node of the tutorial and run the following command:
 
 ```sh
 ./scripts/sparkshell.sh
 ```
 
-This script calls the actual Spark Shell script, `$SPARK_HOME/bin/spark-shell` and passes a `--jars` argument with the jar of the workshop's compiled code. The script also passes any additional arguments you provide to `spark-shell`. (Try the `--help` option to see the full list.)
+This script calls the actual Spark Shell script, `$SPARK_HOME/bin/spark-shell` and passes a `--jars` argument with the jar of the tutorial's compiled code. The script also passes any additional arguments you provide to `spark-shell`. (Try the `--help` option to see the full list.)
 
 You'll see a lot of log messages, ending with the Scala REPL prompt `scala>`.
 
@@ -504,7 +504,7 @@ Before we finish this exercise, open [localhost:4040](http://localhost:4040) and
 
 ## Exercises
 
-There are comments at the end of this file with suggested exercises to learn the API. All the subsequent examples we'll discuss include suggested exercises, too. Solutions for some of them are provided in the [src/main/scala/sparkworkshop/solns](https://github.com/deanwampler/spark-workshop/tree/master/src/main/scala/sparkworkshop/solns) directory.
+There are comments at the end of this file with suggested exercises to learn the API. All the subsequent examples we'll discuss include suggested exercises, too. Solutions for some of them are provided in the [src/main/scala/sparktutorial/solns](https://github.com/deanwampler/spark-scala-tutorial/tree/master/src/main/scala/sparktutorial/solns) directory.
 
 You can exit the Scala REPL now. Type `:quit` or use `^d` (control-d).
 
@@ -512,13 +512,13 @@ If you ran this example locally using the Activator/SBT `console`, you can exit 
 
 ## WordCount2
 
-[WordCount2.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/WordCount2.scala)
+[WordCount2.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount2.scala)
 
 The classic, simple *Word Count* algorithm is easy to understand and it's suitable for parallel computation, so it's a good vehicle when first learning a Big Data API.
 
 In *Word Count*, you read a corpus of documents, tokenize each one into words, and count the occurrences of all the words globally.
 
-[WordCount2.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/WordCount2.scala) uses the KJV Bible text again. (Subsequent exercises will add the ability to specify different input sources using command-line arguments.)
+[WordCount2.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount2.scala) uses the KJV Bible text again. (Subsequent exercises will add the ability to specify different input sources using command-line arguments.)
 
 This example does not have a Hadoop version, so we'll only run it locally.
 
@@ -535,7 +535,7 @@ Either way, the output is written to `output/kjv-wc2` in the local file system. 
 As before, here is the text of the script in sections, with code comments removed:
 
 ```scala
-import com.typesafe.sparkworkshop.util.FileUtil
+import util.FileUtil
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
@@ -606,11 +606,11 @@ Spark also follows another Hadoop convention for file I/O; the `out` path is act
 
 ## Exercises
 
-At the end of each example source file, you'll find exercises you can try. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/solns/WordCount2GroupBy.scala) solves the "group by" exercise described in `WordCount2.scala`.
+At the end of each example source file, you'll find exercises you can try. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/solns/WordCount2GroupBy.scala) solves the "group by" exercise described in `WordCount2.scala`.
 
 ## WordCount3
 
-[WordCount3.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/WordCount3.scala)
+[WordCount3.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount3.scala)
 
 This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it. When we set up the `SparkContext`, we also use [Kryo Serialization](http://spark.apache.org/docs/latest/tuning.html), which provides better compression and therefore better utilization of memory and network bandwidth.
 
@@ -688,12 +688,12 @@ Okay, with all the invocation options out of the way, let's walk through the imp
 
 ## WordCount3 Code Walkthrough
 
-[WordCount3.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/WordCount3.scala)
+[WordCount3.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount3.scala)
 
 We start with import statements:
 
 ```scala
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, TextUtil}
+import util.{CommandLineOptions, FileUtil, TextUtil}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 ```
@@ -718,7 +718,7 @@ object WordCount3 {
     val out    = argz("output-path")
 ```
 
-I won't discuss the implementation of [CommandLineOptions.scala](#code/src/main/scala/sparkworkshop/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+I won't discuss the implementation of [CommandLineOptions.scala](#code/src/main/scala/sparktutorial/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
 
 After parsing the options, we extract some of the values we need.
 
@@ -803,13 +803,13 @@ In a previous section, we described how to run `WordCount3` either locally or in
 
 Recall from the setup instructions that the data must already be in HDFS. The location `/user/$USER/data` is assumed. If you used a different location, always specify the `--input` argument when you run the examples.
 
-The driver program, [hadoop.HWordCound3](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/hadoop/HWordCount3.scala), is used to run `WordCount3` in Hadoop. It is also available in the Activator UI *Run* panel and the shell/SBT `run` command. Try it now.
+The driver program, [hadoop.HWordCound3](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HWordCount3.scala), is used to run `WordCount3` in Hadoop. It is also available in the Activator UI *Run* panel and the shell/SBT `run` command. Try it now.
 
 The output is more verbose and the execution time is longer, due to Hadoop's overhead. The end of the output shows a URL for the *Hue* UI that's also part of the Sandbox. Open your browser to that URL to look at the data. The content will be very similar to the output of the previous, local run, but it will be formatted differently and the word-count pairs will be in a different (random) order.
 
 Using the Activator shell or SBT, you can also use `run-main hadoop.HWordCount3` or the alias `hex3`.
 
-For convenient, there is also a bash shell script for this example in the `scripts` directory, [scripts/wordcount3.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/wordcount3.sh):
+For convenient, there is also a bash shell script for this example in the `scripts` directory, [scripts/wordcount3.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/wordcount3.sh):
 
 ```scala
 #!/bin/bash
@@ -819,15 +819,15 @@ dir=$(dirname $0)
 $dir/hadoop.sh --class WordCount3 --output "$output" "$@"
 ```
 
-It calls a [scripts/hadoop.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the Activator *run* command.
+It calls a [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the Activator *run* command.
 
 The other examples also have corresponding scripts and driver programs.
 
-Let's return to [hadoop.HWordCound3](#code/src/main/scala/sparkworkshop/hadoop.HWordCound3.scala), which is quite small:
+Let's return to [hadoop.HWordCound3](#code/src/main/scala/sparktutorial/hadoop.HWordCound3.scala), which is quite small:
 
 ```scala
 package hadoop
-import com.typesafe.sparkworkshop.util.Hadoop
+import util.Hadoop
 
 object HWordCount3 {
   def main(args: Array[String]): Unit = {
@@ -838,12 +838,12 @@ object HWordCount3 {
 
 It accepts the same options as `WordCount3`, although the `--master` option defaults to `yarn-client` this time.
 
-It delegates to a helper class [com.typesafe.sparkworkshop.util.Hadoop](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/util/Hadoop.scala) to do the work. It passes as arguments the class name and the output location. The second argument is a hack: the default output path must be specified here, even though the same default value is also encoded in the application. This is because we eventually pass the value to the [scripts/hadoop.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/hadoop.sh) script, which uses it to delete an old output directory, if any.
+It delegates to a helper class [util.Hadoop](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/Hadoop.scala) to do the work. It passes as arguments the class name and the output location. The second argument is a hack: the default output path must be specified here, even though the same default value is also encoded in the application. This is because we eventually pass the value to the [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script, which uses it to delete an old output directory, if any.
 
 Here is the `Hadoop` helper class:
 
 ```scala
-package com.typesafe.sparkworkshop.util
+package util
 import scala.sys.process._
 
 object Hadoop {
@@ -873,17 +873,17 @@ object Hadoop {
 
 It tries to determine the user name and whether or not the user explicitly specified an output argument, which should override the hard-coded value.
 
-Finally, it invokes the [scripts/hadoop.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/hadoop.sh) script we mentioned above, so that we go thorugh Spark's `spark-submit` script for submitting to the Hadoop YARN cluster.
+Finally, it invokes the [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script we mentioned above, so that we go thorugh Spark's `spark-submit` script for submitting to the Hadoop YARN cluster.
 
 ## WordCount3 Exercises
 
-[WordCount3.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/WordCount3.scala)
+[WordCount3.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount3.scala)
 
 Don't forget the try the exercises at the end of the source file.
 
 For Hadoop execution, you'll need to edit the source code on cluster or edge node or the sandbox. One way is to simply use an editor on the node, i.e., `vi` or `emacs` to edit the code. Another approach is to use the secure copy command, `scp`, to copy edited sources to and from your workstation.
 
-For sandboxes, the best approach is to share this workshop's root directory between your workstation and the VM Linux instance. This will allow you to edit the code in your workstation environment with the changes immediately available in the VM. See the documentation for your VM runner for details on sharing folders.
+For sandboxes, the best approach is to share this tutorial's root directory between your workstation and the VM Linux instance. This will allow you to edit the code in your workstation environment with the changes immediately available in the VM. See the documentation for your VM runner for details on sharing folders.
 
 For example, in VMWare, the *Sharing* panel lets you specify workstation directories to share. In the Linux VM, run the following commands as `root` to mount all shared directories under `/home/shares` (or use a different location):
 
@@ -896,7 +896,7 @@ Now any shared workstation folders will appear under `/home/shares`.
 
 ## Matrix4
 
-[Matrix4.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/Matrix4.scala)
+[Matrix4.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Matrix4.scala)
 
 An early use for Spark was implementing Machine Learning algorithms. Spark's `MLlib` of algorithms contains classes for vectors and matrices, which are important for many ML algorithms. This exercise uses a simpler representation of matrices to explore another topic; explicit parallelism.
 
@@ -916,12 +916,12 @@ The one new optin is for specifying the dimensions, where the string `NxM` is pa
 
 Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4` and you can run with the default arguments using the Activator *Run* panel.
 
-For Hadoop, select and run [hadoop.HMatrix4](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/hadoop/HMatrix4.scala) in the UI, use `run-main hadoop.HMatrix4` or `hex4` in the Activator shell, and there is a bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/hadoop.sh).
+For Hadoop, select and run [hadoop.HMatrix4](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HMatrix4.scala) in the UI, use `run-main hadoop.HMatrix4` or `hex4` in the Activator shell, and there is a bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh).
 
 We won't cover all the code from now on; we'll skip the familiar stuff:
 
 ```scala
-import com.typesafe.sparkworkshop.util.Matrix
+import util.Matrix
 ...
 
 object Matrix4 {
@@ -987,7 +987,7 @@ Try the simple exercises at the end of the source file.
 
 ## Crawl5a
 
-[Crawl5a.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/Crawl5a.scala)
+[Crawl5a.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Crawl5a.scala)
 
 The fifth example is in two-parts. The first part simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
@@ -1017,7 +1017,7 @@ The next step has to parse this data to generate the *inverted index*.
 
 ## InvertedIndex5b
 
-[InvertedIndex5b.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/InvertedIndex5b.scala)
+[InvertedIndex5b.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/InvertedIndex5b.scala)
 
 Using the crawl data just generated, compute the index of words to documents (emails). This is a simple approach to building a data set that could be used by a search engine. Each record will have two fields, a word and a list of tuples of documents where the word occurs and a count of the occurrences in the document.
 
@@ -1031,7 +1031,7 @@ run-main InvertedIndex5b [ -h | --help] \
   [-q | --quiet]
 ```
 
-For Hadoop, select and run [hadoop.HInvertedIndex5b](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/hadoop/HInvertedIndex5b.scala) in the UI, use `run-main hadoop.HInvertedIndex5b` or `hex5b` in the Activator shell. There is also a bash script [scripts/invertedindex5b.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/invertedindex5b.sh).
+For Hadoop, select and run [hadoop.HInvertedIndex5b](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HInvertedIndex5b.scala) in the UI, use `run-main hadoop.HInvertedIndex5b` or `hex5b` in the Activator shell. There is also a bash script [scripts/invertedindex5b.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/invertedindex5b.sh).
 
 The code outside the `try` clause follows the usual pattern, so we'll focus on the contents of the `try` clause:
 
@@ -1119,7 +1119,7 @@ A few useful [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.
 
 ## NGrams6
 
-[NGrams6.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/NGrams6.scala)
+[NGrams6.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/NGrams6.scala)
 
 In *Natural Language Processing*, one goal is to determine the sentiment or meaning of text. One technique that helps do this is to locate the most frequently-occurring, N-word phrases, or *NGrams*. Longer NGrams can convey more meaning, but they occur less frequently so all of them appear important. Shorter NGrams have better statistics, but each one conveys less meaning. In most cases, N = 3-5 appears to provide the best balance.
 
@@ -1144,7 +1144,7 @@ Where
 -n | --ngrams string  Match string (default "% love % %"). Quote the string!
 ```
 
-For Hadoop, select and run [hadoop.HNGrams6](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/hadoop/HNGrams6.scala) in the UI, use `run-main hadoop.HNGrams6` or `hex6` in the Activator shell. There is also a bash script [scripts/ngrams6.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/ngrams6.sh).
+For Hadoop, select and run [hadoop.HNGrams6](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HNGrams6.scala) in the UI, use `run-main hadoop.HNGrams6` or `hex6` in the Activator shell. There is also a bash script [scripts/ngrams6.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/ngrams6.sh).
 
 I'm in yür codez:
 
@@ -1198,7 +1198,7 @@ The rest of the code formats the results and converts them to a new `RDD` for ou
 
 ## Joins7
 
-[Joins7.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/Joins7.scala)
+[Joins7.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
 
@@ -1219,7 +1219,7 @@ run-main Joins7 [ -h | --help] \
 
 Where the `--abbreviations` is the path to the file with book abbreviations to book names. It defaults to `data/abbrevs-to-names.tsv`. Note that the format is tab-separated values, which the script must handle correctly.
 
-For Hadoop, select and run [hadoop.HJoins7](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/hadoop.HJoins7.scala) in the UI, use `run-main hadoop.HJoins7` or `hex7` in the Activator shell. There is also a bash script [scripts/joins7.sh](https://github.com/deanwampler/spark-workshop/blob/master/scripts/joins7.sh).
+For Hadoop, select and run [hadoop.HJoins7](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop.HJoins7.scala) in the UI, use `run-main hadoop.HJoins7` or `hex7` in the Activator shell. There is also a bash script [scripts/joins7.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/joins7.sh).
 
 Here r yür codez:
 
@@ -1287,8 +1287,8 @@ You can verify that the output file looks like the input KJV file with the book 
 
 ## SparkSQL8
 
-[SparkSQL8.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkSQL8.scala)<br/>
-[SparkSQL8-script.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkSQL8-script.scala)
+[SparkSQL8.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8.scala)<br/>
+[SparkSQL8-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8-script.scala)
 
 The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a new `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
 
@@ -1300,12 +1300,12 @@ Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and del
 
 This example treats the KJV text we've been using as a table with a schema. It runs several SQL queries on the data, then performs the same calculation using the `DataFrame` API.
 
-There is a [SparkSQL8.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkSQL8.scala) program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called [SparkSQL8-script.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkSQL8-script.scala), which we'll look at instead. (There are minor differences in how output is handled.)
+There is a [SparkSQL8.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8.scala) program that you can run as before using Activator or SBT. However, SQL queries are more interesting when used interactively. So, there's also a "script" version called [SparkSQL8-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8-script.scala), which we'll look at instead. (There are minor differences in how output is handled.)
 
 The codez:
 
 ```scala
-import com.typesafe.sparkworkshop.util.Verse
+import util.Verse
 import org.apache.spark.sql.DataFrame
 ```
 
@@ -1400,10 +1400,10 @@ countsDF.count
 
 ## Using SQL in the Spark Shell
 
-So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the [scripts](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/scripts) directory:
+So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the [scripts](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/scripts) directory:
 
 ```sh
-scripts/sparkshell.sh src/main/scala/sparkworkshop/SparkSQL8-script.scala
+scripts/sparkshell.sh src/main/scala/sparktutorial/SparkSQL8-script.scala
 ```
 
 Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
@@ -1425,7 +1425,7 @@ To run this script locally, use the Activator shell's `console` command. Assumin
 
 ```scala
 (Activator-Spark)> console
-scala> :load src/main/scala/sparkworkshop/SparkSQL8-script.scala
+scala> :load src/main/scala/sparktutorial/SparkSQL8-script.scala
 ...
 scala> :quit
 (Activator-Spark)> exit
@@ -1435,7 +1435,7 @@ To enter the statements using copy and paste, just paste them at the `scala>` pr
 
 ## SparkSQLFileFormats9-script
 
-[SparkSQLFileFormats9-script.scala](#code/src/main/scala/sparkworkshop/SparkSQLFileFormats9-script.scala)
+[SparkSQLFileFormats9-script.scala](#code/src/main/scala/sparktutorial/SparkSQLFileFormats9-script.scala)
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) and JSON formats. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it. Then it repeats the exercise using JSON.
 
@@ -1445,7 +1445,7 @@ See the script for more details. Run it in Hadoop using the same techniques as f
 
 ## HiveSQL10
 
-[HiveSQL10.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/hadoop/HiveSQL10.scala)
+[HiveSQL10.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HiveSQL10.scala)
 
 The previous examples used the new [Catalyst](http://databricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL engine, but Hive's.
 
@@ -1458,7 +1458,7 @@ Let's discuss the code hightlights. There is additional imports for Hive:
 ```scala
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive.HiveContext
-import com.typesafe.sparkworkshop.util.Verse
+import util.Verse
 ```
 
 We need the user name.
@@ -1511,7 +1511,7 @@ A few points to keep in mind:
 
 ## SparkStreaming11
 
-[SparkStreaming11.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkStreaming11.scala)
+[SparkStreaming11.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11.scala)
 
 The streaming capability is relatively new and this exercise uses it to construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
 
@@ -1525,7 +1525,7 @@ The second basic configuration reads data from a socket. Spark Streaming also co
 
 The socket option works similarly. By default, the same KJV file is written over and over again to a socket.
 
-In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkStreaming11Main.scala) is the actual driver program we'll run. It uses two helper classes, [com.typesafe.sparkworkshop.util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/util/streaming/DataDirectoryServer.scala) and [com.typesafe.sparkworkshop.util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
+In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11Main.scala) is the actual driver program we'll run. It uses two helper classes, [util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataDirectoryServer.scala) and [util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
 So, let's run this configuration first. In Activator or SBT, run `SparkStreaming11Main` (*not* `SparkStreaming11MainSocket`) as we've done for the other exercises. For the Activator `shell` or SBT prompt, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
@@ -1598,7 +1598,7 @@ A [StreamingContext](http://spark.apache.org/docs/latest/api/scala/index.html#or
 
 ## The SparkStreaming11 Code
 
-Here are the key parts of the code for [SparkStreaming11.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkStreaming11.scala):
+Here are the key parts of the code for [SparkStreaming11.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11.scala):
 
 ```scala
 ...
@@ -1705,9 +1705,9 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
-See also [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/SparkStreaming11Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/util/DataDirectoryServer.scala) and
+See also [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/DataDirectoryServer.scala) and
 [DataSocketServer.scala](
-https://github.com/deanwampler/spark-workshop/blob/master/src/main/scala/sparkworkshop/util/DataSocketServer.scala).
+https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/DataSocketServer.scala).
 
 This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
 
@@ -1756,8 +1756,8 @@ This is a general issue for distributed programs written for the JVM. A future v
 
 To learn more, see the following resources:
 
-* [Typesafe's Big Data Products and Services](http://typesafe.com/reactive-big-data). Typesafe now offers commercial support for Spark on Mesos, as well as developer support, including Spark training and consulting, for all environments.
-* [Fast Data: Big Data Evolved](http://typesafe.com/fast-data). A whitepaper I wrote for Typesafe about the emerging, stream-oriented architecture for Big Data.
+* [Lightbend's Big Data Products and Services](http://lightbend.com/reactive-big-data). Lightbend now offers commercial support for Spark on Mesos, as well as developer support, including Spark training and consulting, for all environments.
+* [Fast Data: Big Data Evolved](http://lightbend.com/fast-data). A whitepaper I wrote for Lightbend about the emerging, stream-oriented architecture for Big Data.
 * The Apache Spark [website](http://spark.apache.org/).
 * The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/latest/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame).
 * The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
@@ -1768,15 +1768,15 @@ To learn more, see the following resources:
 
 * [Spark Packages](http://spark-packages.org/).
 
-## For more about Typesafe:
+## For more about Lightbend:
 
-* See [Typesafe Activator](http://typesafe.com/activator) to find other Activator templates.
-* See [Typesafe Reactive Big Data](http://typesafe.com/reactive-big-data) for more information about our products and services around Spark and Big Data.
-* See [Fast Data: Big Data Evolved](http://typesafe.com/fast-data) for more on my vision for stream-oriented architectures for Big Data.
-* See [Typesafe](http://typesafe.com) for information about the *Typesafe Reactive Platform*, training, and services.
+* See [Lightbend Activator](http://lightbend.com/activator) to find other Activator templates.
+* See [Lightbend Reactive Big Data](http://lightbend.com/reactive-big-data) for more information about our products and services around Spark and Big Data.
+* See [Fast Data: Big Data Evolved](http://lightbend.com/fast-data) for more on my vision for stream-oriented architectures for Big Data.
+* See [Lightbend](http://lightbend.com) for information about the *Lightbend Reactive Platform*, training, and services.
 
 ## Final Thoughts
 
-Thank you for working through this workshop. Feedback and pull requests are welcome.
+Thank you for working through this tutorial. Feedback and pull requests are welcome.
 
-[Dean Wampler](mailto:dean.wampler@typesafe.com)
+[Dean Wampler](mailto:dean.wampler@lightbend.com)

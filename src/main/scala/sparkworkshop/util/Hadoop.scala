@@ -1,4 +1,4 @@
-package com.typesafe.sparkworkshop.util
+package util
 import scala.sys.process._
 
 /**

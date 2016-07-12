@@ -1,5 +1,5 @@
 import org.scalatest.FunSpec
-import com.typesafe.sparkworkshop.util.FileUtil
+import util.FileUtil
 
 // Run in local mode and local data.
 class SparkSQL8Spec extends FunSpec {

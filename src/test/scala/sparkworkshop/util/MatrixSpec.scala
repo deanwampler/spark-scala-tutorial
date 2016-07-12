@@ -1,4 +1,4 @@
-package com.typesafe.sparkworkshop.util
+package util
 import org.scalatest.FunSpec
 
 class MatrixSpec extends FunSpec {

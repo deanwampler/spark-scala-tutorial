@@ -1,5 +1,5 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
-import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
+import util.{CommandLineOptions, FileUtil}
+import util.CommandLineOptions.Opt
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.streaming._

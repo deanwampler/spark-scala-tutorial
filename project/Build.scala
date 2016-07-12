@@ -14,7 +14,7 @@ object BuildSettings {
     version       := Version,
     scalaVersion  := ScalaVersion,
     crossScalaVersions := ScalaVersions,
-    organization  := "com.typesafe",
+    organization  := "com.lightbend",
     description   := "Activator Spark Template",
     scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8", "-Xlint")
   )
@@ -22,11 +22,11 @@ object BuildSettings {
 
 
 object Resolvers {
-  val typesafe = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+  val lightbend = "Lightbend Repository" at "http://repo.lightbend.com/lightbend/releases/"
   val sonatype = "Sonatype Release" at "https://oss.sonatype.org/content/repositories/releases"
   val mvnrepository = "MVN Repo" at "http://mvnrepository.com/artifact"
 
-  val allResolvers = Seq(typesafe, sonatype, mvnrepository)
+  val allResolvers = Seq(lightbend, sonatype, mvnrepository)
 
 }
 

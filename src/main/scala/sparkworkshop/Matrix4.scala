@@ -1,6 +1,6 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
-import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
-import com.typesafe.sparkworkshop.util.Matrix
+import util.{CommandLineOptions, FileUtil}
+import util.CommandLineOptions.Opt
+import util.Matrix
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**

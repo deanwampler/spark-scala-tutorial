@@ -1,4 +1,4 @@
-package com.typesafe.sparkworkshop.util.streaming
+package util.streaming
 import java.net.ServerSocket
 import java.io.{File, PrintWriter}
 import scala.io.Source

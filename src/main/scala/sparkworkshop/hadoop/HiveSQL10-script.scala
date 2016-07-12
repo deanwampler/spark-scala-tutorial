@@ -46,7 +46,7 @@ def sql2(title: String, query: String, n: Int = 100): Unit = {
 }
 
 // Load the KJV verses. Adapted from SparkSQL8-script.scala; see comments there.
-import com.typesafe.sparkworkshop.util.Verse
+import util.Verse
 
 val inputPath = "./data/kjvdat.txt"
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r

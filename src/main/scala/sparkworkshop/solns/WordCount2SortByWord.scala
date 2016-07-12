@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.FileUtil
+import util.FileUtil
 import org.apache.spark.{SparkConf, SparkContext}
 // Implicit conversions, such as methods defined in
 // [org.apache.spark.rdd.PairRDDFunctions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions)

@@ -1,6 +1,6 @@
 // package com.foo.bar    // You could put the code in a package...
 
-import com.typesafe.sparkworkshop.util.FileUtil
+import util.FileUtil
 import org.apache.spark.{SparkConf, SparkContext}
 // Implicit conversions, such as methods defined in
 // org.apache.spark.rdd.PairRDDFunctions

@@ -2,7 +2,7 @@
 // for various file formats.
 
 import org.apache.spark.sql.SQLContext
-import com.typesafe.sparkworkshop.util.{Verse, FileUtil}
+import util.{Verse, FileUtil}
 
 /**
  * Example of SparkSQL's support for Parquet and JSON.

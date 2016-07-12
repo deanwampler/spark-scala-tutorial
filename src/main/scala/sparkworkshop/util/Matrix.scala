@@ -1,4 +1,4 @@
-package com.typesafe.sparkworkshop.util
+package util
 
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._

@@ -1,5 +1,5 @@
 package hadoop
-import com.typesafe.sparkworkshop.util.Hadoop
+import util.Hadoop
 
 /**
  * Hadoop driver for the Matrix example. It actually uses the Scala process

@@ -1,5 +1,5 @@
 package hadoop
-import com.typesafe.sparkworkshop.util.Hadoop
+import util.Hadoop
 import sparkstreaming.ThreadStarter
 
 /**

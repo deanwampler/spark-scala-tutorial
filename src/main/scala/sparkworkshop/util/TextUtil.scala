@@ -1,4 +1,4 @@
-package com.typesafe.sparkworkshop.util
+package util
 
 object TextUtil {
   /**

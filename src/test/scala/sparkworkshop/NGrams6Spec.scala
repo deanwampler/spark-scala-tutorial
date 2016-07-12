@@ -1,6 +1,6 @@
 import org.scalatest.FunSpec
 import java.io.{File, FileOutputStream, PrintStream}
-import com.typesafe.sparkworkshop.util.FileUtil
+import util.FileUtil
 
 // Run in local mode and local data.
 class NGrams6Spec extends FunSpec {

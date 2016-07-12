@@ -1,4 +1,4 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil, Verse}
+import util.{CommandLineOptions, FileUtil, Verse}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.sql.{DataFrame, SQLContext}

@@ -1,6 +1,6 @@
-import com.typesafe.sparkworkshop.util.{CommandLineOptions, FileUtil}
-import com.typesafe.sparkworkshop.util.CommandLineOptions.Opt
-import com.typesafe.sparkworkshop.util.streaming._
+import util.{CommandLineOptions, FileUtil}
+import util.CommandLineOptions.Opt
+import util.streaming._
 import scala.sys.process._
 import scala.language.postfixOps
 import java.net.URL
