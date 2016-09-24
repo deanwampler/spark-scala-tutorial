@@ -5,9 +5,9 @@ object BuildSettings {
 
   val Name = "spark-scala-tutorial"
   val Version = "5.0.0"
-  // You can use either version of Scala. We default to 2.11.7:
-  val ScalaVersion = "2.11.7"
-  val ScalaVersions = Seq("2.11.7", "2.10.6")
+  // You can use either version of Scala. We default to 2.11.8:
+  val ScalaVersion = "2.11.8"
+  val ScalaVersions = Seq("2.11.8", "2.10.6")
 
   lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     name          := Name,
