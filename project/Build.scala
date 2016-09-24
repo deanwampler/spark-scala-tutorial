@@ -57,7 +57,7 @@ object Dependencies {
       scalaTest, scalaCheck)
 }
 
-object ActivatorSparkBuild extends Build {
+object SparkBuild extends Build {
   import Resolvers._
   import Dependencies._
   import BuildSettings._

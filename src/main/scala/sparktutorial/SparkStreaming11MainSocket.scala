@@ -1,6 +1,6 @@
 /**
- * This simple driver program lets you run SparkStreaming11Main with socket input
- * in the Activator UI.
+ * This convenient driver program lets you run SparkStreaming11Main
+ * with socket input.
  */
 object SparkStreaming11MainSocket {
 

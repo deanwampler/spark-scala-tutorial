@@ -1,13 +1,17 @@
-# Apache Spark Workshop
+# Apache Spark Scala Tutorial
 
-![](http://spark.apache.org/docs/latest/img/spark-logo-100x40px.png)
+[![Join the chat at https://gitter.im/deanwampler/spark-scala-tutorial](https://badges.gitter.im/deanwampler/spark-scala-tutorial.svg)](https://gitter.im/deanwampler/spark-scala-tutorial?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+![](http://spark.apache.org/docs/latest/img/spark-logo-hd.png)
 
 Dean Wampler, Ph.D.
 [Lightbend](http://lightbend.com)
 [dean.wampler@lightbend.com](mailto:dean.wampler@lightbend.com)
 [@deanwampler](https://twitter.com/deanwampler)
 
-This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications. You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
+This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala (with some SQL). You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
+
+This tutorial is mostly about learning Spark, but I teach you a little Scala as we go. If you are more interested in learning just enough Scala for Spark programming, see my new tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/JustEnoughScalaForSpark).
 
 If you are most interested in using Spark with Hadoop, the Hadoop vendors have preconfigured, virtual machine "sandboxes" with Spark included. See their websites for information.
 
