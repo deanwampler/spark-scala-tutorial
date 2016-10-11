@@ -67,11 +67,14 @@ object Matrix4 {
 
       // Make a new sequence of strings with the formatted output, then we'll
       // dump to the output location.
-      val outputLines = Vector(          // Scala's Vector, not MLlib's version!
-        s"${dimensions.m}x${dimensions.n} Matrix:") ++ sums_avgs.zipWithIndex.map {
-        case ((sum, avg), index) =>
-          f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d"
-      }
+      // (Use fully-qualified path to Vector to avoid confusion with Spark's
+      // Vector class in MLlib.)
+      val outputLines = scala.collection.immutable.Vector(
+        s"${dimensions.m}x${dimensions.n} Matrix:") ++
+        sums_avgs.zipWithIndex.map {
+          case ((sum, avg), index) =>
+            f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d"
+        }
       val output = sc.makeRDD(outputLines)  // convert back to an RDD
       if (!quiet) println(s"Writing output to: $out")
       output.saveAsTextFile(out)
