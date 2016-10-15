@@ -184,7 +184,7 @@ Because each application has its own executor process per node, applications can
 
 ### Resilient, Distributed Datasets
 
-![Three RDDs Partitioned Across a Cluster of Four Nodes](tutorial/images/RDD.jpg)
+![Three RDDs Partitioned Across a Cluster of Four Nodes](images/RDD.jpg)
 
 The data caching is one of the key reasons that Spark's performance is considerably better than the performance of MapReduce. Spark stores the data for the job in *Resilient, Distributed Datasets* (RDDs), where a logical data set is partitioned over the cluster.
 
