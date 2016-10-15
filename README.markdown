@@ -176,7 +176,7 @@ Let's briefly discuss the anatomy of a Spark cluster, adapting [this discussion 
 
 ![](http://spark.apache.org/docs/latest/img/cluster-overview.png)
 
-Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over Hadoop YARN, Mesos, standalone (static cluster) mode, Mesos, EC2, and local mode.
+Each program we'll write is a *Driver Program*. It uses a [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) to communicate with the *Cluster Manager*, which is an abstraction over Hadoop YARN, Mesos, standalone (static cluster) mode, EC2, and local mode.
 
 The *Cluster Manager* allocates resources. An *Executor* JVM process is created on each worker node per client application. It manages local resources, such as the cache (see below) and it runs tasks, which are provided by your program in the form of Java jar files or Python scripts.
 
