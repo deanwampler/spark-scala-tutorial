@@ -683,7 +683,7 @@ Here is an example that uses the default values for the options:
 
 ```
 run-main WordCount3 \
-  --inpath data/kjvdat.txt --output output/kjv-wc3 \
+  --inpath data/kjvdat.txt --outpath output/kjv-wc3 \
   --master local
 ```
 
