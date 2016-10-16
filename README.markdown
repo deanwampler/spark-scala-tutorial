@@ -925,6 +925,13 @@ The one new option is for specifying the dimensions, where the string `NxM` is p
 
 Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4`.
 
+Here is how to run this example:
+
+```
+run-main Matrix4 \
+  --master local  --outpath output/matrix4
+```
+
 For Hadoop, run [hadoop.HMatrix4](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HMatrix4.scala) using `run-main hadoop.HMatrix4`, the `hex4` alias, our use the bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh).
 
 We won't cover all the code from now on; we'll skip the familiar stuff:
