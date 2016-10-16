@@ -923,7 +923,7 @@ run-main Matrix4 [ -h | --help] \
 
 The one new option is for specifying the dimensions, where the string `NxM` is parsed to mean `N` rows and `M` columns. The default is `5x10`.
 
-Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4`.
+Like for `WordCount3`, there is also a `ex4` shortcut for `run-main Matrix4`.
 
 For Hadoop, run [hadoop.HMatrix4](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HMatrix4.scala) using `run-main hadoop.HMatrix4`, the `hex4` alias, our use the bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh).
 
