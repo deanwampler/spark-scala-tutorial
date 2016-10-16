@@ -48,7 +48,7 @@ object InvertedIndex5b {
 
       if (!quiet) println(s"Writing output to: $out")
 
-      // Split on non-alphabetci sequences of character as before.
+      // Split on non-alphabetical sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
       input
