@@ -921,7 +921,7 @@ run-main Matrix4 [ -h | --help] \
   [-q | --quiet]
 ```
 
-The one new optin is for specifying the dimensions, where the string `NxM` is parsed to mean `N` rows and `M` columns. The default is `5x10`.
+The one new option is for specifying the dimensions, where the string `NxM` is parsed to mean `N` rows and `M` columns. The default is `5x10`.
 
 Like for `WordCount3`, there is also a `ex4` short cut for `run-main Matrix4`.
 
