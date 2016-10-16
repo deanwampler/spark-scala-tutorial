@@ -729,7 +729,7 @@ object WordCount3 {
     val out    = argz("output-path")
 ```
 
-I won't discuss the implementation of [CommandLineOptions.scala](#code/src/main/scala/sparktutorial/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
+I won't discuss the implementation of [CommandLineOptions.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/CommandLineOptions.scala) except to say that it defines some methods that create instances of an `Opt` type, one for each of the options we discussed above. The single argument given to some of the methods (e.g., `CommandLineOptions.inputPath("data/kjvdat.txt")`) specifies the default value for that option.
 
 After parsing the options, we extract some of the values we need.
 
