@@ -17,6 +17,15 @@ If you are most interested in using Spark with Hadoop, the Hadoop vendors have p
 
 For more advanced Spark training and services from Lightbend, please visit [lightbend.com/reactive-big-data](http://www.lightbend.com/platform/reactive-big-data/spark).
 
+## Acknowledgments 
+
+I'm grateful that several people have provided feedback, issue reports, and pull requests. In particular:
+
+* [Ivan Mushketyk](https://github.com/mushketyk)
+* [Andrey Batyuk](https://github.com/abatyuk)
+* [Colin Jones](https://github.com/trptcolin)
+* [Lutz Hühnken](https://github.com/lutzh)
+
 ## Setup Instructions
 
 You can work through the examples and exercises on a local workstation, so-called *local mode*. If you have Hadoop version 2 (YARN based) installation available, including a virtual machine "sandbox" from one of the Hadoop vendors, you can also run most of the examples in that environment. I'll refer to this arrangement as *Hadoop mode*. Finally, the exercises should be runnable in Mesos and Spark *Standalone* clusters with minor tweaks.
