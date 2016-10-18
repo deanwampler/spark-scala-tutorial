@@ -1624,7 +1624,7 @@ Note that the Hadoop implementation of this example doesn't support watching for
 
 #### How Spark Streaming Works
 
-![DStream with N RDDs](tutorial/images/DStream.jpg)
+![DStream with N RDDs](images/DStream.jpg)
 
 Spark Streaming uses a clever hack; it runs more or less the same Spark API (or code that at least looks conceptually the same) on *deltas* of data, say all the events received within one-second intervals (which is what we used here). Deltas of one second to several minutes are most common. Each delta of events is stored in its own [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) encapsulated in a [DStream](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.dstream.DStream) ("Discretized Stream").
 
