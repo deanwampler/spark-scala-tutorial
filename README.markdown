@@ -613,7 +613,7 @@ Now we setup a pipeline of operations to perform the word count.
 
 First the line is split into words using as the separator any run of characters that isn't alphabetic, e.g., digits, whitespace, and punctuation. (Note: using `"\\W+"` doesn't work well for non-UTF8 character sets!) This also conveniently removes the trailing `~` characters at the end of each line that exist in the file for some reason. `input.flatMap(line => line.split(...))` maps over each line, expanding it into a collection of words, yielding a collection of collections of words. The `flat` part flattens those nested collections into a single, "flat" collection of words.
 
-The next two lines convert the single word "records" into tuples with the word and a count of `1`. In Shark, the first field in a tuple will be used as the default key for joins, group-bys, and the `reduceByKey` we use next.
+The next two lines convert the single word "records" into tuples with the word and a count of `1`. In Spark, the first field in a tuple will be used as the default key for joins, group-bys, and the `reduceByKey` we use next.
 
 The `reduceByKey` step effectively groups all the tuples together with the same word (the key) and then "reduces" the values using the passed in function. In this case, the two counts are added together. Hence, we get two-element *records* with unique words and their counts.
 
@@ -1352,7 +1352,7 @@ Next, define the input path:
 
 ```scala
 val inputRoot = "."
-val inputPath = s"$inputRodata/kjvdat.txt"
+val inputPath = s"$inputRoot/data/kjvdat.txt"
 ```
 
 For HDFS, `inputRoot` would be something like `hdfs://my_name_node_server:8020`.
