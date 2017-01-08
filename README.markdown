@@ -59,7 +59,9 @@ Define either variable in the same command window that you'll use to run the the
 
 ### Setup for Hadoop Mode
 
-> NOTE: If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. Also, this "mode" is not as well tested as I would like, so please report bugs or send patch requests!
+> **NOTES:** 
+> * If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. 
+> * This "mode" is not as well tested and I can't offer any help with it if you encounter problems. However, I welcome bug report and even better, pull requests for bug fixes and enhancements.
 
 If you want to run the examples on Hadoop, choose one of the following options.
 
@@ -69,13 +71,15 @@ If you have a Hadoop cluster installation or a "vanilla" virtual machine sandbox
 
 Assuming you don't have administration rights, it's sufficient to expand the archive in your home directory on the cluster node or edge node you intend to use, or within the sandbox. Then add the `bin` directory under the Spark installation directory to your `PATH` or define the environment variable `SPARK_HOME` to match the installation directory, *not* the `bin` directory.
 
-You'll need to copy this tutorial to the same server or sandbox. Copy the data to HDFS using the following command, which copies the tutorial's `data` directory to `/user/$USdata`:
+You'll need to copy this tutorial to the same server or sandbox. You'll also need to copy the data to HDFS using the following command, which copies the tutorial's `data` directory to `/user/$USdata`:
 
 ```sh
 hadoop fs -put data data
 ```
 
 If you want to put the `data` directory somewhere else, you can, but you'll need to always specify that input location when you run the examples in Hadoop.
+
+> All the examples use _relative file paths_ to specify input and output locations. When you run Spark in "local mode", the default for this tutorial, it will assume these paths are in the local file system, relative to the root directory of this project. However, when running in a Hadoop cluster, the local paths will be interpreted to be relative to your HDFS home directory. This is why you need to copy the data files as discussed.
 
 You'll also need SBT on the server or sandbox to run the examples. Recall that I recommend going through the tutorial on your local workstation first, then move everything to the cluster node or sandbox to try running the examples in Hadoop.
 
@@ -131,6 +135,8 @@ An alternative is to enter the `run` command and have SBT ask you which of the a
 Note the `output` directory listed in the log messages. Use your workstation's file browser or a command window to view the output in the directory, which will be `output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data for the "partitions". The `_SUCCESS` files are empty. They are written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know it's safe to read the data.
 
 ### Running a Hadoop Example
+
+> Make sure you completed the Hadoop setup instructions above and read the important notes contained there.
 
 Start SBT and invoke the command, `run hadoop.HWordCount3`. There will be more log messages and it will take longer to run.
 
