@@ -61,7 +61,7 @@ Define either variable in the same command window that you'll use to run the the
 
 > **NOTES:** 
 > * If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. 
-> * This "mode" is not as well tested and I can't offer any help with it if you encounter problems. However, I welcome bug report and even better, pull requests for bug fixes and enhancements.
+> * This "mode" is not as well tested and I can't offer any help with it if you encounter problems. However, I welcome bug reports and even better, pull requests for bug fixes and enhancements.
 
 If you want to run the examples on Hadoop, choose one of the following options.
 
