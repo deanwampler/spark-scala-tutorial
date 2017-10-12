@@ -17,7 +17,7 @@ If you are most interested in using Spark with Hadoop, the Hadoop vendors have p
 
 For more advanced Spark training and services from Lightbend, please visit [lightbend.com/reactive-big-data](http://www.lightbend.com/platform/reactive-big-data/spark).
 
-## Acknowledgments 
+## Acknowledgments
 
 I'm grateful that several people have provided feedback, issue reports, and pull requests. In particular:
 
@@ -59,8 +59,8 @@ Define either variable in the same command window that you'll use to run the the
 
 ### Setup for Hadoop Mode
 
-> **NOTES:** 
-> * If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop. 
+> **NOTES:**
+> * If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop.
 > * This "mode" is not as well tested and I can't offer any help with it if you encounter problems. However, I welcome bug reports and even better, pull requests for bug fixes and enhancements.
 
 If you want to run the examples on Hadoop, choose one of the following options.
@@ -798,7 +798,7 @@ It starts out much like `WordCount2`, but it uses a helper method `TextUtil.toTe
 Note that I omitted a subsequent call to `input.cache` as in `WordCount2`, because we are making a single pass through the data.
 
 ```scala
-      val wc2 = input
+      val wc2a = input
         .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
         .countByValue()  // Returns a Map[T, Long]
 ```
