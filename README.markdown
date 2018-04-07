@@ -4,9 +4,9 @@
 
 ![](http://spark.apache.org/docs/latest/img/spark-logo-hd.png)
 
-Dean Wampler, Ph.D.
-[Lightbend](http://lightbend.com)
-[dean.wampler@lightbend.com](mailto:dean.wampler@lightbend.com)
+Dean Wampler, Ph.D.<br/>
+[Lightbend](http://lightbend.com)<br/>
+[dean.wampler@lightbend.com](mailto:dean.wampler@lightbend.com)<br/>
 [@deanwampler](https://twitter.com/deanwampler)
 
 This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala (with some SQL). You can run the examples and exercises locally on a workstation, on Hadoop (which could also be on your workstation), or both.
