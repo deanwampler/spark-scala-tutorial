@@ -10,11 +10,6 @@ import util.{Verse, FileUtil}
 
 val inputDir   = "data/kjvdat.txt"
 
-// Not needed with spark-shell:
-// val sc = spark.sparkContext
-// val sqlContext = spark.sqlContext
-// import sqlContext.implicits._
-
 import sqlContext.sql
 
 // Read the verses into a table, just as we did in SparkSQL8.scala:

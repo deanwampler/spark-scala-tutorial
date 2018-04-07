@@ -1,6 +1,6 @@
 import util.{CommandLineOptions, FileUtil, TextUtil}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /**
  * This second implementation of Word Count that makes the following changes:
@@ -36,15 +36,16 @@ object WordCount3 {
     // Let's use Kryo serialization. Here's how to set it up.
     // If the data had a custom type, we would want to register it. Kryo already
     // handles common types, like String, which is all we use here:
-    // conf.registerKryoClasses(Array(classOf[MyCustomClass]))
+    // config.registerKryoClasses(Array(classOf[MyCustomClass]))
 
     val name = "Word Count (3)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name).   // To silence Metrics warning.
-      set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.
+      master("local[*]").
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
+      getOrCreate()
+    val sc = spark.sparkContext
 
     try {
       // Load the input text, convert each line to lower case, then split
@@ -75,7 +76,7 @@ object WordCount3 {
       wc2.saveAsTextFile(out)
 
     } finally {
-      sc.stop()
+      spark.stop()  // was sc.stop() in WordCount2
     }
 
     // Exercise: Try different arguments for the input and output.

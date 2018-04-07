@@ -1,8 +1,8 @@
 package sparktutorial.solns
 
 import util.{CommandLineOptions, FileUtil}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /** Inverted Index - Basis of Search Engines */
 object InvertedIndex5bTfIdf {
@@ -24,12 +24,13 @@ object InvertedIndex5bTfIdf {
       FileUtil.rmrf(out)
     }
 
-    val name = "Inverted Index (5b)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name)   // To silence Metrics warning.
-    val sc = new SparkContext(conf)
+    val name = "Inverted Index - TfIdf (5b)"
+    val spark = SparkSession.builder.
+      master("local[*]").
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
 
     try {
       // Load the input "crawl" data, where each line has the format:
@@ -132,7 +133,7 @@ object InvertedIndex5bTfIdf {
                 """.stripMargin)
         Console.in.read()
       }
-      sc.stop()
+      spark.stop()
     }
 
     // Exercise: Sort the output by the words. How much overhead does this add?

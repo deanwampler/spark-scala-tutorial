@@ -7,12 +7,12 @@ import java.net.URL
 import java.io.File
 
 /**
- * The driver program for the SparkStreaming11 example. It handles the need
+ * The driver program for the SparkStreaming10 example. It handles the need
  * to manage a separate process to provide the source data either over a
  * socket or by periodically writing new data files to a directory.
  * Run with the --help option for details.
  */
-object SparkStreaming11Main extends sparkstreaming.ThreadStarter {
+object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
 
   val timeout = 10  // Stop program after N seconds
 
@@ -72,7 +72,7 @@ object SparkStreaming11Main extends sparkstreaming.ThreadStarter {
     val socket = argz("socket")
     val rmWatchedDir = argz("remove-watched-dir").toBoolean
 
-    // Need to remove a few arguments before calling SparkStreaming11.
+    // Need to remove a few arguments before calling SparkStreaming10.
     def mkStreamArgs(argsSeq: Seq[String], newSeq: Vector[String]): Vector[String] =
       argsSeq match {
         case Nil => newSeq
@@ -96,11 +96,11 @@ object SparkStreaming11Main extends sparkstreaming.ThreadStarter {
           startSocketDataThread(port, data)
         }
       if (argz("use-sql").toBoolean) {
-        SparkStreaming11SQL.main(streamArgs)
+        SparkStreaming10SQL.main(streamArgs)
       } else {
-        SparkStreaming11.main(streamArgs)
+        SparkStreaming10.main(streamArgs)
       }
-      // When SparkStreaming11.main returns, we can terminate the data server thread:
+      // When SparkStreaming10.main returns, we can terminate the data server thread:
       dataThread.interrupt()
     } finally {
       if (rmWatchedDir) FileUtil.rmrf(in)
@@ -108,7 +108,7 @@ object SparkStreaming11Main extends sparkstreaming.ThreadStarter {
   }
 }
 
-/** This exists to enable reuse by HSparkStreaming11. A package is necessary... */
+/** This exists to enable reuse by HSparkStreaming10. A package is necessary... */
 package sparkstreaming {
   trait ThreadStarter {
     def startSocketDataThread(port: Int, dataFile: String): Thread = {

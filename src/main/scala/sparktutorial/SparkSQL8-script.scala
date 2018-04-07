@@ -8,11 +8,7 @@ import org.apache.spark.sql.DataFrame
 val inputRoot = "."
 val inputPath = s"$inputRoot/data/kjvdat.txt"
 
-// The following are already invoked when we start sbt `console` or `spark-shell`
-// in the Spark distribution:
-// val sc = spark.sparkContext
-// val sqlContext = spark.sqlContext
-// import sqlContext.implicits._
+// We already have sqlContext from the Spark Shell and SBT console.
 
 // Regex to match the fields separated by "|".
 // Also strips the trailing "~" in the KJV file.

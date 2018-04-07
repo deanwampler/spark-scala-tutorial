@@ -1,7 +1,7 @@
 import util.{CommandLineOptions, FileUtil}
 import util.CommandLineOptions.Opt
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /**
  * Joins7 - Perform joins of datasets.
@@ -119,7 +119,14 @@ object Joins7Ordered {
       FileUtil.rmrf(out)
     }
 
-    val sc = new SparkContext(master, "Joins (7)", new SparkConf())
+    val name = "Joins - ordered (7)"
+    val spark = SparkSession.builder.
+      master("local[*]").
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
+
     try {
       // Load one of the religious texts, don't convert each line to lower case
       // this time, then extract the fields in the "book|chapter|verse|text" format
@@ -181,7 +188,7 @@ object Joins7Ordered {
       if (!quiet) println(s"Writing output to: $out")
       verses2.saveAsTextFile(out)
     } finally {
-      sc.stop()
+      spark.stop()
     }
 
     // Exercise: Try different sacred text files.

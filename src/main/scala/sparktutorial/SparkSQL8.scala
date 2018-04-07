@@ -1,6 +1,5 @@
 import util.{CommandLineOptions, FileUtil, Verse}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 
 /**
@@ -33,9 +32,9 @@ object SparkSQL8 {
       FileUtil.rmrf(outvpb)
     }
 
-    val name = "Spark SQL"
+    val name = "Spark SQL (8)"
     val spark = SparkSession.builder.
-      master(master).
+      master("local[*]").
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

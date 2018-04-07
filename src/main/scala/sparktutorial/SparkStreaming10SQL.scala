@@ -1,7 +1,7 @@
 import util.{CommandLineOptions, FileUtil}
 import util.CommandLineOptions.Opt
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.dstream.DStream
@@ -24,11 +24,11 @@ import org.apache.spark.streaming.scheduler.{
  *   nc -c -l -p 9900
  * or if you get an error that "-c" isn't a valid option, just try this:
  *   nc -l 9900
- * Back in the original terminal window, run SparkStreaming11 application with
+ * Back in the original terminal window, run SparkStreaming10 application with
  * the following option, using the same port:
  *   --socket localhost:9900
  * For example, at the SBT prompt:
- *   run-main SparkStreaming11 --socket localhost:9900
+ *   run-main SparkStreaming10 --socket localhost:9900
  * (You can use any server and port combination you want for these two processes):
  *
  * Spark Streaming assumes long-running processes. For this example, we set a
@@ -38,7 +38,7 @@ import org.apache.spark.streaming.scheduler.{
  * automatically if the streaming process dies.
  * Nicer clean up, e.g., when a socket connection dies, is TBD.
  */
-object SparkStreaming11 {
+object SparkStreaming10SQL {
 
   val timeout = 10         // Terminate after N seconds
   val batchSeconds = 2     // Size of batch intervals
@@ -92,17 +92,20 @@ object SparkStreaming11 {
     // for pointers to debug a "BlockManager" problem when streaming. Specifically
     // for this example, it was necessary to specify 2 cores using
     // setMaster("local[2]").
-    val name = "Spark Streaming (8)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name).   // To silence Metrics warning.
-      set("spark.files.overwrite", "true")
+    val name = "Spark Streaming SQL (10)"
+    val spark = SparkSession.builder.
+      master("local[*]").
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      config("spark.files.overwrite", "true").
       // If you need more memory:
-      // .set("spark.executor.memory", "1g")
-    val sc  = new SparkContext(conf)
+      // config("spark.executor.memory", "1g").
+      getOrCreate()
+    val sc = spark.sparkContext
     val ssc = new StreamingContext(sc, Seconds(batchSeconds))
     ssc.addStreamingListener(new EndOfStreamListener(ssc))
+    val sqlc = spark.sqlContext
+    import sqlc._
 
     try {
 
@@ -120,8 +123,18 @@ object SparkStreaming11 {
 
       // Generates a separate subdirectory for each interval!!
       if (!quiet) println(s"Writing output to: $out")
-      wordCounts.saveAsTextFiles(out, "out")
+      wordCounts.saveAsTextFiles(out, "txt")
 
+      wordCounts.window(Seconds(6), Seconds(2))
+        .foreachRDD { wordCount =>
+          val df = sqlc.createDataFrame(wordCount)
+          df.createOrReplaceTempView("wordcount")
+          df.printSchema
+          val topWCs = sql("""
+            SELECT * FROM wordcount
+            ORDER BY _2 DESC LIMIT 10""")
+          topWCs.rdd.saveAsTextFile(s"out-top10")
+        }
       ssc.start()
       if (term > 0) ssc.awaitTerminationOrTimeout(term * 1000)
       else ssc.awaitTermination()

@@ -58,5 +58,5 @@ addCommandAlias("ex7",  "runMain Joins7")
 addCommandAlias("ex8",  "runMain SparkSQL8")
 
 // Note the differences in the next two definitions:
-addCommandAlias("ex11directory",  "runMain SparkStreaming11Main")
-addCommandAlias("ex11socket",     "runMain SparkStreaming11Main --socket localhost:9900")
+addCommandAlias("ex10directory",  "runMain SparkStreaming10Main")
+addCommandAlias("ex10socket",     "runMain SparkStreaming10Main --socket localhost:9900")
