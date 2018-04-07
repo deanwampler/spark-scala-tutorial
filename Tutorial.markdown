@@ -623,8 +623,8 @@ We start with import statements:
 
 ```scala
 import util.{CommandLineOptions, FileUtil, TextUtil}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
 ```
 
 As before, but with our new `CommandLineOptions` utilities added.
@@ -662,31 +662,32 @@ Next, if we're running in local mode, we delete the old output, if any:
 
 Note that this logic is only invoked in local mode, because `FileUtil` only works locally. We also delete old data from HDFS when running in Hadoop, but deletion is handled through a different mechanism, as we'll see shortly.
 
-Now we create a `SparkConf` to configure the `SparkContext` with the desired `master` setting, application name, and the use of Kryo serialization.
+Now we create a `SparkSession`, the new way (since Spark 2.0) to create a Spark job. It encompasses both the older `SparkContext` and the `SQLContext`. Note we turn on Kryo serialization.
 
 ```scala
     val name = "Word Count (3)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name).   // To silence Metrics warning.
-      set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.
+      master("local[*]").
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
+      getOrCreate()
+    val sc = spark.sparkContext
 ```
 
 If the data had a custom type, we would want to register it with Kryo, which already handles common types, like `String`, which is all we use here for "records". For serializing your classes, _replace_ this line:
 
 ```scala
-      set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
 ```
 
 with this line:
 
 ```scala
-      registerKryoClasses(Array(classOf[MyCustomClass]))
+      registerKryoClasses(Array(classOf[MyCustomClass])).
 ```
 
-Actually, it's harmless to leave in the `set("spark.serializer", ...)`, but it's done for you inside `registerKryoClasses`.
+Actually, it's harmless to leave in the `config("spark.serializer", ...)`, but it's done for you inside `registerKryoClasses`.
 
 Now we process the input as before, with a few changes...
 
@@ -716,7 +717,7 @@ Take `input` and split on non-alphabetic sequences of character as we did in `Wo
       wc2.saveAsTextFile(out)
 
     } finally {
-      sc.stop()
+      spark.stop()  // was sc.stop() in WordCount2
     }
   }
 }
@@ -732,19 +733,6 @@ The result of `countByValue` is a Scala `Map`, not an [RDD](http://spark.apache.
 [WordCount3.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount3.scala)
 
 Don't forget the try the exercises at the end of the source file.
-
-For Hadoop execution, you'll need to edit the source code on cluster or edge node or the sandbox. One way is to simply use an editor on the node, i.e., `vi` or `emacs` to edit the code. Another approach is to use the secure copy command, `scp`, to copy edited sources to and from your workstation.
-
-For sandboxes, the best approach is to share this tutorial's root directory between your workstation and the VM Linux instance. This will allow you to edit the code in your workstation environment with the changes immediately available in the VM. See the documentation for your VM runner for details on sharing folders.
-
-For example, in VMWare, the *Sharing* panel lets you specify workstation directories to share. In the Linux VM, run the following commands as `root` to mount all shared directories under `/home/shares` (or use a different location):
-
-```scala
-mkdir -p /home/shares
-mount -t vmhgfs .host:/ /home/shares
-```
-
-Now any shared workstation folders will appear under `/home/shares`.
 
 ### Matrix4
 
@@ -803,7 +791,7 @@ object Matrix4 {
 `Dimensions` is a convenience class for capturing the default or user-specified matrix dimensions. We parse the argument string to extract `N` and `M`, then construct a `Dimension` instance.
 
 ```scala
-    val sc = new SparkContext(...)
+    val sc = spark.sparkContext
 
     try {
       // Set up a mxn matrix of numbers.
@@ -969,9 +957,7 @@ input
   //   case (word, seq) => (word, seq.mkString(", "))
   // }
   .saveAsTextFile(out)
-} finally {
-  sc.stop()
-}
+} finally { ... }
 ```
 
 Each output record has the following form: `(word, (doc1, n1), (doc2, n2), ...)`. For example, the word "ability" appears twice in one email and once in another (both SPAM):
@@ -1063,6 +1049,8 @@ The rest of the code formats the results and converts them to a new `RDD` for ou
 
 ### Joins7
 
+> **Note:** This example is obsolete. Use `Dataset` (SQL) joins instead. They are far more flexible and performant!
+
 [Joins7.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Joins7.scala)
 
 Joins are a familiar concept in databases and Spark supports them, too. Joins at very large scale can be quite expensive, although a number of optimizations have been developed, some of which require programmer intervention to use. We won't discuss the details here, but it's worth reading how joins are implemented in various *Big Data* systems, such as [this discussion for Hive joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins#LanguageManualJoins-JoinOptimization) and the **Joins** section of [Hadoop: The Definitive Guide](http://shop.oreilly.com/product/0636920021773.do).
@@ -1153,13 +1141,15 @@ You can verify that the output file looks like the input KJV file with the book 
 [SparkSQL8.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8.scala)<br/>
 [SparkSQL8-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8-script.scala)
 
-The last set of examples and exercises explores the new SparkSQL API, which extends RDDs with a new `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
+The last set of examples and exercises explores the SparkSQL API, which extends RDDs with the `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
 
-> Even if you prefer the Scala collections-like `RDD` API, consider using the `DataFrame` API because the performance is usually better.
+> **Note:** The even newer `Dataset` API encapsulates `DataFrame`, but adds more type safety for the data columns.
 
-Furthermore, SparkSQL has convenient support for reading and writing [Parquet](http://parquet.io) files, which is popular in Hadoop environments, and reading and writing JSON-formatted records, with inferred schemas.
+> **Tip:** Even if you prefer the Scala collections-like `RDD` API, consider using the `DataFrame` API because the performance is _significantly_ better in most cases.
 
-Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using Hive's query language, *HiveQL*.
+Furthermore, SparkSQL has convenient support for reading and writing files encoded using [Parquet](http://parquet.io), [ORC](https://orc.apache.org/), JSON, CSV, etc.
+
+Finally, SparkSQL embeds access to a Hive _metastore_, so you can create and delete tables, and run queries against them using SparkSQL.
 
 This example treats the KJV text we've been using as a table with a schema. It runs several SQL queries on the data, then performs the same calculation using the `DataFrame` API.
 
@@ -1183,18 +1173,9 @@ val inputPath = s"$inputRoot/data/kjvdat.txt"
 
 For HDFS, `inputRoot` would be something like `hdfs://my_name_node_server:8020`.
 
-We discussed earlier that our `console` setup automatically instantiates the `SparkContext` as a variable named `sc`. It also instantiates the wrapper [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) and imports some implicits. Note that you can still also use a `StreamingContext` to wrap the `SparkContext`, if you want, but we don't need one here. So, the following commented lines in our script would be uncommented in a program using SparkSQL:
+We discussed earlier that our `console` setup automatically instantiates the [SparkSession](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession) as a variable named `spark` and it extracts the [SQLContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext) variable it holds. It also does some convenient imports.
 
-```scala
-// val sc = new SparkContext("local[*]", "Spark SQL (9)")
-// val sqlContext = new SQLContext(sc)
-// import sqlContext.implicits._
-```
-
-The import statement brings SQL-specific functions and values in scope.
-(Scala allows importing members of objects, while Java only allows importing `static` members of classes.)
-
-Next we use a regex to parse the input verses and extract the book abbreviation, chapter number, verse number, and text. The fields are separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
+Next, after defining a few simple variables, we define a regex to parse the input verses and extract the book abbreviation, chapter number, verse number, and text. The fields are separated by "|", and also removes the trailing "~" unique to this file. Then it invokes `flatMap` over the file lines (each considered a record) to extract each "good" lines and convert them into a `Verse` instances. `Verse` is defined in the `util` package. If a line is bad, a log message is written and an empty sequence is returned. Using `flatMap` and sequences means we'll effectively remove the bad lines.
 
 We use `flatMap` over the results so that lines that fail to parse are essentially put into empty lists that will be ignored.
 
@@ -1263,28 +1244,22 @@ countsDF.count
 
 #### Using SQL in the Spark Shell
 
-So, how do we use this script? To run it in Hadoop, you can run the script using the following helper script in the [scripts](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/scripts) directory:
+So, how do we use this script in the `spark-shell` that comes with the Spark distribution?
+
+First, use SBT to create a jar ("package") of all the utility code (as well as the full Spark jobs we've written):
 
 ```sh
-scripts/sparkshell.sh src/main/scala/sparktutorial/SparkSQL8-script.scala
+sbt package
 ```
 
-Alternatively, start the interactive shell and then copy and past the statements one at a time to see what they do. I recommend this approach for the first time:
-
-```sh
-scripts/sparkshell.sh
-```
-
-Th `sparkshell.sh` script does some set up, but essentially its equivalent to the following:
+The jar is found in `target/scala-2.11`. Now you can pass this jar to `spark-shell`:
 
 ```sh
 $SPARK_HOME/bin/spark-shell \
   --jars target/scala-2.11/spark-scala-tutorial_2.11-X.Y.Z.jar [arguments]
 ```
 
-The jar file contains all the project's build artifacts (but not the dependencies).
-
-To run this script locally, use the SBT `console`, then use the Scala interpreter's `:load` command to load the file and evaluate its contents:
+To run this script locally, use the same `spark-shell` or the SBT `console`, then use the Scala interpreter's `:load` command to load the file and evaluate its contents:
 
 ```
 scala> :load src/main/scala/sparktutorial/SparkSQL8-script.scala
@@ -1303,13 +1278,15 @@ This script demonstrates the methods for reading and writing files in the [Parqu
 
 The key [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, and `DataFrame.read.json(inpath)` and `DataFrame.write.json(outpath)` for reading and writing JSON. (The format for the first `write.save` method can be overridden to default to a different format.)
 
-See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL8-script.scala`.
+See the script for more details. Run it the same way we ran `SparkSQL8-script.scala`.
 
-### SparkStreaming11
+### SparkStreaming10
 
-[SparkStreaming11.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11.scala)
+[SparkStreaming10.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10.scala)
 
-The streaming capability is relatively new and this exercise uses it to construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
+This example shows the _Spark streaming_ capability that is based on the `RDD` API. We construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
+
+> **Note:** The newer streaming module is called _Structured Streaming_. It is based on the `Dataset` API, for better performance and convenience. It has supports much lower-latency processing. Examples of this API are TBD here, but see the [Structured Streaming Programming Guide](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) for more information.
 
 In the first configuration, which is also the default behavior for this example, new data is read from files that appear in a directory. This approach supports a workflow where new files are written to a landing directory and Spark Streaming is used to detect them, ingest them, and process the data.
 
@@ -1317,15 +1294,15 @@ Note that Spark Streaming does not use the `_SUCCESS` marker file we mentioned e
 
 The second basic configuration reads data from a socket. Spark Streaming also comes with connectors for other data sources, such as [Apache Kafka](http://kafka.apache.org/) and Twitter streams. We don't explore those here.
 
-`SparkStreaming11` uses directory watching by default. A temporary directory is created and a second process writes the KJV Bible file to a temporary file in the directory every few seconds. Hence, the data will be same in every file, but stream processing with read each new file on each iteration. `SparkStreaming11` does *Word Count* on the data.
+`SparkStreaming10` uses directory watching by default. A temporary directory is created and a second process writes the KJV Bible file to a temporary file in the directory every few seconds. Hence, the data will be same in every file, but stream processing with read each new file on each iteration. `SparkStreaming10` does *Word Count* on the data.
 
 The socket option works similarly. By default, the same KJV file is written over and over again to a socket.
 
-In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11Main.scala) is the actual driver program we'll run. It uses two helper classes, [util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataDirectoryServer.scala) and [util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
+In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming10Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10Main.scala) is the actual driver program we'll run. It uses two helper classes, [util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataDirectoryServer.scala) and [util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
-So, let's run this configuration first. In SBT, run `SparkStreaming11Main` (*not* `SparkStreaming11MainSocket`) as we've done for the other exercises. For the SBT, the corresponding alias is now `ex8directory`, instead of `ex8`.
+So, let's run this configuration first. In SBT, run `SparkStreaming10Main` (*not* `SparkStreaming10MainSocket`) as we've done for the other exercises. For the SBT, the corresponding alias is now `ex8directory`, instead of `ex8`.
 
-This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming11` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
+This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming10` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
 If you watch the console output, you'll see messages like this:
 
@@ -1350,14 +1327,14 @@ The time stamp will increment by 2000 ms each time, because we're running with 2
 
 At the same time, you'll see new directories appear in `output`, one per batch. They are named like `output/wc-streaming-1413724628000.out`, again with a timestamp appended to our default output argument `output/wc-streaming`. Each of these will contain the usual `_SUCCESS` and `part-0000N` files, one for each core that the job can get!
 
-Now let's run with socket input. In SBT, run `SparkStreaming11MainSocket`. The corresponding alias is `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming11Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming11 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
+Now let's run with socket input. In SBT, run `SparkStreaming10MainSocket`. The corresponding alias is `ex8socket`. In either case, this is equivalent to passing the extra option `--socket localhost:9900` to `SparkStreaming10Main`, telling it spawn a thread running an instance of `DataSocketServer` to write data to a socket at this address. SparkStreaming10 will read this socket. the same data file (KJV text by default) will be written over and over again to this socket.
 
 The console output and the directory output should be very similar to the output of the previous run.
 
-`SparkStreaming11` supports the following command-line options:
+`SparkStreaming10` supports the following command-line options:
 
 ```scala
-runMain SparkStreaming11 [ -h | --help] \
+runMain SparkStreaming10 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-s | --socket server:port] \
   [--term | --terminate N] \
@@ -1368,7 +1345,7 @@ Where the default is `--inpath tmp/wc-streaming`. This is the directory that wil
 
 By default, 30 seconds is used for the terminate option, after which time it exits. Pass 0 for no termination.
 
-Note that there's no argument for the data file. That's an extra option supported by `SparkStreaming11Main` (`SparkStreaming11` is agnostic to the source!):
+Note that there's no argument for the data file. That's an extra option supported by `SparkStreaming10Main` (`SparkStreaming10` is agnostic to the source!):
 
 ```scala
   -d | --data  file
@@ -1376,7 +1353,7 @@ Note that there's no argument for the data file. That's an extra option supporte
 
 The default is `data/kjvdat.txt`.
 
-There is also an alternative to `SparkStreaming11` called `SparkStreaming11SQL`, which uses a SQL query rather than the RDD API to do the calculation. To use this variant, pass the `--sql` argument when you invoke either version of `SparkStreaming11Main` or `SparkStreaming11MainSocket`.
+There is also an alternative to `SparkStreaming10` called `SparkStreaming10SQL`, which uses a SQL query rather than the RDD API to do the calculation. To use this variant, pass the `--sql` argument when you invoke either version of `SparkStreaming10Main` or `SparkStreaming10MainSocket`.
 
 #### How Spark Streaming Works
 
@@ -1388,9 +1365,11 @@ You can also define a moving window over one or more batches, for example if you
 
 A [StreamingContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.streaming.StreamingContext) is used to wrap the normal [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext), too.
 
-#### The SparkStreaming11 Code
+> **Note:** The new _Structured Streaming_ module has a brand new runtime engine, providing true streaming capabilities.
 
-Here are the key parts of the code for [SparkStreaming11.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11.scala):
+#### The SparkStreaming10 Code
+
+Here are the key parts of the code for [SparkStreaming10.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10.scala):
 
 ```scala
 ...
@@ -1410,24 +1389,23 @@ The `EndOfStreamListener` will be used to detect when a socket connection drops.
 
 ```scala
 ...
-val conf = new SparkConf().
-  setMaster("local[*]").
-  setAppName("Spark Streaming (8)").
-  set("spark.app.id", "Spark Streaming (8)").   // To silence Metrics warning.
-  set("spark.files.overwrite", "true")
-  // If you need more memory:
-  // .set("spark.executor.memory", "1g")
-val sc  = new SparkContext(conf)
+    val name = "Spark Streaming (10)"
+    val spark = SparkSession.builder.
+      master("local[*]").
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      config("spark.files.overwrite", "true").
+      // If you need more memory:
+      // config("spark.executor.memory", "1g").
+      getOrCreate()
+    val sc = spark.sparkContext
+    val ssc = new StreamingContext(sc, Seconds(batchSeconds))
+    ssc.addStreamingListener(new EndOfStreamListener(ssc))
 ```
 
 It is necessary to use at least 2 cores here, because each stream `Reader` will lock a core. We have run stream for input and hence one `Reader`, plus another core for the rest of our processing. So, we use `*` to let it use as many cores as it can, `setMaster("local[*]")`
 
 With the `SparkContext`, we create a `StreamingContext`, where we also specify the time interval, 2 seconds. The best choice will depend on the data rate, how soon the events need processing, etc. Then, we add a listener for socket drops:
-
-```scala
-val ssc = new StreamingContext(sc, Seconds(2))
-ssc.addStreamingListener(EndOfStreamListener(ssc))
-```
 
 If a socket connection wasn't specified, then use the `input-path` to read from one or more files (the default case). Otherwise use a socket. An `InputDStream` is returned in either case as `lines`. The two methods `useDirectory` and `useSocket` are listed below.
 
@@ -1497,11 +1475,11 @@ The code ends with `useSocket` and `useDirectory`:
 }
 ```
 
-See also [SparkStreaming11Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/DataDirectoryServer.scala) and
+See also [SparkStreaming10Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10Main.scala), the `main` driver, and the helper classes for feeding data to the example, [DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/DataDirectoryServer.scala) and
 [DataSocketServer.scala](
 https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/DataSocketServer.scala).
 
-This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) for more information.
+This is just the tip of the iceberg for Streaming. See the [Streaming Programming Guide](http://spark.apache.org/docs/latest/streaming-programming-guide.html) and the newer [Structured Streaming Programming Guide](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) for more information.
 
 ## Wrapping Up
 
@@ -1546,25 +1524,7 @@ This is a general issue for distributed programs written for the JVM. A future v
 
 ### Going Forward from Here
 
-To learn more, see the following resources:
-
-* [Lightbend's Big Data Products and Services](http://lightbend.com/reactive-big-data). Lightbend now offers commercial support for Spark on Mesos, as well as developer support, including Spark training and consulting, for all environments.
-* [Fast Data: Big Data Evolved](http://lightbend.com/fast-data). A whitepaper I wrote for Lightbend about the emerging, stream-oriented architecture for Big Data.
-* The Apache Spark [website](http://spark.apache.org/).
-* The Apache Spark [Quick Start](http://spark.apache.org/docs/latest/quick-start.html). See also the examples in the [Spark distribution](https://github.com/apache/spark) and be sure to study the [Scaladoc](http://spark.apache.org/docs/latest/api.html) pages for key types such as [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) and [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame).
-* The [SparkSQL Programmer's Guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
-* [Talks from the Spark Summit conferences](http://spark-summit.org).
-* [Learning Spark](http://shop.oreilly.com/product/0636920028512.do), an excellent introduction from O'Reilly.
-
-**Other Spark Based Libraries:**
-
-* [Spark Packages](http://spark-packages.org/).
-
-### For more about Lightbend:
-
-* See [Lightbend Reactive Big Data](http://lightbend.com/reactive-big-data) for more information about our products and services around Spark and Big Data.
-* See [Fast Data: Big Data Evolved](http://lightbend.com/fast-data) for more on my vision for stream-oriented architectures for Big Data.
-* See [Lightbend](http://lightbend.com) for information about the *Lightbend Reactive Platform*, training, and services.
+See the [README](README.markdown) for a list of resources for more information.
 
 ## Final Thoughts
 
