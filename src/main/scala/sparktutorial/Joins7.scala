@@ -5,6 +5,8 @@ import org.apache.spark.SparkContext._
 
 /**
  * Joins7 - Perform joins of datasets.
+ *
+ * @deprecated - Use the SparkSQL join implementations instead. They are far more performant!
  */
 object Joins7 {
   def main(args: Array[String]): Unit = {

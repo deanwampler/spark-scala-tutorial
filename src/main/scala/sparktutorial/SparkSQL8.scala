@@ -1,7 +1,7 @@
 import util.{CommandLineOptions, FileUtil, Verse}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 
 /**
  * Example of SparkSQL, both SQL queries and the new DataFrame API,
@@ -33,15 +33,15 @@ object SparkSQL8 {
       FileUtil.rmrf(outvpb)
     }
 
-    val name = "Spark SQL (9)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name)   // To silence Metrics warning.
-    val sc = new SparkContext(conf)
-    val sqlContext = new SQLContext(sc)
+    val name = "Spark SQL"
+    val spark = SparkSession.builder.
+      master(master).
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
+    val sqlContext = spark.sqlContext
     import sqlContext.implicits._
-    import sqlContext.sql    // Convenient for running SQL queries.
 
     try {
       // Regex to match the fields separated by "|".
@@ -62,7 +62,7 @@ object SparkSQL8 {
       // defined on org.apache.spark.sql.SchemaRDDLike, which also has a method
       // "saveAsParquetFile" to write a schema-preserving Parquet file.
       val verses = sqlContext.createDataFrame(versesRDD)
-      verses.registerTempTable("kjv_bible")
+      verses.createOrReplaceTempView("kjv_bible")
       verses.cache()
       // print the 1st 20 lines (default: pass another integer as the argument
       // to show() for a different number of lines).
@@ -70,6 +70,7 @@ object SparkSQL8 {
         verses.show()
       }
 
+      import sqlContext.sql    // Convenient for running SQL queries.
       val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
       if (!quiet) {
         println("The query plan:")
@@ -109,7 +110,7 @@ object SparkSQL8 {
       counts1.rdd.saveAsTextFile(outvpb)
 
     } finally {
-      sc.stop()
+      spark.stop()
     }
 
     // For the following exercises, when you're running in local mode, consider

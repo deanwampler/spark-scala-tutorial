@@ -10,7 +10,8 @@ val inputPath = s"$inputRoot/data/kjvdat.txt"
 
 // The following are already invoked when we start sbt `console` or `spark-shell`
 // in the Spark distribution:
-// val sqlContext = new SQLContext(sc)
+// val sc = spark.sparkContext
+// val sqlContext = spark.sqlContext
 // import sqlContext.implicits._
 
 // Regex to match the fields separated by "|".

@@ -6,6 +6,8 @@ import org.apache.spark.SparkContext._
 /**
  * Joins7 - Perform joins of datasets.
  * Implements the exercise to restore the original order of the verses.
+ *
+ * @deprecated - Use the SparkSQL join implementations instead. They are far more performant!
  */
 object Joins7Ordered {
   def main(args: Array[String]): Unit = {

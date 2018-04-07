@@ -19,6 +19,9 @@ import org.apache.spark.SparkContext._
 object WordCount2 {
   def main(args: Array[String]): Unit = {
 
+    // This is the way you would start a Spark program before Spark 2.0, by
+    // creating a SparkContext. We'll see the preferred way to do it now, in
+    // WordCount3.
     // The first argument specifies the "master" (see the tutorial notes).
     // The second argument is a name for the job.
     val sc = new SparkContext("local", "Word Count (2)", new SparkConf())

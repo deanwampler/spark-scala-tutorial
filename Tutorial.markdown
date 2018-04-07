@@ -1,311 +1,108 @@
-# Apache Spark Scala Tutorial - README
+# Apache Spark Scala Tutorial
 
-[![Join the chat at https://gitter.im/deanwampler/spark-scala-tutorial](https://badges.gitter.im/deanwampler/spark-scala-tutorial.svg)](https://gitter.im/deanwampler/spark-scala-tutorial?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Use this text to work through the tutorial if you using an IDE or SBT in a terminal. If you are using the Jupyter notebook option, the same content can be found in the `00_Tutorial.ipynb` notebook.
 
-![](http://spark.apache.org/docs/latest/img/spark-logo-hd.png)
+## Preliminaries
 
-Dean Wampler, Ph.D.<br/>
-[Lightbend](http://lightbend.com)<br/>
-[dean.wampler@lightbend.com](mailto:dean.wampler@lightbend.com)<br/>
-[@deanwampler](https://twitter.com/deanwampler)
+We'll assume you've setup the tutorial as described in the [README](README.markdown).
 
-This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. I also teach a little Scala as we go, but if you already know Spark and you are more interested in learning just enough Scala for Spark programming, see my other tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/JustEnoughScalaForSpark).
+### How to Run the Examples
 
-This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. You can run the examples and exercises several ways:
+We'll describe the techniques used for running in an IDE and SBT. Pick the appropriate choice as described for each particular example.
 
-1. [Jupyter notebooks](http://jupyter.org/) - The easiest way, especially for data scientists accustomed to _notebooks_
-2. In an IDE, like IntelliJ - Familiar for developers
-3. At the terminal prompt using the build tool [SBT](https://www.scala-sbt.org/)
+#### IDE
 
-This tutorial is mostly about learning Spark, but I teach you a little Scala as we go. If you are more interested in learning just enough Scala for Spark programming, see my new tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/spark-scala-tutorial).
+For the regular Scala programs, i.e., the ones that _don't_ use the naming convention `*-script.scala`, you can select the class in the project browser or the editor for the file, then invoke the IDE's _run_ command.
 
-For more advanced Spark training and for information about Lightbend's _Fast Data Platform_, please visit [lightbend.com/fast-data-platform](http://www.lightbend.com/platform/fast-data-platform).
+Many of the examples accept command line arguments to configure behavior, but all have suitable defaults. To change the command line arguments, use IDE's tool for editing the _run configuration_.
 
-## Acknowledgments
+Try running `WordCount3`. Note the `output` directory listed in the console output; it should be `output/kjv-wc3`. Use a file browser or a terminal window to view the output in that directory. You should find a `_SUCCESS` and a `part-00000` file. Following Hadoop conventions, the latter contains the actual data for the "partitions" (in this case just one, the `00000` partition). The `_SUCCESS` file is empty. It is written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know the process is done and it's safe to read the data.
 
-I'm grateful that several people have provided feedback, issue reports, and pull requests. In particular:
+For the "script" files, i.e., those use the naming convention `*-script.scala`, they are designed to be run in the Spark Shell, which we have simulated with our configuration of SBT.
 
-* [Ivan Mushketyk](https://github.com/mushketyk)
-* [Andrey Batyuk](https://github.com/abatyuk)
-* [Colin Jones](https://github.com/trptcolin)
-* [Lutz Hühnken](https://github.com/lutzh)
+To run these scripts, use the `sbt console` command discussed below. Or, download the [Spark 2.2.0 distribution](https://www.apache.org/dyn/closer.lua/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz), expand it somewhere, and start the `$SPARK_HOME/bin/spark-shell`. Then load the script file as follows at the `scala>` prompt:
 
-## Getting Help
-
-Before describing the different ways to work with the tutorial, if you're having problems, use the [Gitter chat room](https://gitter.im/deanwampler/spark-scala-tutorial) to ask for help. If you're reasonably certain you've found a bug, post an issue to the [GitHub repo](https://github.com/deanwampler/spark-scala-tutorial/issues). Pull requests are welcome!!
-
-## Setup Instructions
-
-Let's get started...
-
-### Download the Tutorial
-
-Begin by cloning or downloading the tutorial GitHub project [github.com/deanwampler/spark-scala-tutorial](https://github.com/deanwampler/spark-scala-tutorial).
-
-Now Pick the way you want to work through the tutorial:
-
-1. Jupyter notebooks - Go [here](#use-jupyter-notebooks)
-2. In an IDE, like IntelliJ - Go [here](#use-ide)
-3. At the terminal prompt using SBT - Go [here](#use-sbt)
-
-<a name="use-jupyter-notebooks"></a>
-## Using Jupyter Notebooks
-
-The easiest way to work with this tutorial is to use a [Docker](https://docker.com) image that combines the popular [Jupyter](http://jupyter.org/) notebook environment with all the tools you need to run Spark, including the Scala language. It's called the [All Spark Notebook](https://hub.docker.com/r/jupyter/all-spark-notebook/).  It bundles [Apache Toree](https://toree.apache.org/) to provide Spark and Scala access.
-
-There are other notebook tools you might investigate for your team's needs:
-
-* [Jupyter](https://ipython.org/) + [BeakerX](http://beakerx.com/) - a powerful set of extensions for Jupyter
-* [Zeppelin](http://zeppelin-project.org/) - a popular environment in big data environments
-* [Spark Notebook](http://spark-notebook.io) - a powerful, but not as polished
-* [IBM Data Science Experience](http://datascience.ibm.com/) - IBM's full-featured environment for data science
-* [Databricks](https://databricks.com/) - a feature-rich, commercial, cloud-based service
-
-## Installing Docker and the Jupyter Image
-
-If you need to install Docker, follow the installation instructions at [docker.com](https://www.docker.com/products/overview) (the _community edition_ is sufficient).
-
-Now we'll run the docker image. It's important to follow the next steps carefully. We're going to mount two local directories inside the running container, one for the data we want to use so and one for the notebooks.
-
-* Open a terminal or command window
-* Change to the directory where you expanded the tutorial project or cloned the repo
-* To download and run the Docker image, run the following command: `run.sh` (MacOS and Linux) or `run.bat` (Windows)
-
-The MacOS and Linux `run.sh` command executes this command:
-
-```bash
-docker run -it --rm -p 8888:8888 \
-  -v "$PWD/data":/home/jovyan/data \
-  -v "$PWD/notebooks":/home/jovyan/notebooks \
-  jupyter/all-spark-notebook
-```
-
-The Windows `run.bat` command executes this command (wrapped for readability):
-
-```bash
-docker run -it --rm -p 8888:8888
-  -v "%CD%\data":/home/jovyan/data
-  -v "%CD%\notebooks":/home/jovyan/notebooks
-  jupyter/all-spark-notebook
-```
-
-The `-v PATH:/home/jovyan/dir` tells Docker to mount the `dir` directory under your current working directory, so it's available as `/home/jovyan/dir` inside the container. _This is essential to provide access to the tutorial data and notebooks_. When you open the notebook UI (discussed shortly), you'll see these folders listed.
-
-> **Note:** On Windows, you may get the following error: _C:\Program Files\Docker\Docker\Resources\bin\docker.exe: Error response from daemon: D: drive is not shared. Please share it in Docker for Windows Settings."_ If so, do the following. On your tray, next to your clock, right-click on Docker, then click on Settings. You'll see the _Shared Drives_. Mark your drive and hit apply. See [this Docker forum thread](https://forums.docker.com/t/cannot-share-drive-in-windows-10/28798/5) for more tips.
-
-The `-p 8888:8888` argument tells Docker to "tunnel" port 8888 out of the container to your local environment, so you can get to the Jupyter UI.
-
-You should see output similar to the following:
-
-```bash
-Unable to find image 'jupyter/all-spark-notebook:latest' locally
-latest: Pulling from jupyter/all-spark-notebook
-e0a742c2abfd: Pull complete
+```scala
+scala> :load src/main/scala/sparktutorial/Intro1-script.scala
 ...
-ed25ef62a9dd: Pull complete
-Digest: sha256:...
-Status: Downloaded newer image for jupyter/all-spark-notebook:latest
-Execute the command: jupyter notebook
+scala>
+```
+
+You can also copy and paste individual lines, but be careful about using the correct "paste" conventions required by the Scala interpreter. See [here](https://www.safaribooksonline.com/library/view/scala-cookbook/9781449340292/ch14s03.html) for details.
+
+There's no real need to start the shell first; the following command just passes the script to the `spark-shell` on invocation.
+
+```shell
+$SPARK_HOME/bin/spark-shell src/main/scala/sparktutorial/Intro1-script.scala
 ...
-[I 19:08:15.017 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[C 19:08:15.019 NotebookApp]
-
-    Copy/paste this URL into your browser when you connect for the first time,
-    to login with a token:
-        http://localhost:8888/?token=...
 ```
 
-Now copy and paste the URL shown in a browser window.
+#### SBT
 
-> **Warning:** When you quit the Docker container at the end of the tutorial, all your changes will be lost, unless they are in the `data` and `notebooks` directories shown in the Jupyter UI! To save notebooks elsewhere, export the notebook using the _File > Download as > Notebook_ menu item in toolbar.
+It's easiest to work at the SBT prompt. Start `sbt` and you'll arrive at the prompt `sbt:spark-scala-tutorial>`.
 
-## Running the Tutorial
-
-Now we need to load the tutorial into Jupyter.
-
-* Click the _Upload_ button on the upper right-hand side of the UI.
-* Browse to where you downloaded and expanded the tutorial, then to the `notebooks` directory. \
-* Open `spark-scala-tutorial`.
-* Click the blue _Upload_ button.
-* Click the link for the tutorial that is now shown in the list of notebooks.
-
-It opens in a new browser tab. It will take several seconds to load. (It's big!)
-
->  **Tip:** If the new tab fails to open or the notebook fails to load as shown, check the terminal window where you started Jupyter. Are there any error messages?
-
-Finally, you'll notice there is a box around the first "cell". This cell has one line of source code `println("Hello World!")`. Above this cell is a toolbar with a button that has a right-pointing arrow and the word _run_. Click that button to run this code cell. Or, use the menu item _Cell > Run Cells_.
-
-After many seconds, once initialization has completed, it will print the output, `Hello World!` just below the input text field.
-
-Do the same thing for the next box. It should print `Array(shakespeare)`.
-
-> **Warning:** If instead you see `Array()` or `null` is printed, the mounting of the `data` directory did not work correctly. In the terminal window, use `control-c` to exit from the Docker container, make sure you are in the root directory of the project (`data` should be a subdirectory), restart the docker image, and make sure you enter the command exactly as shown.
-
-If these steps worked, you're done setting up the tutorial!
-
-## What's Next?
-
-You are now ready to go through the tutorial.
-
-Don't want to run Spark Notebook to learn the material? A PDF printout of the notebook can also be found in the `notebooks` directory.
-
-
-<a name="use-ide"></a>
-# Use an IDE
-
-<a name="use-sbt"></a>
-# Use SBT in a Terminal
-
-
-
-Let's discuss setup for local mode first.
-
-### Setup for Local Mode
-
-Working in *local mode* makes it easy to edit, test, run, and debug applications quickly. Then, running them in a cluster provides more real-world testing and finally production scalability and resiliency.
-
-We will build and run the examples and exercises using [SBT](http://www.scala-sbt.org/download.html). You'll need to install SBT, if you don't already have it installed. Follow the instructions on the [download](http://www.scala-sbt.org/download.html) page. SBT puts itself on your path. However, if you have a custom installation that isn't on your path, define the environment variable `SBT_HOME` (MacOS, Linux, or Cygwin only).
-
-### NOTE for Windows users
-
-You will need to download a utility program called `winutils.exe`.
-
-If you have a Hadoop installation on your PC, see if `%HADOOP_HOME%\bin\winutils.exe` already exists.
-
-If not, download it from here: [http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe](http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe).
-
-If you have a Hadoop installation on your PC (just not `winutils.exe`...), move the downloaded `winutils.exe` to the `%HADOOP_HOME%\bin` directory.
-
-If you don't have a Hadoop installation on your PC, create a directory somewhere, e.g., `C:\hadoop`, and a `bin` subdirectory, e.g., `C:\hadoop\bin`. Move `winutils.exe` to the `bin` directory.
-
-Finally, make sure that Spark can find it. Do **one** of the following:
-
-* Define `HADOOP_HOME` to point to the parent of bin, e.g., `set HADOOP_HOME=C:\hadoop`.
-* Define `JAVA_OPTS` to point to the parent of bin, e.g., `set JAVA_OPTS=-Dhadoop.home.dir=C:\hadoop`
-
-Define either variable in the same command window that you'll use to run the the examples.
-
-### Setup for Hadoop Mode
-
-> **NOTES:**
-> * If you are here to learn Spark, you don't need to setup these exercises for Hadoop execution. Come back to these instructions when you're ready to try working with Spark on Hadoop.
-> * This "mode" is not as well tested and I can't offer any help with it if you encounter problems. However, I welcome bug reports and even better, pull requests for bug fixes and enhancements.
-
-If you want to run the examples on Hadoop, choose one of the following options.
-
-The Hadoop vendors all provide virtual machine "sandboxes" that you can load into [VMWare](http://vmware.com), [VirtualBox](http://virtualbox.org), and other virtualization environments. Most of them now bundle Spark. Check the vendor's documentation.
-
-If you have a Hadoop cluster installation or a "vanilla" virtual machine sandbox, verify if Spark is already installed. For example, log into a cluster node, edge node, or the sandbox and try running `spark-shell`. If it's not found, then assume that Spark is not installed. Your Hadoop vendor's web site should have information on installing and using Spark. In most cases, it will be as simple as downloading an appropriate Spark build from the [Spark download](http://spark.apache.org/downloads.html) page. Select the distribution built for your Hadoop distribution.
-
-Assuming you don't have administration rights, it's sufficient to expand the archive in your home directory on the cluster node or edge node you intend to use, or within the sandbox. Then add the `bin` directory under the Spark installation directory to your `PATH` or define the environment variable `SPARK_HOME` to match the installation directory, *not* the `bin` directory.
-
-You'll need to copy this tutorial to the same server or sandbox. You'll also need to copy the data to HDFS using the following command, which copies the tutorial's `data` directory to `/user/$USdata`:
-
-```sh
-hadoop fs -put data data
-```
-
-If you want to put the `data` directory somewhere else, you can, but you'll need to always specify that input location when you run the examples in Hadoop.
-
-> All the examples use _relative file paths_ to specify input and output locations. When you run Spark in "local mode", the default for this tutorial, it will assume these paths are in the local file system, relative to the root directory of this project. However, when running in a Hadoop cluster, the local paths will be interpreted to be relative to your HDFS home directory. This is why you need to copy the data files as discussed.
-
-You'll also need SBT on the server or sandbox to run the examples. Recall that I recommend going through the tutorial on your local workstation first, then move everything to the cluster node or sandbox to try running the examples in Hadoop.
-
-## Using SBT for the Examples and Exercises
-
-From now on, except where noted, the instructions apply for both your local workstation and Hadoop setup.
-
-First, change to the root directory for this tutorial.
-
-If you are working through the tutorial on your local machine, run the SBT command-line interface:
-
-Start the SBT interpreter. Here the `$` is the prompt for your command-line shell and `>` is the SBT prompt:
+To run an executable program, use one of the following:
 
 ```
-$ sbt
->
+sbt:spark-scala-tutorial> runMain WordCount3
+...
 ```
 
-> The prompts can be confusing. We'll see a _third_ prompt shortly, for the Scala interpreter, which is `scala>`. To remind yourself which interpreter you are using, look at the prompt!
-
-If you are trying the tutorial on a Hadoop cluster or edge node, or in a sandbox, change to the tutorial root directory and run the command `./start.sh`. It will start SBT and load this tutorial. There are options for this script. Use `./start.sh --help` to see those options.
-
-### Building and Testing
-
-To ensure that the basic environment is working, compile the code and run the tests:
+or have SBT prompt you for the executable to run:
 
 ```
-> test
+sbt:spark-scala-tutorial> run
+
+Multiple main classes detected, select one to run:
+
+ [1] Crawl5a
+ [2] Crawl5aLocal
+ ...
+Enter number:
 ```
 
-> You can also run SBT with any target from your shell, e.g., `$ sbt test`.
+Enter a number to pick `WordCount3` and hit RETURN. Unfortunately, the programs are not listed in alphabetical order, nor is your order guaranteed to match the order I see!
 
-All dependencies are downloaded, the code is compiled, and the tests are executed. This will take a few minutes the first time, especially because of the dependency downloads, and the tests should pass without error. (We've noticed that sometimes a timeout of some kind prevents the tests from completing successfully, but running the tests again works.)
+> **Tip:** Change your mind? Enter an invalid number and it will stop.
 
-Tests are provided for most, but not all of the examples. The tests run Spark in *local mode* only, in a single JVM process without using Hadoop.
+Finally, most of the programs have command aliases defined in `build.sbt` for `runMain Foo`. For example, `ex3` runs `runMain WordCount3`.
 
-### Running the Examples
+Note the `output` directory listed in the console output. If you picked `WordCount3`, it will be `output/kjv-wc3`. Use a file browser or a terminal window to view the output in that directory. You should find a `_SUCCESS` and a `part-00000` file. Following Hadoop conventions, the latter contains the actual data for the "partitions" (in this case just one, the `00000` partition). The `_SUCCESS` file is empty. It is written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know the process is done and it's safe to read the data.
 
-Next, let's run one of the examples both locally or with Hadoop to further confirm that everything is working.
-
-### Running a Local-mode Example
-
-Start the SBT interpreter, if necessary:
+The script files, i.e., those using the naming convention `*-script.scala`, are designed to be run in the Spark Shell, but we have configured the SBT "console" to simulate the shell. The following example starts the console from the SBT prompt and loads one of the scripts at the `scala>` prompt:
 
 ```
-$ sbt
+sbt:spark-scala-tutorial> console
+...
+
+scala> :load src/main/scala/sparktutorial/Intro1-script.scala
+...
+scala>
 ```
 
-At the sbt prompt, invoke `run-main WordCount3`.
-
-An alternative is to enter the `run` command and have SBT ask you which of the available programs to run. They are listed with a number. Find the entry for `WordCount3` and enter the corresponding number at the prompt, then hit RETURN. (Unfortunately, they are not listed in alphabetical order.)
-
-Note the `output` directory listed in the log messages. Use your workstation's file browser or a command window to view the output in the directory, which will be `output/kjv-wc3`. You should find `_SUCCESS` and `part-00000` files, following Hadoop conventions, where the latter contains the actual data for the "partitions". The `_SUCCESS` files are empty. They are written when output to the `part-NNNNN` files is completed, so that other applications watching the directory know it's safe to read the data.
-
-### Running a Hadoop Example
-
-> Make sure you completed the Hadoop setup instructions above and read the important notes contained there.
-
-Start SBT and invoke the command, `run hadoop.HWordCount3`. There will be more log messages and it will take longer to run.
-
-The log messages end with a URL where you can view the output in HDFS, using either the `hadoop fs` shell command or the HDFS file browser that comes with your distribution.
-
-If you are using the `hadoop fs` command from a login window, ignore everything in the URL up to the `output` directory. In other words, you will type the following command for this example:
-
-```sh
-hadoop fs -ls output/kjv-wc3
-```
-
-If you are using your HDFS file browser, the host IP address and port in the full URL are only valid for sandbox virtual machines. On a real cluster, consult your administrator for the host name and port for your *Name Node* (the HDFS master process).
-
-For example, in a sandbox, if its IP address is 192.168.64.100, the URL will be `http://192.168.64.100:8000/filebrowser/#/user/routput/kjv-wc3`. Once you've opened this file browser, it will be easy to navigate to the outputs for the rest of the examples we'll run. If you get a 404 error, check with the sandbox documentation for the correct URL to browse HDFS files (and send us a pull request with a fix!).
-
-Either way, the same `_SUCCESS` and `part-00000` files will be found, although the lines in the latter might not be in the same order as for the *local* run.
-
-Assuming you encountered no problems, everything is working!
-
-> NOTE: The normal Hadoop and Spark convention is to never overwrite existing data. However, that would force us to manually delete old data before rerunning programs, an inconvenience while learning. So, to make the tutorial easier, the programs delete existing data first. **Don't do this in production unless you know it's okay!**
-
-## Naming Conventions
+### Naming Conventions
 
 We're using a few conventions for the package structure and `main` class names:
 
-* `FooBarN.scala` - The `FooBar` compiled program for the N^th^ example. With a few exceptions, it can be run locally and in Hadoop. It defaults to local execution.
-* `FooBarN-script.scala` - The `FooBar` script for the N^th^ example. It is run using the `spark-shell` for local mode and cluster execution, or using the `console` (interactive Spark shell or *REPL*) that's provided by SBT.
-* `hadoop/HFooBarN.scala` - A driver program to run `FooBarN` in Hadoop. These small classes use a Scala library API for managing operating system *processes*. In this case, they invoke one or more shell scripts in the tutorial's `scripts` directory, which in turn call the Spark driver program `$SPARK_HOME/bin/spark-submit`, passing it the correct arguments. We'll explore the details shortly.
-* `solns/FooBarNSomeExercise.scala` - The solution to the "some exercise" exercise that's described in `FooBarN.scala`. These programs are also invoked using `sbt run`.
+* `FooBarN.scala` - The `FooBar` compiled program for the N^th^ example.
+* `FooBarN-script.scala` - The `FooBar` _script_ for the N^th^ example. It is run using the `spark-shell` or the SBT `console`, as described above.
+* `solns/FooBarNSomeExercise.scala` - The solution to the "some exercise" exercise that's described in `FooBarN.scala`. These programs are also invoked in the same ways.
 
-Otherwise, we don't use package prefixes, but only because they tend to be inconvenient. Most production code should use packages.
+Otherwise, we don't use package prefixes, but only because they tend to be inconvenient. Most production code should use packages, of course.
 
 ## Introduction: What Is Spark?
 
 Let's start with an overview of Spark, then discuss how to setup and use this tutorial.
 
-[Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming.
+[Apache Spark](http://spark.apache.org) is a distributed computing system written in Scala for distributed data programming. Besides Scala, you can program Spark using Java, Python, R, and SQL! This tutorial focuses on Scala and SQL.
 
-Spark includes support for event stream processing, as well as more traditional batch-mode applications. There is a [SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for working with data sets through SQL queries. It integrates the core Spark API with embedded SQL queries with defined schemas. It also offers [Hive](http://hive.apache.org) integration so you can query existing Hive tables, even create and delete them. Finally, it has JSON support, where records written in JSON can be parsed automatically with the schema inferred and RDDs can be written as JSON.
+Spark includes support for stream processing, using an older [DStream](https://spark.apache.org/docs/latest/streaming-programming-guide.html) or a newer [Structured Streaming](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) backend, as well as more traditional batch-mode applications.
 
-There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell). SparkSQL adds a SQL-only REPL shell. For completeness, you can also use a custom Python shell that exposes Spark's Python API. A Java API is also supported and R support is under development.
+> **Note:** The streaming examples in this tutorial use the older library. Newer examples are TODO.
+
+There is a [SQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) module for working with data sets through SQL queries or a SQL-like API. It integrates the core Spark API with embedded SQL queries with defined schemas. It also offers [Hive](http://hive.apache.org) integration so you can query existing Hive tables, even create and delete them. Finally, it supports a variety of file formats, including CSV, JSON, Parquet, ORC, etc.
+
+There is also an interactive shell, which is an enhanced version of the Scala REPL (read, eval, print loop shell).
 
 ### Why Spark?
 
@@ -339,35 +136,36 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ### SparkSQL
 
-[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) adds a new `DataFrame` type that wraps RDDs with schema information and the ability to run SQL queries on them. There is an integration with [Hive](http://hive.apache.org), the original SQL tool for Hadoop, which lets you not only query Hive tables, but run DDL statements too. There is convenient support for reading and writing [Parquet](http://parquet.io) files and for reading and writing JSON-based records.
+[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) first introduce a new `DataFrame` type that wraps RDDs with schema information and the ability to run SQL queries on them. A successor called `Dataset` removes some of the type safety "holes" in the `DataFrame` API, although that API is still available.
+
+There is an integration with [Hive](http://hive.apache.org), the original SQL tool for Hadoop, which lets you not only query Hive tables, but run DDL statements too. There is convenient support for reading and writing various formats like [Parquet](http://parquet.io) and JSON.
 
 ### The Spark Version
 
-This tutorial uses Spark 1.6.2.
+This tutorial uses Spark 2.2.0.
 
 The following documentation links provide more information about Spark:
 
 * [Documentation](http://spark.apache.org/docs/latest/).
 * [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package).
 
-The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the tutorial.
+The [Documentation](http://spark.apache.org/docs/latest/) includes a getting-started guide and overviews of the various major components. You'll find the [Scaladocs API](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package) useful for the tutorial.
 
 ## The Examples and Exercises
 
 Here is a list of the examples, some of which have exercises embedded as comments. In subsequent sections, we'll dive into the details for each one. Note that each name ends with a number, indicating the order in which we'll discuss and try them:
 
-* **Intro1-script:** The first example is actually run interactively.
+* **Intro1-script:** The first example is actually run interactively as a _script_.
 * **WordCount2:** The *Word Count* algorithm: read a corpus of documents, tokenize it into words, and count the occurrences of all the words. A classic, simple algorithm used to learn many Big Data APIs. By default, it uses a file containing the King James Version (KJV) of the Bible. (The `data` directory has a [README](data/README.html) that discusses the sources of the data files.)
 * **WordCount3:** An alternative implementation of *Word Count* that uses a slightly different approach and also uses a library to handle input command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code.
 * **Matrix4:** Demonstrates using explicit parallelism on a simplistic Matrix application.
 * **Crawl5a:** Simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines. The documents "crawled" are sample emails from the Enron email dataset, each of which has been classified already as SPAM or HAM.
 * **InvertedIndex5b:** Using the crawl data, compute the index of words to documents (emails).
 * **NGrams6:** Find all N-word ("NGram") occurrences matching a pattern. In this case, the default is the 4-word phrases in the King James Version of the Bible of the form `% love % %`, where the `%` are wild cards. In other words, all 4-grams are found with `love` as the second word. The `%` are conveniences; the NGram Phrase can also be a regular expression, e.g., `% (hat|lov)ed? % %` finds all the phrases with `love`, `loved`, `hate`, and `hated`.
-* **Joins7:** Spark supports SQL-style joins as shown in this simple example.
-* **SparkSQL8:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous tutorial. There is also a
+* **Joins7:** Spark supports SQL-style joins as shown in this simple example. Note this RDD approach is obsolete; use the SparkSQL alternatives.
+* **SparkSQL8:** Uses the SQL API to run basic queries over structured data in `DataFrames`, in this case, the same King James Version (KJV) of the Bible used in the previous tutorial. There is also a script version of this file. Using the _spark-shell_ to do SQL queries can be very convenient!
 * **SparkSQLFileFormats9:** Demonstrates writing and reading [Parquet](http://parquet.io)-formatted data, namely the data written in the previous example.
-* **hadoop/HiveSQL10:** A script that demonstrates interacting with Hive tables (we actually create one) in the Scala REPL! This example is in a `hadoop` subdirectory, because it uses features that require a Hadoop setup (more details later on).
-* **SparkStreaming11:** The streaming capability is relatively new and this exercise shows how it works to construct a simple "echo" server. Running it is a little more involved. See below.
+* **SparkStreaming10:** The older _structured streaming_ (`DStream`) capability. Here it's used to construct a simplistic "echo" server. Running it is a little more involved, as discussed below.
 
 Let's now work through these exercises...
 
@@ -379,13 +177,13 @@ Our first exercise demonstrates the useful *Spark Shell*, which is a customized 
 
 #### Local Mode Execution
 
-Actually, for local mode execution, we won't use the `spark-shell` command provided by Spark. Instead, we've customized the SBT `console` (Scala interpreter or "REPL") to behave in a similar way. For Hadoop execution, we'll use `spark-shell`.
+You can run this script, as described earlier, using either the `spark-shell` command in the Spark 2.2.0 distribution, or you can use the SBT `console` (Scala interpreter or "REPL"), which I've customized to behave in a similar way. For Hadoop, Mesos, or Kubernetes execution, you would have to use `spark-shell`; see the [Spark Documentation](https://spark.apache.org/docs/latest/index.html) for more details.
 
-We'll copy and paste commands from the file [Intro1-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Intro1-script.scala). Open the file in your favorite editor/IDE.
+We'll copy and paste expressions from the file [Intro1-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Intro1-script.scala). We showed above how to run it all at once.
 
-The extensive comments in this file and the subsequent files explain the API calls in detail. You can copy and paste the comments, too.
+Open the file in your favorite editor/IDE. The extensive comments in this file and the subsequent files explain the API calls in detail. You can copy and paste the comments, too.
 
-> NOTE: while the file extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. The SBT build is configured to not compile files with names that match the pattern `*-script.scala`.
+> NOTE: while the file extension is `.scala`, this file is not compiled with the rest of the code, because it works like a script. The SBT compile step is configured to ignore files with names that match the pattern `*-script.scala`.
 
 To run this example, start the SBT console, e.g.,
 
@@ -398,53 +196,38 @@ scala>
 
 Now you are at the prompt for the Scala interpreter. Note the _three_ prompts, `$` for your command-line shell, `>` for SBT, and `scala>` for the Scala interpreter. Confusing, yes, but you'll grow accustom to them.
 
-Continue with the instructions below.
-
-#### Hadoop Execution
-
-In your sandbox or cluster node, change to the root node of the tutorial and run the following command:
-
-```sh
-./scripts/sparkshell.sh
-```
-
-This script calls the actual Spark Shell script, `$SPARK_HOME/bin/spark-shell` and passes a `--jars` argument with the jar of the tutorial's compiled code. The script also passes any additional arguments you provide to `spark-shell`. (Try the `--help` option to see the full list.)
-
-You'll see a lot of log messages, ending with the Scala REPL prompt `scala>`.
-
-Continue with the instructions below.
-
-#### An Interactive Spark Session
-
-Whether you running the REPL in local mode or the `spark-shell` version in Hadoop, continue with the following steps.
-
-First, there are some commented lines that every Spark program needs, but you don't need to run them now. Both the local Scala REPL configured in the build and the `spark-shell` variant of the REPL execute these three lines automatically at startup:
+First, there are some commented lines that every Spark program needs, but you don't need to run them in this script. Both the local Scala REPL configured in the build and the `spark-shell` variant of the Scala REPL execute more or less the same lines automatically at startup:
 
 ```scala
-// import org.apache.spark.SparkContext
-// import org.apache.spark.SparkContext._
-// val sc = new SparkContext("local[*]", "Intro (1)")
+// If you're using the Spark Shell, $SPARK_HOME/bin/spark-shell, the following
+// commented-out code are done automatically by the shell as it starts up.
+// In this tutorial, we don't download and use a full Spark distribution.
+// Instead, we'll use SBT's "console" task, but we'll configure it to use the
+// same commands that spark-shell uses (more or less...).
+//   import org.apache.spark.sql.SparkSession
+//   import org.apache.spark.SparkContext
+//   val spark = SparkSession.builder.
+//     master("local[*]").
+//     appName("Console").
+//     config("spark.app.id", "Console").   // to silence Metrics warning
+//     getOrCreate()
+//   val sc = spark.sparkContext
+//   val sqlContext = spark.sqlContext
+//   import sqlContext.implicits._
+//   import org.apache.spark.sql.functions._    // for min, max, etc.
 ```
 
-The [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) drives everything else. Why are there two, very similar `import` statements? The first one imports the `SparkContext` type so it wouldn't be necessary to use a fully-qualified name in the `new SparkContext` statement. The second import statement is analogous to a `static import` in Java, where we make some methods and values visible in the current scope, again without requiring qualification.
+The [SparkSession](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession) drives everything else. Before Spark 2.0, the [SparkContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext) was the entry point. You can still extract it from the `SparkSession` as shown near the end, for convenience.
 
-> When we start the `console`, there are other Scala expressions evaluated, too, involving the SparkSQL API. We'll come back to those below.
-
-When a `SparkContext` is constructed, there are several constructors that can be used. The one shown takes a string for the "master" and an arbitrary job name. The master must be one of the following:
-
-* `local`: Start the Spark job standalone and use a single thread to run the job.
-* `local[k]`: Use `k` threads instead. Should be less than or equal to the number of cores. Use `local[*]` for all cores.
-* `mesos://host:port`: Connect to a running, Mesos-managed Spark cluster.
-* `spark://host:port`: Connect to a running, standalone Spark cluster.
-* `yarn-client` or `yarn-cluster`: Connect to a YARN cluster, which we'll use implicitly when we run in Hadoop.
-
-So, actually, the comment shown is only correct for *local* mode. When you run `spark-shell` in Hadoop, the actual master argument used is `yarn-client`.
+The `SparkSession.builder` uses the common _builder pattern_ to construct the session object. Note that value passed to `master`. The setting `local[*]` says run locally on this machine, but take all available CPU cores. Replace `*` with a number to limit this to fewer cores. Just using `local` limits execution to 1 core. There are different arguments you would use for Hadoop, Mesos, Kubernetes, etc.
 
 Next we define a read-only variable `input` of type [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) by loading the text of the King James Version of the Bible, which has each verse on a line, we then map over the lines converting the text to lower case:
 
 ```scala
 val input = sc.textFile("data/kjvdat.txt").map(line => line.toLowerCase)
 ```
+
+More accurately, the type of `input` is `RDD[String]` (or `RDD<String>` in Java syntax). Think of it as a "collection of strings".
 
 > The `data` directory has a `README` that discusses the files present and where they came from.
 
@@ -454,18 +237,21 @@ Then, we cache the data in memory for faster, repeated retrieval. You shouldn't 
 input.cache
 ```
 
-Next, we filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many were found, convert the RDD to a Scala collection (in the memory for the driver process JVM). Finally, loop through the first twenty lines of the array, printing each one, then we do it again with RDD itself.
+Next, we filter the input for just those verses that mention "sin" (recall that the text is now lower case). Then count how many were found.
 
 ```scala
 val sins = input.filter(line => line.contains("sin"))
 val count = sins.count()         // How many sins?
-val array = sins.collect()       // Convert the RDD into a collection (array)
-array.take(20) foreach println   // Take the first 20, and print them 1/line.
-sins.take(20) foreach println    // ... but we don't have to "collect" first;
-                                 // we can just use foreach on the RDD.
 ```
 
-Note: in Scala, the `()` in method calls are actually optional for no-argument methods.
+Next, convert the RDD to a Scala collection (in the memory for the driver process JVM). Finally, loop through the first twenty lines of the array, printing each one, then we do this again with the RDD itself.
+
+```scala
+val array = sins.collect()       // Convert the RDD into a collection (array)
+array.take(20).foreach(println)  // Take the first 20, loop through them, and print them 1 per line.
+sins.take(20).foreach(println)   // ... but we don't have to "collect" first;
+                                 // we can just use foreach on the RDD.
+```
 
 Continuing, you can define *functions* as *values*. Here we create a separate filter function that we pass as an argument to the filter method. Previously we used an *anonymous function*. Note that `filterFunc` is a value that's a function of type `String` to `Boolean`.
 
@@ -481,10 +267,10 @@ val filterFunc: String => Boolean =
     s => s.contains("god") || s.contains("christ")
 ```
 
-Now use the filter to find all the `sin` verses that also mention God or Christ, then count them. Note that this time, we drop the parentheses after "count". Parentheses can be omitted when methods take no arguments.
+Now use the filter to find all the `sin` verses that also mention God or Christ, then count them. Note that this time, we drop the "punctuation" in the first line (the comment shows what we dropped), and we drop the parentheses after "count". Parentheses can be omitted when methods take no arguments.
 
 ```scala
-val sinsPlusGodOrChrist  = sins filter filterFunc
+val sinsPlusGodOrChrist  = sins filter filterFunc // same as: sins.filter(filterFunc)
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 ```
 
@@ -503,7 +289,7 @@ def peek(rdd: RDD[_], n: Int = 10): Unit = {
 }
 ```
 
-In the type signature `RDD[_]`, the `_` means "any type". In other words, we don't care what records this `RDD` is holding, because we're just going to call `toString` on it (indirectly). The second argument `n` is the number of records to print. It has a default value of `10`, which means if the caller doesn't provide this argument, we'll print `10` records.
+In the type signature `RDD[_]`, the `_` means "any type". In other words, we don't care what records this `RDD` is holding, because we're just going to call `toString` on each one. The second argument `n` is the number of records to print. It has a default value of `10`, which means if the caller doesn't provide this argument, we'll print `10` records.
 
 The `peek` function prints the type of the `RDD` by calling `toString` on it (effectively). Then it takes the first `n` records, loops through them, and prints each one on a line.
 
@@ -654,7 +440,7 @@ We're done, but let's finish by noting that a non-script program should shutdown
 // sc.stop()
 ```
 
-If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`.
+If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`. Don't do this now; we want to keep the session alive...
 
 #### The Spark Web Console
 
@@ -664,7 +450,9 @@ Before we finish this exercise, open [localhost:4040](http://localhost:4040) and
 
 #### Intro1-script Exercises
 
-There are comments at the end of this file with suggested exercises to learn the API. All the subsequent examples we'll discuss include suggested exercises, too. Solutions for some of them are provided in the [src/main/scala/sparktutorial/solns](https://github.com/deanwampler/spark-scala-tutorial/tree/master/src/main/scala/sparktutorial/solns) directory.
+There are comments at the end of this file with suggested exercises to learn the API. All the subsequent examples we'll discuss include suggested exercises, too.
+
+Solutions for some of the suggested are provided in the [src/main/scala/sparktutorial/solns](https://github.com/deanwampler/spark-scala-tutorial/tree/master/src/main/scala/sparktutorial/solns) directory (athough not for this script's suggestions).
 
 You can exit the Scala REPL now. Type `:quit` or use `^d` (control-d - which means "end of input" for \*NIX systems.).
 
@@ -678,13 +466,11 @@ In *Word Count*, you read a corpus of documents, tokenize each one into words, a
 
 [WordCount2.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount2.scala) uses the KJV Bible text again. (Subsequent exercises will add the ability to specify different input sources using command-line arguments.)
 
-This example does not have a Hadoop version, so we'll only run it locally.
+Use your IDE's _run_ command for the file or use SBT to run it. For SBT, use one of the following three methods:
 
-Use SBT to run it, using one of the following three methods:
-
-* Enter the `run` command and select the number corresponding to the `WordCount2` program.
-* Enter `run-main WordCount2`
-* Enter `ex2`, a command alias for `run-main WordCount2`. (The alias is defined in the project's `./build.sbt` file.)
+* Enter the `run` command at the `sbt` prompt and select the number corresponding to the `WordCount2` program.
+* Enter `runMain WordCount2`
+* Enter `ex2`, a command alias for `runMain WordCount2`. (The alias is defined in the project's `./build.sbt` file.)
 
 Either way, the output is written to `output/kjv-wc2` in the local file system. Use a file browser or another terminal window to view the files in this directory. You'll find an empty `_SUCCESS` file that marks completion and a `part-00000` file that contains the data.
 
@@ -698,7 +484,7 @@ import org.apache.spark.SparkContext._
 
 We use the Java default package for the compiled exercises, but you would normally include a `package ...` statement to organize your applications into packages, in the usual Java way.
 
-We import a `FileUtil` class that we'll use for "housekeeping". Then we use the same two `SparkContext` imports we discussed previously. This time, they aren't commented; we must specify these imports ourselves in Spark programs.
+We import a `FileUtil` class that we'll use for "housekeeping". Then we use two `SparkContext` imports. The first one imports the type, the second imports items _inside_ the _companion object_, for convenience.
 
 > Even though most of the examples and exercises from now on will be compiled classes, you could still use the Spark Shell to try out most constructs. This is especially useful when experimenting and debugging!
 
@@ -739,7 +525,7 @@ println(s"Writing output to: $out")
 wc.saveAsTextFile(out)
 ```
 
-Because Spark follows Hadoop conventions that it won't overwrite existing data, we delete any previous output, if any. Of course, you should only do this in production jobs when you know it's okay!
+Because Spark follows Hadoop conventions that it won't overwrite existing data, we delete any previous output, if any. Of course, you should only do this in production jobs when you _know_ it's okay!
 
 Next we load and cache the data like we did previously, but this time, it's questionable whether caching is useful, since we will make a single pass through the data. I left this statement here just to remind you of this feature.
 
@@ -759,7 +545,6 @@ Spark also follows another Hadoop convention for file I/O; the `out` path is act
 
 **Quiz:** If you look at the (unsorted) data, you'll find a lot of entries where the word is a number. (Try searching the input text file to find them.) Are there really that many numbers in the bible? If not, where did the numbers come from? Look at the original file for clues.
 
-
 #### WordCount2 Exercises
 
 At the end of each example source file, you'll find exercises you can try. Solutions for some of them are implemented in the `solns` package. For example, [solns/WordCount2GroupBy.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/solns/WordCount2GroupBy.scala) solves the "group by" exercise described in `WordCount2.scala`.
@@ -768,9 +553,7 @@ At the end of each example source file, you'll find exercises you can try. Solut
 
 [WordCount3.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/WordCount3.scala)
 
-This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it. When we set up the `SparkContext`, we also use [Kryo Serialization](http://spark.apache.org/docs/latest/tuning.html), which provides better compression and therefore better utilization of memory and network bandwidth.
-
-You can run this example in both local mode or using Hadoop.
+This exercise also implements *Word Count*, but it uses a slightly simpler approach. It also uses a utility library to support command-line arguments, demonstrating some idiomatic (but fairly advanced) Scala code. We won't worry about the details of this utility code, just how to use it. Next, instead of using the old approach of creating a `SparkContext`, we'll use the new approach of creating a `SparkSession` and extracting the `SparkContext` from it when needed. Finally, we'll also use [Kryo Serialization](http://spark.apache.org/docs/latest/tuning.html), which provides better compression and therefore better utilization of memory and network bandwidth (not that we really need it for this small dataset...).
 
 This version also does some data cleansing to improve the results. The sacred text files included in the `data` directory, such as `kjvdat.txt` are actually formatted records of the form:
 
@@ -785,23 +568,15 @@ That is, pipe-separated fields with the book of the Bible (e.g., Genesis, but ab
 Using SBT, do one of the following:
 
 * Enter the `run` command and select the number corresponding to the `WordCount3` program.
-* Enter `run-main WordCount3`
-* Enter `ex3`, a command alias for `run-main WordCount3`.
+* Enter `runMain WordCount3`
+* Enter `ex3`, a command alias for `runMain WordCount3`.
 
-To run this example in Hadoop, use the `hadoop.HWordCount3` program instead. Run it in one of the same ways as for `WordCount3`:
-
-* Enter the `run` command and select the number corresponding to the `hadoop.HWordCount3` program.
-* Enter `run-main hadoop.HWordCount3`
-* Enter `hex3`, a command alias for `run-main hadoop.HWordCount3`.
-
-We'll discuss the Hadoop driver in more detail later.
-
-Command line options can be used to override the default settings for input and output locations, among other things. You can specify arguments after the `run`, `run-main ...`, `ex3`, or `hex3` commands.
+Command line options can be used to override the default settings for input and output locations, among other things. You can specify arguments after the `run`, `runMain ...`, or `ex3` commands.
 
 Here is the help message that lists the available options. The "\" characters indicate long lines that are wrapped to fit. Enter the commands on a single line without the "\". Following Unix conventions, `[...]` indicates optional arguments, and `|` indicates alternatives:
 
 ```
-run-main WordCount3 [ -h | --help] \
+runMain WordCount3 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
@@ -825,7 +600,7 @@ When running in Hadoop, relative file paths for input our output are interpreted
 Here is an example that uses the default values for the options:
 
 ```
-run-main WordCount3 \
+runMain WordCount3 \
   --inpath data/kjvdat.txt --outpath output/kjv-wc3 \
   --master local
 ```
@@ -951,81 +726,6 @@ The result of `countByValue` is a Scala `Map`, not an [RDD](http://spark.apache.
 
 > **WARNING:** Methods like `countByValue` that return a Scala collection will copy the entire object back to the driver program. This could crash your application with an [OutOfMemory](http://docs.oracle.com/javase/8/docs/api/java/lang/OutOfMemoryError.html) exception if the collection is too big!
 
-#### Running as a Hadoop Job
-
-Let's discuss Hadoop execution in a little more detail.
-
-Recall from the setup instructions that the data must already be in HDFS. The location `/user/$USER/data` is assumed. If you used a different location, always specify the `--input` argument when you run the examples.
-
-The driver program, [hadoop.HWordCound3](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HWordCount3.scala), is used to run `WordCount3` in Hadoop. It is run with SBT using `run-main hadoop.HWordCound3` or alias `hex3` command. Try it now.
-
-The output is more verbose and the execution time is longer, due to Hadoop's overhead. The end of the output shows a URL for the *Hue* UI that's also part of the Sandbox. Open your browser to that URL to look at the data. The content will be very similar to the output of the previous, local run, but it will be formatted differently and the word-count pairs will be in a different (random) order.
-
-For convenient, there is also a bash shell script for this example in the `scripts` directory, [scripts/wordcount3.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/wordcount3.sh):
-
-```scala
-#!/bin/bash
-
-output=output/kjv-wc3
-dir=$(dirname $0)
-$dir/hadoop.sh --class WordCount3 --output "$output" "$@"
-```
-
-It calls a [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script in the same directory, which deletes the old output from HDFS, if any, and calls Spark's `$SPARK_HOME/bin/spark-submit` to submit the job to YARN. One of the arguments it passes to `spark-submit` is the jar file containing all the project code. This jar file is built automatically anytime you invoke the SBT *run* command.
-
-The other examples also have corresponding scripts and driver programs.
-
-Let's return to [hadoop.HWordCound3](#code/src/main/scala/sparktutorial/hadoop.HWordCound3.scala), which is quite small:
-
-```scala
-package hadoop
-import util.Hadoop
-
-object HWordCount3 {
-  def main(args: Array[String]): Unit = {
-    Hadoop("WordCount3", "output/kjv-wc3", args)
-  }
-}
-```
-
-It accepts the same options as `WordCount3`, although the `--master` option defaults to `yarn-client` this time.
-
-It delegates to a helper class [util.Hadoop](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/Hadoop.scala) to do the work. It passes as arguments the class name and the output location. The second argument is a hack: the default output path must be specified here, even though the same default value is also encoded in the application. This is because we eventually pass the value to the [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script, which uses it to delete an old output directory, if any.
-
-Here is the `Hadoop` helper class:
-
-```scala
-package util
-import scala.sys.process._
-
-object Hadoop {
-  def apply(className: String, defaultOutpath: String, args: Array[String]): Unit = {
-    val user = sys.env.get("USER") match {
-      case Some(user) => user
-      case None =>
-        println("ERROR: USER environment variable isn't defined. Using root!")
-        "root"
-    }
-
-    // Did the user specify an output path? Use it instead.
-    val predicate = (arg: String) => arg.startsWith("-o") || arg.startsWith("--o")
-    val args2 = args.dropWhile(arg => !predicate(arg))
-    val outpath = if (args2.size == 0) s"/user/$user/$defaultOutpath"
-      else if (args2(1).startsWith("/")) args2(1)
-      else s"/user/$user/${args(2)}"
-
-    // We don't need to remove the output argument. A redundant occurrence
-    // is harmless.
-    val argsString = args.mkString(" ")
-    val exitCode = s"scripts/hadoop.sh --class $className --out $outpath $argsString".!
-    if (exitCode != 0) sys.exit(exitCode)
-  }
-}
-```
-
-It tries to determine the user name and whether or not the user explicitly specified an output argument, which should override the hard-coded value.
-
-Finally, it invokes the [scripts/hadoop.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh) script we mentioned above, so that we go thorugh Spark's `spark-submit` script for submitting to the Hadoop YARN cluster.
 
 #### WordCount3 Exercises
 
@@ -1054,10 +754,10 @@ An early use for Spark was implementing Machine Learning algorithms. Spark's `ML
 
 The sample data is generated internally; there is no input that is read. The output is written to the file system as before.
 
-Here is the `run-main` command with optional arguments:
+Here is the `runMain` command with optional arguments:
 
 ```scala
-run-main Matrix4 [ -h | --help] \
+runMain Matrix4 [ -h | --help] \
   [-d | --dims NxM] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
@@ -1066,16 +766,14 @@ run-main Matrix4 [ -h | --help] \
 
 The one new option is for specifying the dimensions, where the string `NxM` is parsed to mean `N` rows and `M` columns. The default is `5x10`.
 
-Like for `WordCount3`, there is also a `ex4` shortcut for `run-main Matrix4`.
+Like for `WordCount3`, there is also a `ex4` shortcut for `runMain Matrix4`.
 
 Here is how to run this example:
 
 ```
-run-main Matrix4 \
+runMain Matrix4 \
   --master local  --outpath output/matrix4
 ```
-
-For Hadoop, run [hadoop.HMatrix4](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HMatrix4.scala) using `run-main hadoop.HMatrix4`, the `hex4` alias, our use the bash script [scripts/matrix4.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/hadoop.sh).
 
 We won't cover all the code from now on; we'll skip the familiar stuff:
 
@@ -1153,17 +851,17 @@ The fifth example is in two-parts. The first part simulates a web crawler that b
 `Crawl5a` supports the same command-line options as `WordCount3`:
 
 ```scala
-run-main Crawl5a [ -h | --help] \
+runMain Crawl5a [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
   [-q | --quiet]
 ```
 
-Run with `run-main Crawl5a`, or the `ex5a` alias:
+Run with `runMain Crawl5a`, or the `ex5a` alias:
 
 ```
-run-main Crawl5a \
+runMain Crawl5a \
   --outpath output/crawl --master local
 ```
 
@@ -1188,21 +886,19 @@ Using the crawl data just generated, compute the index of words to documents (em
 `InvertedIndex5b` supports the usual command-line options:
 
 ```scala
-run-main InvertedIndex5b [ -h | --help] \
+runMain InvertedIndex5b [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
   [-q | --quiet]
 ```
 
-+Run with `run-main InvertedIndex5b`, or the `ex5b` alias:
++Run with `runMain InvertedIndex5b`, or the `ex5b` alias:
 
 ```
-run-main InvertedIndex5b \
+runMain InvertedIndex5b \
   --outpath output/inverted-index --master local
 ```
-
-For Hadoop, run [hadoop.HInvertedIndex5b](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HInvertedIndex5b.scala) using `run-main hadoop.HInvertedIndex5b` or the `hex5b` alias. There is also a bash script [scripts/invertedindex5b.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/invertedindex5b.sh).
 
 The code outside the `try` clause follows the usual pattern, so we'll focus on the contents of the `try` clause:
 
@@ -1299,7 +995,7 @@ This exercise finds all NGrams matching a user-specified pattern. The default is
 `NGrams6` supports the same command-line options as `WordCount3`, plus two new options:
 
 ```scala
-run-main NGrams6 [ -h | --help] \
+runMain NGrams6 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
@@ -1314,8 +1010,6 @@ Where
 -c | --count N        List the N most frequently occurring NGrams (default: 100)
 -n | --ngrams string  Match string (default "% love % %"). Quote the string!
 ```
-
-For Hadoop, run [hadoop.HNGrams6](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HNGrams6.scala) using `run-main hadoop.HNGrams6` or the `hex6` alias. There is also a bash script [scripts/ngrams6.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/ngrams6.sh).
 
 I'm in yür codez:
 
@@ -1380,7 +1074,7 @@ Here, we will join the KJV Bible data with a small "table" that maps the book ab
 `Joins7` supports the following command-line options:
 
 ```scala
-run-main Joins7 [ -h | --help] \
+runMain Joins7 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-o | --out | --outpath output] \
   [-m | --master master] \
@@ -1389,8 +1083,6 @@ run-main Joins7 [ -h | --help] \
 ```
 
 Where the `--abbreviations` is the path to the file with book abbreviations to book names. It defaults to `data/abbrevs-to-names.tsv`. Note that the format is tab-separated values, which the script must handle correctly.
-
-For Hadoop, run [hadoop.HJoins7](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop.HJoins7.scala) using `run-main hadoop.HJoins7` or the `hex7` alias. There is also a bash script [scripts/joins7.sh](https://github.com/deanwampler/spark-scala-tutorial/blob/master/scripts/joins7.sh).
 
 Here r yür codez:
 
@@ -1613,72 +1305,6 @@ The key [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org
 
 See the script for more details. Run it in Hadoop using the same techniques as for `SparkSQL8-script.scala`.
 
-### HiveSQL10
-
-[HiveSQL10.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/hadoop/HiveSQL10.scala)
-
-The previous examples used the new [Catalyst](httpdatabricks.com/blog/2014/03/26/spark-sql-manipulating-structured-data-using-spark-2.html) query engine. However, SparkSQL also has an integration with Hive, so you can write HiveQL (HQL) queries, manipulate Hive tables, etc. This example demonstrates this feature. So, we're not using the Catalyst SQL engine, but Hive's.
-
-> NOTE: Running this script requires a Hadoop installation, therefore it won't work in local mode, i.e., the SBT `console`. This is why it is in a `hadoop` sub-package.
-
-For this exercise, the Hive "metadata" is stored in a `megastore` directory created in the current working directory. This is written and managed by Hive's embedded [Derby SQL](http://db.apache.org/derby/) store, but it's not a production deployment option.
-
-Let's discuss the code hightlights. There is additional imports for Hive:
-
-```scala
-import org.apache.spark.sql._
-import org.apache.spark.sql.hive.HiveContext
-import util.Verse
-```
-
-We need the user name.
-
-```scala
-val user = sys.env.get("USER") match {
-  case Some(user) => user
-  case None =>
-    println("ERROR: USER environment variable isn't defined. Using root!")
-    "root"
-}
-```
-
-Create a [HiveContext](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.hive.HiveContext), analogous to the previous `SQLContext`. Then define a helper function to run the query using the new `hql` function, after which we print each line.
-
-```scala
-val sc = new SparkContext("local[2]", "Hive SQL (8)")
-val hiveContext = new HiveContext(sc)
-import hiveContext._   // Make methods local, like sql
-
-def sql2(title: String, query: String, n: Int = 100): Unit = {
-  println(title)
-  println(s"Running query: $query")
-  sql(query).take(n).foreach(println)
-}
-```
-
-(Previously, this version of `sql` was called `hql`.) We can now execute Hive DDL statements, such the following statements to create a database, "use it" as the working database, and then a table inside it.
-
-```scala
-sql2("Create a work database:", "CREATE DATABASE work")
-sql2("Use the work database:", "USE work")
-
-sql2("Create the 'external' kjv Hive table:", s"""
-  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (
-    book    STRING,
-    chapter INT,
-    verse   INT,
-    text    STRING)
-  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
-  LOCATION '/user/$usdata/hive-kjv'""")
-```
-
-Here we use a triple-quoted string to specify a multi-line HiveQL statement to create a table. In this case, an `EXTERNAL` table is created, a Hive extension, where we just tell it use data in a particular directory (`LOCATION`). Here is why we needed the user name, because Hive expects an absolute path.
-
-A few points to keep in mind:
-
-* **Omit semicolons** at the end of the HQL (Hive SQL) string. While those would be required in Hive's own REPL or scripts, they cause errors here!
-* The query results are returned in an RDD as for the other SparkSQL queries. To dump to the console, you have to use the conversion we implemented in `sql2`.
-
 ### SparkStreaming11
 
 [SparkStreaming11.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming11.scala)
@@ -1731,7 +1357,7 @@ The console output and the directory output should be very similar to the output
 `SparkStreaming11` supports the following command-line options:
 
 ```scala
-run-main SparkStreaming11 [ -h | --help] \
+runMain SparkStreaming11 [ -h | --help] \
   [-i | --in | --inpath input] \
   [-s | --socket server:port] \
   [--term | --terminate N] \
@@ -1751,10 +1377,6 @@ Note that there's no argument for the data file. That's an extra option supporte
 The default is `data/kjvdat.txt`.
 
 There is also an alternative to `SparkStreaming11` called `SparkStreaming11SQL`, which uses a SQL query rather than the RDD API to do the calculation. To use this variant, pass the `--sql` argument when you invoke either version of `SparkStreaming11Main` or `SparkStreaming11MainSocket`.
-
-To run a subset of these combinations in Hadoop, there is `hadoop.HSparkStreaming11` driver. Similarly to `SparkStreaming11Main`, it starts the `DataSocketSever` process *locally* (outside of Hadoop), then submits `SparkStreaming11` to your Hadoop environment. There is also a script driver, `scripts/sparkstreaming8.sh`.
-
-Note that the Hadoop implementation of this example doesn't support watching for new files in a directory. That's not a Spark Streaming limitation. Also, the SQL variant is not supported, but it would be easy to add this capability.
 
 #### How Spark Streaming Works
 

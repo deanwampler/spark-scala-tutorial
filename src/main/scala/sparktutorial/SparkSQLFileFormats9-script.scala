@@ -11,9 +11,8 @@ import util.{Verse, FileUtil}
 val inputDir   = "data/kjvdat.txt"
 
 // Not needed with spark-shell:
-// val master = "yarn-client"
-// val sc = new SparkContext(master, "Spark SQL File Formats (9)")
-// val sqlContext = new SQLContext(sc)
+// val sc = spark.sparkContext
+// val sqlContext = spark.sqlContext
 // import sqlContext.implicits._
 
 import sqlContext.sql
