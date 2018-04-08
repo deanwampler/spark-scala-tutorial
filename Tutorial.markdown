@@ -20,7 +20,9 @@ Try running `WordCount3`. Note the `output` directory listed in the console outp
 
 For the "script" files, i.e., those use the naming convention `*-script.scala`, they are designed to be run in the Spark Shell, which we have simulated with our configuration of SBT.
 
-To run these scripts, use the `sbt console` command discussed below. Or, download the [Spark 2.2.0 distribution](https://www.apache.org/dyn/closer.lua/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz), expand it somewhere, and start the `$SPARK_HOME/bin/spark-shell`. Then load the script file as follows at the `scala>` prompt:
+To run these scripts, use the `sbt console` command discussed in the **SBT** section below or the equivalent within your IDE. It's not sufficient to just run a "generic" Scala REPL (interpreter), because you need the libraries and expressions setup as part of the SBT project for the console.
+
+Or you can download the [Spark 2.2.0 distribution](https://www.apache.org/dyn/closer.lua/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz), expand it somewhere, and start the `$SPARK_HOME/bin/spark-shell` (use this project's working directory as your starting point). Then load the script file as follows at the `scala>` prompt:
 
 ```scala
 scala> :load src/main/scala/sparktutorial/Intro1-script.scala
@@ -557,7 +559,7 @@ This exercise also implements *Word Count*, but it uses a slightly simpler appro
 
 This version also does some data cleansing to improve the results. The sacred text files included in the `data` directory, such as `kjvdat.txt` are actually formatted records of the form:
 
-```scala
+```text
 book|chapter#|verse#|text
 ```
 

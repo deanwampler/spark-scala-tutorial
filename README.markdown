@@ -14,7 +14,7 @@ This tutorial demonstrates how to write and run [Apache Spark](http://spark.apac
 This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. You can run the examples and exercises several ways:
 
 1. [Jupyter notebooks](http://jupyter.org/) - The easiest way, especially for data scientists accustomed to _notebooks_
-2. In an IDE, like IntelliJ - Familiar for developers
+2. In an IDE, like [IntelliJ](https://www.jetbrains.com/idea/) - Familiar for developers
 3. At the terminal prompt using the build tool [SBT](https://www.scala-sbt.org/)
 
 This tutorial is mostly about learning Spark, but I teach you a little Scala as we go. If you are more interested in learning just enough Scala for Spark programming, see my new tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/spark-scala-tutorial).
@@ -52,12 +52,18 @@ Now Pick the way you want to work through the tutorial:
 ## Using Jupyter Notebooks
 
 The easiest way to work with this tutorial is to use a [Docker](https://docker.com) image that combines the popular [Jupyter](http://jupyter.org/) notebook environment with all the tools you need to run Spark, including the Scala language. It's called the [All Spark Notebook](https://hub.docker.com/r/jupyter/all-spark-notebook/).  It bundles [Apache Toree](https://toree.apache.org/) to provide Spark and Scala access.
+The [webpage](https://hub.docker.com/r/jupyter/all-spark-notebook/) for this Docker image discusses useful information like using Python as well as Scala, user authentication topics, running your Spark jobs on clusters, rather than local mode, etc.
 
-There are other notebook tools you might investigate for your team's needs:
+There are other notebook options you might investigate for your needs:
+
+**Open source:**
 
 * [Jupyter](https://ipython.org/) + [BeakerX](http://beakerx.com/) - a powerful set of extensions for Jupyter
-* [Zeppelin](http://zeppelin-project.org/) - a popular environment in big data environments
-* [Spark Notebook](http://spark-notebook.io) - a powerful, but not as polished
+* [Zeppelin](http://zeppelin-project.org/) - a popular tool in big data environments
+* [Spark Notebook](http://spark-notebook.io) - a powerful tool, but not as polished or well maintained
+
+**Commercial:**
+
 * [IBM Data Science Experience](http://datascience.ibm.com/) - IBM's full-featured environment for data science
 * [Databricks](https://databricks.com/) - a feature-rich, commercial, cloud-based service
 
@@ -117,45 +123,49 @@ Execute the command: jupyter notebook
         http://localhost:8888/?token=...
 ```
 
-Now copy and paste the URL shown in a browser window.
+Now copy and paste the URL shown in a browser window. (Use command+click in your terminal window on MacOS.)
 
-> **Warning:** When you quit the Docker container at the end of the tutorial, all your changes will be lost, unless they are in the `data` and `notebooks` directories shown in the Jupyter UI! To save notebooks elsewhere, export the notebook using the _File > Download as > Notebook_ menu item in toolbar.
+> **Warning:** When you quit the Docker container at the end of the tutorial, all your changes will be lost, unless they are in the `data` and `notebooks` directories that we mounted! To save notebooks you defined in other locations, export them using the _File > Download as > Notebook_ menu item in toolbar.
 
 ## Running the Tutorial
 
-Now we need to load the tutorial into Jupyter.
+In the Jupyter UI, you should see three folders, `data`, `notebooks`, and `work`. The first two are the folders we mounted. The data we'll use is in the `data` folder. The notebooks we'll use are... you get the idea.
 
-* Click the _Upload_ button on the upper right-hand side of the UI.
-* Browse to where you downloaded and expanded the tutorial, then to the `notebooks` directory. \
-* Open `spark-scala-tutorial`.
-* Click the blue _Upload_ button.
-* Click the link for the tutorial that is now shown in the list of notebooks.
+Open the `notebooks` folder and click the link for `00_Intro.ipynb`.
 
-It opens in a new browser tab. It will take several seconds to load. (It's big!)
+It opens in a new browser tab. It may take several seconds to load.
 
 >  **Tip:** If the new tab fails to open or the notebook fails to load as shown, check the terminal window where you started Jupyter. Are there any error messages?
 
-Finally, you'll notice there is a box around the first "cell". This cell has one line of source code `println("Hello World!")`. Above this cell is a toolbar with a button that has a right-pointing arrow and the word _run_. Click that button to run this code cell. Or, use the menu item _Cell > Run Cells_.
+If you're new to Jupyter, try _Help > User Interface Tour_ to learn how to use Jupyter. At a minimum, you need to new that the content is organized into _cells_. You can navigate with the up and down arrows or clicks. When you come to a cell with code, either click the _run_ button in the toolbar or use shift+return to execute the code.
 
-After many seconds, once initialization has completed, it will print the output, `Hello World!` just below the input text field.
-
-Do the same thing for the next box. It should print `Array(shakespeare)`.
-
-> **Warning:** If instead you see `Array()` or `null` is printed, the mounting of the `data` directory did not work correctly. In the terminal window, use `control-c` to exit from the Docker container, make sure you are in the root directory of the project (`data` should be a subdirectory), restart the docker image, and make sure you enter the command exactly as shown.
-
-You are now ready to go through the [tutorial](Tutorial.markdown).
+Read through the Introduction notebook, then navigate to the examples using the table near the bottom. I've set up the table so that clicking each link opens a new browser tab.
 
 <a name="use-ide"></a>
 ### Use an IDE
 
-TODO
+The tutorial is also set up as a using the build tool [SBT](https://www.scala-sbt.org/). The popular IDEs, like [IntelliJ](https://www.jetbrains.com/idea/) with the Scala plugin (required) and [Eclipse with Scala](http://scala-ide.org/), can import an SBT project and automatically create an IDE project from it.
+
+Once imported, you can run the Spark job examples as regular applications. There are some examples implemented as scripts that need to be run using the Spark Shell or the SBT console. The tutorial goes into the details.
 
 You are now ready to go through the [tutorial](Tutorial.markdown).
 
 <a name="use-sbt"></a>
 ### Use SBT in a Terminal
 
-TODO
+Using [SBT](https://www.scala-sbt.org/) in a terminal is a good approach if you prefer to use a code editor like Emacs, Vim, or SublimeText. You'll need to [install SBT](https://www.scala-sbt.org/download.html), but not Scala or Spark. Those dependencies will be resolved when you build the software.
+
+Start the `sbt` console, then build the code, where the `sbt:spark-scala-tutorial>` is the prompt I've configured for the project. Running `test` compiles the code and runs the tests, while `package` creates a jar file of the compiled code and configuration files:
+
+```shell
+$ sbt
+...
+sbt:spark-scala-tutorial> test
+...
+sbt:spark-scala-tutorial> package
+...
+sbt:spark-scala-tutorial>
+```
 
 You are now ready to go through the [tutorial](Tutorial.markdown).
 
