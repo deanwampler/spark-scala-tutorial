@@ -61,19 +61,19 @@ object WordCount3 {
       // Split on non-alphabetic sequences of character as before.
       // Rather than map to "(word, 1)" tuples, we treat the words by values
       // and count the unique occurrences.
-      val wc2a = input
+      val wc1 = input
         .flatMap(line => line.split("""[^\p{IsAlphabetic}]+"""))
-        .countByValue() // Returns a Map[T, Long]
+        .countByValue() // Returns a Map[T, Long] to the driver; no more RDD!
 
       // ... and convert back to an RDD for output, with one "slice".
       // First, convert to a comma-separated string. When you call "map" on
       // a Map, you get 2-tuples for the key-value pairs. You extract the
       // first and second elements with the "_1" and "_2" methods, respectively.
-      val wc2b = wc2a.map(key_value => s"${key_value._1},${key_value._2}").toSeq
-      val wc2 = sc.makeRDD(wc2b, 1)
+      val wc2 = wc1.map(key_value => s"${key_value._1},${key_value._2}").toSeq
+      val wc = sc.makeRDD(wc2, 1)
 
       if (!quiet) println(s"Writing output to: $out")
-      wc2.saveAsTextFile(out)
+      wc.saveAsTextFile(out)
 
     } finally {
       spark.stop()  // was sc.stop() in WordCount2

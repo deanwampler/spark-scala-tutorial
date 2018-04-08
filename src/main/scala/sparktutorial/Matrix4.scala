@@ -86,7 +86,6 @@ object Matrix4 {
     }
 
     // Exercise: Try different values of m, n.
-    // Exercise: Try other statistics, like standard deviation.
     // Exercise: Try other statistics, like standard deviation. Are the average
     //   and standard deviation very meaningful here?
   }

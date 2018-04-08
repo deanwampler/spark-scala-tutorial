@@ -12,10 +12,10 @@ import org.apache.spark.rdd.RDD
  * in a directory hierarchy and return a single RDD with records of the form:
  *    <code>(file_name, file_contents)</code>
  * After loading with <code>SparkContext.wholeTextFiles</code>, we post process
- * the data in two ways. First, we the <code>file_name</code> will be an
- * absolute path, which is normally what you would want. However, to make it
- * easier to support running the corresponding unit test <code>Crawl5aSpec</code>
- * anywhere, we strip all leading path elements. Second, the <code>file_contents</code>
+ * the data in two ways. First, the <code>file_name</code> will be an absolute
+ * path, which is normally what you would want. However, to make it easier to
+ * support running the corresponding unit test <code>Crawl5aSpec</code> anywhere,
+ * we strip all leading path elements. Second, the <code>file_contents</code>
  * still contains linefeeds. We remove those, so that <code>InvertedIndex5b</code>
  * can treat each line as a complete record.
  */
@@ -50,11 +50,11 @@ object Crawl5a {
       if (!quiet) println(s"Writing ${files_contents.count} lines to: $out")
       // See class notes above.
       files_contents.map{
-        case (id, text) =>
-          val lastSep = id.lastIndexOf(separator)
-          val id2 = if (lastSep < 0) id.trim else id.substring(lastSep+1, id.length).trim
+        case (path, text) =>
+          val lastSep = path.lastIndexOf(separator)
+          val path2 = if (lastSep < 0) path.trim else path.substring(lastSep+1, path.length).trim
           val text2 = text.trim.replaceAll("""\s*\n\s*""", " ")
-          (id2, text2)
+          (path2, text2)
       }.saveAsTextFile(out)
     } finally {
       spark.stop()

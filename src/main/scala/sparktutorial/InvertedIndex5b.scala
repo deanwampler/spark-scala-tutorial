@@ -49,9 +49,7 @@ object InvertedIndex5b {
 
       if (!quiet) println(s"Writing output to: $out")
 
-      // Split on non-alphabetical sequences of character as before.
-      // Rather than map to "(word, 1)" tuples, we treat the words by values
-      // and count the unique occurrences.
+      // Start by splitting on non-alphabetical sequences of character as before.
       input
         .flatMap {
           // all lines are two-tuples; extract the path and text into variables
@@ -67,7 +65,7 @@ object InvertedIndex5b {
           // pair as the key and an initial count of "1".
           case (word, path) => ((word, path), 1)
         }  // RDD[((String,String),Int)] of ((word,path),1) pairs
-        .reduceByKey{    // Count the equal (word, path) pairs, as before
+        .reduceByKey {    // Count the equal (word, path) pairs, as before
           (count1, count2) => count1 + count2
         }  // RDD[((String,String),Int)], now with unique (word,path) and int value >= 1
         // In the function passed to reduceByKey, we could use placeholder "_", one
@@ -107,7 +105,8 @@ object InvertedIndex5b {
 
     // Exercise: Sort the output by the words. How much overhead does this add?
     // Exercise: For each output record, sort the list of (path, n) tuples by n,
-    //   descending.
+    //   descending. Recall that you would want a real search index to show you
+    //   the documents first that have a lot to say about the subject.
     // Exercise: Try you own set of text files. First run Crawl5a to generate
     //   the "web crawl" data.
     // Exercise (hard): Try combining some of the processing steps or reordering

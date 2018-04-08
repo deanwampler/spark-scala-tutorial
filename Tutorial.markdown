@@ -836,7 +836,7 @@ Try the simple exercises at the end of the source file.
 
 [Crawl5a.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/Crawl5a.scala)
 
-The fifth example is in two-parts. The first part simulates a web crawler that builds an index of documents to words, the first step for computing the *inverse index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
+The fifth example is in two-parts. The first part simulates a web crawler that builds an index of documents to words, the first step for computing the *inverted index* used by search engines, from words to documents. The documents "crawled" are sample emails from the Enron email dataset, each of which has been previously classified already as SPAM or HAM.
 
 `Crawl5a` supports the same command-line options as `WordCount3`:
 
@@ -855,9 +855,9 @@ runMain Crawl5a \
   --outpath output/crawl --master local
 ```
 
-`Crawl5a` uses a convenient `SparkContext` method `wholeTextFiles`, which is given a directory "glob". The default we use is `data/enron-spam-ham/*`, which expands to `data/enron-spam-ham/ham100` and `data/enron-spam-ham/spam100`. This method returns records of the form `(file_name, file_contents)`, where the `file_name` is the absolute path to a file found in one of the directories, and `file_contents` contains its contents, including nested linefeeds. To make it easier to run unit tests, `Crawl5a` strips off the leading path elements in the file name (not normally recommended) and it removes the embedded linefeeds, so that each final record is on a single line.
+`Crawl5a` uses a convenient `SparkContext` method called `wholeTextFiles`, which is given a directory "glob". The default we use is `data/enron-spam-ham/*`, which expands to `data/enron-spam-ham/ham100` and `data/enron-spam-ham/spam100`. This method returns records of the form `(file_name, file_contents)`, where the `file_name` is the absolute path to a file found in one of the directories, and `file_contents` contains its contents, including nested linefeeds. To make it easier to run unit tests, `Crawl5a` strips off the leading path elements in the file name (not normally recommended) and it removes the embedded linefeeds, so that each final record is on a single line.
 
-Here is an example line from the output :
+Here is an example line from the output:
 
 ```scala
 (0038.2001-08-05.SA_and_HP.spam.txt,  Subject: free foreign currency newsletter ...)
@@ -968,7 +968,7 @@ Each output record has the following form: `(word, (doc1, n1), (doc2, n2), ...)`
 (ability,(0018.2003-12-18.GP.spam.txt,2), (0020.2001-07-28.SA_and_HP.spam.txt,1))
 ```
 
-It's worth studying this sequence of transformations to understand how it works. Many problems can be solves with these techniques. You might try reading a smaller input file (say the first 5 lines of the crawl output), then hack on the script to dump the [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) after each step.
+It's worth studying this sequence of transformations to understand how it works. Many problems can be solved with these techniques. You might try reading a smaller input file (say the first 5 lines of the crawl output), then hack on the script to dump the [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) after each step.
 
 A few useful [RDD](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) methods for exploration include `RDD.sample` or `RDD.take`, to select a subset of elements. Use `RDD.saveAsTextFile` to write to a file or use `RDD.collect` to convert the RDD data into a "regular" Scala collection (don't use for massive data sets!).
 

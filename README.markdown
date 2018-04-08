@@ -82,20 +82,16 @@ The MacOS and Linux `run.sh` command executes this command:
 ```bash
 docker run -it --rm \
   -p 8888:8888 -p 4040:4040 \
+  --cpus=2.0 --memory=2000M \
   -v "$PWD/data":/home/jovyan/data \
   -v "$PWD/notebooks":/home/jovyan/notebooks \
+  "$@" \
   jupyter/all-spark-notebook
 ```
 
-The Windows `run.bat` command executes this command (wrapped for readability):
+The Windows `run.bat` command is similar, but uses Windows conventions.
 
-```bash
-docker run -it --rm
-  -p 8888:8888 -p 4040:4040
-  -v "%CD%\data":/home/jovyan/data
-  -v "%CD%\notebooks":/home/jovyan/notebooks
-  jupyter/all-spark-notebook
-```
+The `--cpus=... --memory=...` arguments were added because the notebook "kernel" is prone to crashing with the default values. Edit to taste. Also, it will help to keep only one notebook (other than the Introduction) open at a time.
 
 The `-v PATH:/home/jovyan/dir` tells Docker to mount the `dir` directory under your current working directory, so it's available as `/home/jovyan/dir` inside the container. _This is essential to provide access to the tutorial data and notebooks_. When you open the notebook UI (discussed shortly), you'll see these folders listed.
 
