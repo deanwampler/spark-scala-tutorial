@@ -136,7 +136,7 @@ The architecture of RDDs is described in the research paper [Resilient Distribut
 
 ### SparkSQL
 
-[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) first introduce a new `DataFrame` type that wraps RDDs with schema information and the ability to run SQL queries on them. A successor called `Dataset` removes some of the type safety "holes" in the `DataFrame` API, although that API is still available.
+[SparkSQL](http://spark.apache.org/docs/latest/sql-programming-guide.html) first introduced a new `DataFrame` type that wraps RDDs with schema information and the ability to run SQL queries on them. A successor called `Dataset` removes some of the type safety "holes" in the `DataFrame` API, although that API is still available.
 
 There is an integration with [Hive](http://hive.apache.org), the original SQL tool for Hadoop, which lets you not only query Hive tables, but run DDL statements too. There is convenient support for reading and writing various formats like [Parquet](http://parquet.io) and JSON.
 
@@ -337,7 +337,7 @@ the
 
 Does the output make sense to you? The type of the `RDD` hasn't changed, but the records are now individual words.
 
-Now let's use our friend from SQL `GROUPBY`, where we use the words as the "keys":
+Now let's use our friend from SQL, `GROUPBY`, where we use the words as the "keys":
 
 ```scala
 scala> val wordGroups = words.groupBy(word => word)
@@ -357,7 +357,7 @@ scala> peek(wordGroups)
 =====================
 ```
 
-Note that the records are now two-element `Tuples`: `(String, Iterable[String])`, where `Iterable` is a Scala abstraction for an underlying, sequential collection. We see that these iterables are `CompactBuffers`, a Spark collection that wraps an array of objects. Note that these buffers just hold repeated occurrences of the corresponding keys. This is wasteful, especially at scala! We'll learn a better way to do this calculation shortly.
+Note that the records are now two-element `Tuples`: `(String, Iterable[String])`, where `Iterable` is a Scala abstraction for an underlying, sequential collection. We see that these iterables are `CompactBuffers`, a Spark collection that wraps an array of objects. Note that these buffers just hold repeated occurrences of the corresponding keys. This is wasteful, especially at scale! We'll learn a better way to do this calculation shortly.
 
 Finally, let's compute the size of each `CompactBuffer`, which completes the calculation of how many occurrences are there for each word:
 
@@ -434,10 +434,10 @@ part-00001
 
 The `_SUCCESS` file is empty. It's a marker used by the Hadoop File I/O libraries (which Spark uses) to signal to waiting processes that the file output has completed. The other two files each hold a _partition_ of the data. In this case, we had two partitions.
 
-We're done, but let's finish by noting that a non-script program should shutdown gracefully by calling `sc.stop()`. However, we don't need to do so here, because both our configured `console` environment for local execution and `spark-shell` do this for us:
+We're done, but let's finish by noting that a non-script program should shutdown gracefully by calling `spark.stop()`. However, we don't need to do so here, because both our configured `console` environment for local execution and `spark-shell` do this for us:
 
 ```scala
-// sc.stop()
+// spark.stop()
 ```
 
 If you exit the REPL immediately, this will happen implicitly. Still, it's a good practice to always call `stop`. Don't do this now; we want to keep the session alive...
@@ -452,7 +452,7 @@ Before we finish this exercise, open [localhost:4040](http://localhost:4040) and
 
 There are comments at the end of this file with suggested exercises to learn the API. All the subsequent examples we'll discuss include suggested exercises, too.
 
-Solutions for some of the suggested are provided in the [src/main/scala/sparktutorial/solns](https://github.com/deanwampler/spark-scala-tutorial/tree/master/src/main/scala/sparktutorial/solns) directory (athough not for this script's suggestions).
+Solutions for some of the suggested exercises are provided in the [src/main/scala/sparktutorial/solns](https://github.com/deanwampler/spark-scala-tutorial/tree/master/src/main/scala/sparktutorial/solns) directory (athough not for this script's suggestions).
 
 You can exit the Scala REPL now. Type `:quit` or use `^d` (control-d - which means "end of input" for \*NIX systems.).
 
@@ -1522,7 +1522,7 @@ Now, only `factor2` must be serialized.
 
 This is a general issue for distributed programs written for the JVM. A future version of Scala may introduce a "serialization-safe" mechanism for defining closures for this purpose.
 
-### Going Forward from Here
+## Going Forward from Here
 
 See the [README](README.markdown) for a list of resources for more information.
 
