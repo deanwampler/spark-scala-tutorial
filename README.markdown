@@ -74,7 +74,8 @@ Now we'll run the docker image. It's important to follow the next steps carefull
 The MacOS and Linux `run.sh` command executes this command:
 
 ```bash
-docker run -it --rm -p 8888:8888 \
+docker run -it --rm \
+  -p 8888:8888 -p 4040:4040 \
   -v "$PWD/data":/home/jovyan/data \
   -v "$PWD/notebooks":/home/jovyan/notebooks \
   jupyter/all-spark-notebook
@@ -83,7 +84,8 @@ docker run -it --rm -p 8888:8888 \
 The Windows `run.bat` command executes this command (wrapped for readability):
 
 ```bash
-docker run -it --rm -p 8888:8888
+docker run -it --rm
+  -p 8888:8888 -p 4040:4040
   -v "%CD%\data":/home/jovyan/data
   -v "%CD%\notebooks":/home/jovyan/notebooks
   jupyter/all-spark-notebook
@@ -93,7 +95,7 @@ The `-v PATH:/home/jovyan/dir` tells Docker to mount the `dir` directory under y
 
 > **Note:** On Windows, you may get the following error: _C:\Program Files\Docker\Docker\Resources\bin\docker.exe: Error response from daemon: D: drive is not shared. Please share it in Docker for Windows Settings."_ If so, do the following. On your tray, next to your clock, right-click on Docker, then click on Settings. You'll see the _Shared Drives_. Mark your drive and hit apply. See [this Docker forum thread](https://forums.docker.com/t/cannot-share-drive-in-windows-10/28798/5) for more tips.
 
-The `-p 8888:8888` argument tells Docker to "tunnel" port 8888 out of the container to your local environment, so you can get to the Jupyter UI.
+The `-p 8888:8888 -p 4040:4040` arguments tells Docker to "tunnel" ports 8888 and 4040 out of the container to your local environment, so you can get to the Jupyter UI at port 8888 and the Spark driver UI at 4040.
 
 You should see output similar to the following:
 
