@@ -63,7 +63,7 @@ object Joins7 {
       // on the first space (in the unlikely case there are embedded tabs
       // in the names!)
       val abbrevs = sc.textFile(argz("abbreviations"))
-        .map{ line =>
+        .map { line =>
           val ary = line.split("\\s+", 2)
           (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
         }

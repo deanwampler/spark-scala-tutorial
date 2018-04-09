@@ -1143,7 +1143,7 @@ You can verify that the output file looks like the input KJV file with the book 
 [SparkSQL8.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8.scala)<br/>
 [SparkSQL8-script.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkSQL8-script.scala)
 
-The last set of examples and exercises explores the SparkSQL API, which extends RDDs with the `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
+The next to last set of examples and exercises explores the SparkSQL API, which extends RDDs with the `DataFrame` API that adds a "schema" for records, defined using Scala _case classes_, tuples, or a built-in schema mechanism. The DataFrame API is inspired by similar `DataFrame` concepts in R and Python libraries. The transformation and action steps written in any of the support languages, as well as SQL queries embedded in strings, are translated to the same, performant query execution model, optimized by a new query engine called *Catalyst*.
 
 > **Note:** The even newer `Dataset` API encapsulates `DataFrame`, but adds more type safety for the data columns.
 
@@ -1278,7 +1278,7 @@ To enter the statements using copy and paste, just paste them at the `scala>` pr
 
 This script demonstrates the methods for reading and writing files in the [Parquet](http://parquet.io) and JSON formats. It reads in the same data as in the previous example, writes it to new files in Parquet format, then reads it back in and runs queries on it. Then it repeats the exercise using JSON.
 
-The key [DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrame) methods are `DataFrame.read.parquet(inpath)` and `DataFrame.write.save(outpath)` for reading and writing Parquet, and `DataFrame.read.json(inpath)` and `DataFrame.write.json(outpath)` for reading and writing JSON. (The format for the first `write.save` method can be overridden to default to a different format.)
+The key [SparkSession](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession) and [Dataset](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Dataset) methods are `SparkSession.read.parquet(inpath)` and `Dataset.write.save(outpath)` for reading and writing Parquet, and `SparkSession.read.json(inpath)` and `Dataset.write.json(outpath)` for reading and writing JSON. (The format for the first `write.save` method can be overridden to default to a different format.)
 
 See the script for more details. Run it the same way we ran `SparkSQL8-script.scala`.
 

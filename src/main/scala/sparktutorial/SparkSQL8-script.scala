@@ -22,22 +22,22 @@ val versesRDD = sc.textFile(inputPath).flatMap {
     Nil // or use Seq.empty[Verse]. It will be eliminated by flattening.
 }
 
-// Create a DataFrame and register as a temporary "table".
-val verses = sqlContext.createDataFrame(versesRDD)
-verses.registerTempTable("kjv_bible")
+// Create a DataFrame and create as a temporary "view".
+val verses = spark.createDataFrame(versesRDD)
+verses.createOrReplaceTempView("kjv_bible")
 verses.cache()
 // print the 1st 20 lines. Pass an integer argument to show a different number
 // of lines:
 verses.show()
-verses.show(100)
+verses.show(10)
+verses.show(10, truncate = false) // wider output
 
-import sqlContext.sql  // for convenience
+val godVerses = spark.sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
+println("Number of verses that mention God: "+godVerses.count())
+godVerses.show(truncate = false)
 
-val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
 println("The query plan:")
 godVerses.queryExecution   // Compare with godVerses.explain(true)
-println("Number of verses that mention God: "+godVerses.count())
-godVerses.show()
 
 // Use the DataFrame API:
 val godVersesDF = verses.filter(verses("text").contains("God"))
@@ -47,7 +47,7 @@ println("Number of verses that mention God: "+godVersesDF.count())
 godVersesDF.show()
 
 // Use GroupBy and column aliasing.
-val counts = sql("SELECT book, COUNT(*) as count FROM kjv_bible GROUP BY book")
+val counts = spark.sql("SELECT book, COUNT(*) as count FROM kjv_bible GROUP BY book")
 counts.show(100)  // print the 1st 100 lines, but there are only 66 books/records...
 
 // Exercise: Sort the output by the book names. Sort by the counts.
@@ -70,6 +70,11 @@ countsDF.count
 // Exercise: Sort the last output by the words, by counts. How much overhead does this add?
 
 // Aggregations, a la data warehousing:
+// NOTE: the following import is here so this script works in Spark Shell, but
+// it's already done in the setup for the SBT Console:
+
+import org.apache.spark.sql.functions._    // for min, max, etc.
+
 verses.groupBy("book").agg(
   max(verses("chapter")),
   max(verses("verse")),
@@ -123,7 +128,7 @@ val abbrevNamesRDD = sc.textFile(abbrevsNamesPath).flatMap { line =>
     Seq(Abbrev(ary(0), ary(1)))
   }
 }
-val abbrevNames = sqlContext.createDataFrame(abbrevNamesRDD)
-abbrevNames.registerTempTable("abbrevs_to_names")
+val abbrevNames = spark.createDataFrame(abbrevNamesRDD)
+abbrevNames.createOrReplaceTempView("abbrevs_to_names")
 
 // Exercise: Play with other methods in the DataFrame DSL.

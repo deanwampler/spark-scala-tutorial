@@ -1,6 +1,6 @@
 import util.{CommandLineOptions, FileUtil, Verse}
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
  * Example of SparkSQL, both SQL queries and the new DataFrame API,
@@ -39,8 +39,7 @@ object SparkSQL8 {
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()
     val sc = spark.sparkContext
-    val sqlContext = spark.sqlContext
-    import sqlContext.implicits._
+    import spark.implicits._
 
     try {
       // Regex to match the fields separated by "|".
@@ -55,12 +54,12 @@ object SparkSQL8 {
           Seq.empty[Verse]  // Will be eliminated by flattening.
       }
 
-      // Create a DataFrame and register as a temporary "table".
+      // Create a DataFrame and create as a temporary "view".
       // The following expression invokes several "implicit" conversions and
-      // methods that we imported through sqlContext._ The actual method is
+      // methods that we imported through spark._ The actual method is
       // defined on org.apache.spark.sql.SchemaRDDLike, which also has a method
       // "saveAsParquetFile" to write a schema-preserving Parquet file.
-      val verses = sqlContext.createDataFrame(versesRDD)
+      val verses = spark.createDataFrame(versesRDD)
       verses.createOrReplaceTempView("kjv_bible")
       verses.cache()
       // print the 1st 20 lines (default: pass another integer as the argument
@@ -69,7 +68,8 @@ object SparkSQL8 {
         verses.show()
       }
 
-      import sqlContext.sql    // Convenient for running SQL queries.
+      import spark.sql    // Convenient for running SQL queries.
+
       val godVerses = sql("SELECT * FROM kjv_bible WHERE text LIKE '%God%'")
       if (!quiet) {
         println("The query plan:")

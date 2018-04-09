@@ -1,7 +1,6 @@
 // HiveSQLFileFormats10-script.scala - A Scala script that demonstrates support
 // for various file formats.
 
-import org.apache.spark.sql.SQLContext
 import util.{Verse, FileUtil}
 
 /**
@@ -9,8 +8,6 @@ import util.{Verse, FileUtil}
  */
 
 val inputDir   = "data/kjvdat.txt"
-
-import sqlContext.sql
 
 // Read the verses into a table, just as we did in SparkSQL8.scala:
 val lineRE = """^\s*([^|]+)\s*\|\s*([\d]+)\s*\|\s*([\d]+)\s*\|\s*(.*)~?\s*$""".r
@@ -21,8 +18,8 @@ val versesRDD = sc.textFile(inputDir).flatMap {
     Console.err.println(s"Unexpected line: $line")
     Nil // or use Seq.empty[Verse]. It will be eliminated by flattening.
 }
-val verses = sqlContext.createDataFrame(versesRDD)
-verses.registerTempTable("kjv_bible")
+val verses = spark.createDataFrame(versesRDD)
+verses.createOrReplaceTempView("kjv_bible")
 
 // Save as a Parquet file:
 val parquetDir = "output/parquet"
@@ -32,13 +29,13 @@ verses.write.parquet(parquetDir)
 
 // Now read it back and use it as a table:
 println(s"Reading in the Parquet file from $parquetDir:")
-val verses2 = sqlContext.read.parquet(parquetDir)
-verses2.registerTempTable("verses2")
+val verses2 = spark.read.parquet(parquetDir)
+verses2.createOrReplaceTempView("verses2")
 verses2.show
 
 // Run a SQL query against the table:
 println("Using the table from Parquet File, select Jesus verses:")
-val jesusVerses = sql("SELECT * FROM verses2 WHERE text LIKE '%Jesus%'")
+val jesusVerses = spark.sql("SELECT * FROM verses2 WHERE text LIKE '%Jesus%'")
 println("Number of Jesus Verses: "+jesusVerses.count())
 jesusVerses.show
 
@@ -49,7 +46,7 @@ val jsonDir = "output/json"
 println(s"Saving 'verses' as a JSON file to $jsonDir.")
 FileUtil.rmrf(jsonDir)
 verses.write.json(jsonDir)
-val versesJSON = sqlContext.read.json(jsonDir)
+val versesJSON = spark.read.json(jsonDir)
 versesJSON.show
 
 // Not needed if you're using the actual Spark Shell and our configured sbt
