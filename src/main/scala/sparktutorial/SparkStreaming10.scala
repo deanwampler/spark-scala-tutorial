@@ -94,7 +94,7 @@ object SparkStreaming10 {
     // setMaster("local[2]").
     val name = "Spark Streaming (10)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       config("spark.files.overwrite", "true").

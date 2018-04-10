@@ -5,6 +5,7 @@ import scala.sys.process._
 import scala.language.postfixOps
 import java.net.URL
 import java.io.File
+import java.nio.file.Path
 
 /**
  * The driver program for the SparkStreaming10 example. It handles the need
@@ -58,7 +59,7 @@ object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
       useSQL(false),
       CommandLineOptions.outputPath("output/wc-streaming"),
       // For this process, use at least 2 cores!
-      CommandLineOptions.master("local[*]"),
+      CommandLineOptions.master("local[2]"),
       CommandLineOptions.socket(""),  // empty default, so we know the user specified this option.
       CommandLineOptions.terminate(timeout),
       CommandLineOptions.quiet)
@@ -110,15 +111,17 @@ object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
 
 /** This exists to enable reuse by HSparkStreaming10. A package is necessary... */
 package sparkstreaming {
+  import DataServer._
+
   trait ThreadStarter {
-    def startSocketDataThread(port: Int, dataFile: String): Thread = {
-      val dataThread = new Thread(new DataSocketServer(port, dataFile))
+    def startSocketDataThread(port: Int, dataSource: String): Thread = {
+      val dataThread = new Thread(new DataSocketServer(port, makePath(dataSource)))
       dataThread.start()
       dataThread
     }
-    def startDirectoryDataThread(in: String, dataFile: String): Thread = {
-      FileUtil.mkdir(in)
-      val dataThread = new Thread(new DataDirectoryServer(in, dataFile))
+    def startDirectoryDataThread(watchedDir: String, dataSource: String): Thread = {
+      FileUtil.mkdir(watchedDir)
+      val dataThread = new Thread(new DataDirectoryServer(makePath(watchedDir), makePath(dataSource)))
       dataThread.start()
       dataThread
     }
