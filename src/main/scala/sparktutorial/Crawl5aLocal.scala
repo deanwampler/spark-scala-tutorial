@@ -44,7 +44,7 @@ object Crawl5aLocal {
 
     val name = "CrawlLocal (5a)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

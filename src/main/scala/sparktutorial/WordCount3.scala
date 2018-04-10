@@ -40,7 +40,7 @@ object WordCount3 {
 
     val name = "Word Count (3)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").

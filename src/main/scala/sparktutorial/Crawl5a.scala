@@ -39,7 +39,7 @@ object Crawl5a {
 
     val name = "Crawl (5a)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

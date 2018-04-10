@@ -669,7 +669,7 @@ Now we create a `SparkSession`, the new way (since Spark 2.0) to create a Spark 
 ```scala
     val name = "Word Count (3)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
@@ -1302,7 +1302,7 @@ The socket option works similarly. By default, the same KJV file is written over
 
 In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming10Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10Main.scala) is the actual driver program we'll run. It uses two helper classes, [util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataDirectoryServer.scala) and [util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
-So, let's run this configuration first. In SBT, run `SparkStreaming10Main` (*not* `SparkStreaming10MainSocket`) as we've done for the other exercises. For the SBT, the corresponding alias is now `ex8directory`, instead of `ex8`.
+So, let's run this configuration first. In SBT, run `SparkStreaming10Main` (*not* `SparkStreaming10MainSocket`) as we've done for the other exercises. For the SBT, the corresponding alias is now `ex10directory`, instead of `ex10`.
 
 This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming10` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
 
@@ -1393,7 +1393,7 @@ The `EndOfStreamListener` will be used to detect when a socket connection drops.
 ...
     val name = "Spark Streaming (10)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       config("spark.files.overwrite", "true").

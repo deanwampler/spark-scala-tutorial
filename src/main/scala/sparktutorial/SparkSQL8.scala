@@ -34,7 +34,7 @@ object SparkSQL8 {
 
     val name = "Spark SQL (8)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

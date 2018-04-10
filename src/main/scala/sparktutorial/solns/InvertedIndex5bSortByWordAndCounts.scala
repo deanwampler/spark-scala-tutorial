@@ -28,7 +28,7 @@ object InvertedIndex5bSortByWordAndCounts {
 
     val name = "Inverted Index - sort by word and count (5b)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

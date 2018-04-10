@@ -52,7 +52,7 @@ object NGrams6 {
 
     val name = "NGrams (6)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

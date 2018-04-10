@@ -24,7 +24,7 @@ object InvertedIndex5b {
 
     val name = "Inverted Index (5b)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       getOrCreate()

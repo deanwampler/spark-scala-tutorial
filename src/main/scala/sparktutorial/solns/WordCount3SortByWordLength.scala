@@ -38,7 +38,7 @@ object WordCount3SortByWordLength {
 
     val name = "Word Count - sort by word length (3)"
     val spark = SparkSession.builder.
-      master("local[*]").
+      master(master).
       appName(name).
       config("spark.app.id", name).   // To silence Metrics warning.
       config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
