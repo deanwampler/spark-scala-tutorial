@@ -11,9 +11,9 @@ import java.nio.file.{FileSystems, Path}
 case class DataSocketServer(
   port: Int,
   sourcePath: Path,
-  iterations: Int = DataServer.defaultIterations,
   sleepIntervalMillis: Int = DataServer.defaultSleepIntervalMillis) extends DataServer {
 
+  println(s"Starting $this")
   import DataServer.Consumer
   protected def makeConsumer(): Consumer = new DataSocketServer.SocketConsumer(port)
 }
@@ -55,7 +55,6 @@ object DataSocketServer {
       println("DataSocketServer: ERROR - Must specify the port and source data file")
     }
     val (port, sourceString) = (args(0).toInt, args(1))
-    val iterations = if (args.length > 2) args(2).toInt else defaultIterations
-    new DataSocketServer(port, makePath(sourceString), iterations).run
+    new DataSocketServer(port, makePath(sourceString)).run
   }
 }

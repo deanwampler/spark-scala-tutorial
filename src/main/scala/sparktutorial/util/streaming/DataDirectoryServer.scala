@@ -11,9 +11,9 @@ import java.io.{File, PrintWriter}
 case class DataDirectoryServer(
   watchedDirectory: Path,
   sourcePath: Path,
-  iterations: Int = DataServer.defaultIterations,
   sleepIntervalMillis: Int = DataServer.defaultSleepIntervalMillis) extends DataServer {
 
+  println(s"Starting $this")
   import DataServer.Consumer
   protected def makeConsumer(): Consumer = new DataDirectoryServer.DirectoryConsumer(watchedDirectory)
 }
@@ -26,12 +26,13 @@ object DataDirectoryServer {
     Files.createDirectories(dirPath)
     if (Files.isDirectory(dirPath) == false)
       throw DataServerError(s"Given path $dirPath is not a directory")
+    val dir = new File(dirPath.toString)
 
     /** Reset when a new source is set? */
     protected def resetOnSourceChange: Boolean = true
 
     protected def makePrintWriter(source: Path): PrintWriter = {
-      val outFile = File.createTempFile("copy-", "txt", new File(source.toString))
+      val outFile = File.createTempFile("copy-", "txt", dir)
       new PrintWriter(outFile)
     }
 
@@ -49,7 +50,6 @@ object DataDirectoryServer {
       println("DataDirectoryServer: ERROR - Must specify the port and source data file")
     }
     val (watchedDirectoryString, sourceString) = (args(0), args(1))
-    val iterations = if (args.length > 2) args(2).toInt else defaultIterations
-    new DataDirectoryServer(makePath(watchedDirectoryString), makePath(sourceString), iterations).run
+    new DataDirectoryServer(makePath(watchedDirectoryString), makePath(sourceString)).run
   }
 }

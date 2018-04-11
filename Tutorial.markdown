@@ -1296,15 +1296,17 @@ Note that Spark Streaming does not use the `_SUCCESS` marker file we mentioned e
 
 The second basic configuration reads data from a socket. Spark Streaming also comes with connectors for other data sources, such as [Apache Kafka](http://kafka.apache.org/) and Twitter streams. We don't explore those here.
 
-`SparkStreaming10` uses directory watching by default. A temporary directory is created and a second process writes the KJV Bible file to a temporary file in the directory every few seconds. Hence, the data will be same in every file, but stream processing with read each new file on each iteration. `SparkStreaming10` does *Word Count* on the data.
+`SparkStreaming10` uses directory watching by default. A temporary directory is created and a second process writes the user-specified data file(s) (default: Enron emails) to a temporary directory every second. Hence, the data will eventually repeat. `SparkStreaming10` does *Word Count* on the data. By default, it also stops after 200 iterations (the number of email files).
 
-The socket option works similarly. By default, the same KJV file is written over and over again to a socket.
+The socket option works similarly, but this time, the data are written to a socket.
 
 In either configuration, we need a second process or dedicated thread to either write new files to the watch directory or over the socket. To support this, [SparkStreaming10Main.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10Main.scala) is the actual driver program we'll run. It uses two helper classes, [util.streaming.DataDirectoryServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataDirectoryServer.scala) and [util.streaming.DataSocketServer.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/util/streaming/DataSocketServer.scala), respectively. It runs their logic in a separate thread, although each can also be run as a separate executable. Command line options specify which one to use and it defaults to `DataSocketServer`.
 
-So, let's run this configuration first. In SBT, run `SparkStreaming10Main` (*not* `SparkStreaming10MainSocket`) as we've done for the other exercises. For the SBT, the corresponding alias is now `ex10directory`, instead of `ex10`.
+So, let's run this configuration first. In SBT, run `SparkStreaming10Main` (*not* `SparkStreaming10MainSocket`) as we've done for the other exercises.
 
-This driver uses `DataDrectoryServer` to periodically write copies of the KJV Bible text file to a temporary directory `tmp/streaming-input`, while it also runs `SparkStreaming10` with options to watch this directory. Execution is terminated after 30 seconds, because otherwise the app will run forever!
+There two SBT aliases, `ex10directory`, for watching a directory, and `ex10socket`, for listening on a socket.
+
+This driver uses `DataDrectoryServer` or `DataSocketServer` to periodically write the data to a temporary directory, `tmp/streaming-input`, or to a socket, respectively.
 
 If you watch the console output, you'll see messages like this:
 
@@ -1312,16 +1314,16 @@ If you watch the console output, you'll see messages like this:
 -------------------------------------------
 Time: 1413724627000 ms
 -------------------------------------------
-(Oshea,2)
-(winefat,2)
-(cleaveth,13)
-(bone,19)
-(House,1)
-(Shimri,3)
-(pygarg,1)
-(nobleman,3)
-(honeycomb,9)
-(manifestly,1)
+(limitless,2)
+(grand,2)
+(someone,4)
+(priority,2)
+(goals,1)
+(ll,5)
+(agree,1)
+(offer,2)
+(yahoo,3)
+(ebook,3)
 ...
 ```
 
@@ -1345,7 +1347,7 @@ runMain SparkStreaming10 [ -h | --help] \
 
 Where the default is `--inpath tmp/wc-streaming`. This is the directory that will be watched for data, which `DataDirectoryserver` will populate. However, the `--inpath` argument is ignored if the `--socket` argument is given.
 
-By default, 30 seconds is used for the terminate option, after which time it exits. Pass 0 for no termination.
+By default, it runs for 30 seconds, unless a different duration is specified with the "--terminate seconds" option. Pass 0 for no termination.
 
 Note that there's no argument for the data file. That's an extra option supported by `SparkStreaming10Main` (`SparkStreaming10` is agnostic to the source!):
 

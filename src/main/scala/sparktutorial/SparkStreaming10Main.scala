@@ -13,20 +13,20 @@ import java.nio.file.Path
  * socket or by periodically writing new data files to a directory.
  * Run with the --help option for details.
  */
-object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
+object SparkStreaming10Main {
 
-  val timeout = 10  // Stop program after N seconds
+  val iterations = 200   // Terminate after N iterations
 
   /**
-   * The source data file to write over a socket or to write repeatedly to the
+   * The source data to write over a socket or to write repeatedly to the
    * directory specified by --inpath.
    */
-  def sourceDataFile(path: String): Opt = Opt(
-    name   = "source-data-file",
+  def sourceData(path: String): Opt = Opt(
+    name   = "source-data",
     value  = path,
-    help   = s"-d | --data  file   The source data file used for the socket or --input direcotry of data (default: $path)",
+    help   = s"-d | --data  file_or_dir The source data file or directory tree used for the socket or --input direcotry of data (default: $path)",
     parser = {
-      case ("-d" | "--data") +: file +: tail => (("source-data-file", file), tail)
+      case ("-d" | "--data") +: path2 +: tail => (("source-data", path2), tail)
     })
 
   /**
@@ -51,9 +51,12 @@ object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
     })
 
   def main(args: Array[String]): Unit = {
+
+    val defaultDuration = 30 // seconds
+
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
-      sourceDataFile("data/kjvdat.txt"),
+      sourceData("data/enron-spam-ham"),
       CommandLineOptions.inputPath("tmp/streaming-input"),
       removeWatchedDirectory(true),
       useSQL(false),
@@ -61,27 +64,25 @@ object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
       // For this process, use at least 2 cores!
       CommandLineOptions.master("local[2]"),
       CommandLineOptions.socket(""),  // empty default, so we know the user specified this option.
-      CommandLineOptions.terminate(timeout),
+      CommandLineOptions.terminate(defaultDuration),
       CommandLineOptions.quiet)
 
-    val argz   = options(args.toList)
-    val master = argz("master")
-    val quiet  = argz("quiet").toBoolean
-    val in     = argz("input-path")
-    val out    = argz("output-path")
-    val data   = argz("source-data-file")
-    val socket = argz("socket")
+    val argz         = options(args.toList)
+    val master       = argz("master")
+    val quiet        = argz("quiet").toBoolean
+    val in           = argz("input-path")
+    val out          = argz("output-path")
+    val data         = argz("source-data")
+    val socket       = argz("socket")
     val rmWatchedDir = argz("remove-watched-dir").toBoolean
+    val seconds      = argz("terminate").toInt
 
-    // Need to remove a few arguments before calling SparkStreaming10.
-    def mkStreamArgs(argsSeq: Seq[String], newSeq: Vector[String]): Vector[String] =
-      argsSeq match {
-        case Nil => newSeq
-        case ("-d" | "--data") +: file +: tail => mkStreamArgs(tail, newSeq)
-        case ("--sql") +: tail => mkStreamArgs(tail, newSeq)
-        case head +: tail => mkStreamArgs(tail, newSeq :+ head)
-      }
-    val streamArgs = mkStreamArgs(args, Vector.empty[String]).toArray
+    val streamArgs: Array[String] = Array(
+      "--master",      master,
+      "--inpath",      in,
+      "--outpath",     out,
+      "--socket",      socket,
+      "--terminate",   seconds.toString)
 
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
@@ -96,6 +97,7 @@ object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
           val port = socket.split(":").last.toInt
           startSocketDataThread(port, data)
         }
+      dataThread.start()
       if (argz("use-sql").toBoolean) {
         SparkStreaming10SQL.main(streamArgs)
       } else {
@@ -107,23 +109,14 @@ object SparkStreaming10Main extends sparkstreaming.ThreadStarter {
       if (rmWatchedDir) FileUtil.rmrf(in)
     }
   }
-}
 
-/** This exists to enable reuse by HSparkStreaming10. A package is necessary... */
-package sparkstreaming {
   import DataServer._
 
-  trait ThreadStarter {
-    def startSocketDataThread(port: Int, dataSource: String): Thread = {
-      val dataThread = new Thread(new DataSocketServer(port, makePath(dataSource)))
-      dataThread.start()
-      dataThread
-    }
-    def startDirectoryDataThread(watchedDir: String, dataSource: String): Thread = {
-      FileUtil.mkdir(watchedDir)
-      val dataThread = new Thread(new DataDirectoryServer(makePath(watchedDir), makePath(dataSource)))
-      dataThread.start()
-      dataThread
-    }
+  def startSocketDataThread(port: Int, dataSource: String): Thread =
+    new Thread(new DataSocketServer(port, makePath(dataSource)))
+
+  def startDirectoryDataThread(watchedDir: String, dataSource: String): Thread = {
+    FileUtil.mkdir(watchedDir)
+    new Thread(new DataDirectoryServer(makePath(watchedDir), makePath(dataSource)))
   }
 }

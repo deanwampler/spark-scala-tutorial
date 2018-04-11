@@ -40,7 +40,6 @@ import org.apache.spark.streaming.scheduler.{
  */
 object SparkStreaming10 {
 
-  val timeout = 10         // Terminate after N seconds
   val batchSeconds = 2     // Size of batch intervals
 
   class EndOfStreamListener(sc: StreamingContext) extends StreamingListener {
@@ -50,27 +49,28 @@ object SparkStreaming10 {
     }
     override def onReceiverStopped(stopped: StreamingListenerReceiverStopped):Unit = {
       println(s"Receiver Stopped: $stopped. Stopping...")
-      sc.stop()
     }
   }
 
   def main(args: Array[String]): Unit = {
+
+    val defaultDuration = 180 // seconds
 
     val options = CommandLineOptions(
       this.getClass.getSimpleName,
       CommandLineOptions.inputPath("tmp/streaming-input"),
       CommandLineOptions.outputPath("output/wc-streaming"),
       // For this process, use at least 2 cores!
-      CommandLineOptions.master("local[*]"),
+      CommandLineOptions.master("local[2]"),
       CommandLineOptions.socket(""),     // empty default, so we know the user specified this option.
-      CommandLineOptions.terminate(timeout),
+      CommandLineOptions.terminate(defaultDuration),
       CommandLineOptions.quiet)
 
-    val argz   = options(args.toList)
-    val master = argz("master")
-    val quiet  = argz("quiet").toBoolean
-    val out    = argz("output-path")
-    val term   = argz("terminate").toInt
+    val argz    = options(args.toList)
+    val master  = argz("master")
+    val quiet   = argz("quiet").toBoolean
+    val out     = argz("output-path")
+    val seconds = argz("terminate").toInt
 
     if (master.startsWith("local")) {
       if (!quiet) println(s" **** Deleting old output (if any), $out:")
@@ -124,7 +124,7 @@ object SparkStreaming10 {
       wordCounts.saveAsTextFiles(out, "out")
 
       ssc.start()
-      if (term > 0) ssc.awaitTerminationOrTimeout(term * 1000)
+      if (seconds > 0) ssc.awaitTerminationOrTimeout(seconds * 1000)
       else ssc.awaitTermination()
     } finally {
       // This is a good time to look at the web console again:
@@ -142,7 +142,7 @@ object SparkStreaming10 {
           """.stripMargin)
         Console.in.read()
       }
-      // Having the ssc.stop here is only needed when we use the timeout.
+      // Having the ssc.stop here is only needed when we use the terminate option.
       println("+++++++++++++ Stopping Streaming Context! +++++++++++++")
       ssc.stop(stopSparkContext = true)
     }

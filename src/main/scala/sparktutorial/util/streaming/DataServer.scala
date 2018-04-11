@@ -16,7 +16,6 @@ import scala.io.Source
 trait DataServer extends Runnable {
 
   val sourcePath: Path
-  val iterations: Int
   val sleepIntervalMillis: Int
 
   import DataServer._
@@ -25,18 +24,27 @@ trait DataServer extends Runnable {
     var consumer = makeConsumer()
     try {
       val sources = getSourcePaths(sourcePath)
+      if (sources.size == 0) throw DataServerError(s"No sources for path $sourcePath!")
+      // println("sources:")
+      // sources.foreach(println)
+
+      var count = 0
       for {
-        count <- 1 to iterations
         source <- sources
       } {
-        println(s"\nIteration $count/$iterations")
+        count += 1
+        Thread.sleep(sleepIntervalMillis)
+        // println(s"\nIteration $count")
         val inputLines = getLines(source)
         consumer.setSource(source)
-        inputLines.foreach(consumer.consume)
-        Thread.sleep(sleepIntervalMillis)
+        try {
+          inputLines.foreach(consumer.consume)
+        } catch {
+          case NonFatal(ex) => println(s"""ERROR serving source $source. Ignoring...""")
+        }
       }
     } catch {
-      case NonFatal(ex) => DataServerError("Data serving failed!", ex)
+      case NonFatal(ex) => throw DataServerError("Data serving failed!", ex)
     } finally {
       consumer.close()
     }
@@ -62,8 +70,7 @@ trait DataServer extends Runnable {
 
 object DataServer {
 
-  val defaultIterations = 100
-  val defaultSleepIntervalMillis = 200 // 0.2 seconds
+  val defaultSleepIntervalMillis = 100 // 0.1 seconds
 
   case class DataServerError(msg: String, cause: Throwable = null) extends RuntimeException(msg, cause)
 
@@ -73,6 +80,7 @@ object DataServer {
 
   trait Consumer extends Closer {
     def setSource(source: Path): Unit = {
+      //println(s"new source: $source")
       sourceOpt = Some(source)
       if (resetOnSourceChange) resetPrintWriter()
     }
