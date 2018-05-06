@@ -1,45 +1,62 @@
+name          := "spark-scala-tutorial"
+organization  := "com.lightbend"
+description   := "Spark Spark Tutorial"
+version       := "6.0.0"
+scalaVersion  := "2.11.8"
+scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8", "-Xlint")
+excludeFilter in unmanagedSources := (HiddenFileFilter || "*-script.scala")
+unmanagedResourceDirectories in Compile += baseDirectory.value / "conf"
+unmanagedResourceDirectories in Test += baseDirectory.value / "conf"
+//This is important for some programs to read input from stdin
+connectInput in run := true
+// Works better to run the examples and tests in separate JVMs.
+fork := true
+// Must run Spark tests sequentially because they compete for port 4040!
+parallelExecution in Test := false
+
+val sparkVersion        = "2.3.0"
+val scalaTestVersion    = "3.0.5"
+val scalaCheckVersion   = "1.13.4"
+
+libraryDependencies ++= Seq(
+  "org.apache.spark"  %% "spark-core"      % sparkVersion,
+  "org.apache.spark"  %% "spark-streaming" % sparkVersion,
+  "org.apache.spark"  %% "spark-sql"       % sparkVersion,
+  "org.apache.spark"  %% "spark-hive"      % sparkVersion,
+  "org.apache.spark"  %% "spark-repl"      % sparkVersion,
+
+  "org.scalatest"     %% "scalatest"       % scalaTestVersion  % "test",
+  "org.scalacheck"    %% "scalacheck"      % scalaCheckVersion % "test")
+
+
 initialCommands += """
-  import org.apache.spark.{SparkConf, SparkContext}
-  import org.apache.spark.SparkContext._
-  import org.apache.spark.sql.SQLContext
-  val conf = new SparkConf().
-    setMaster("local[*]").
-    setAppName("Console").
-    set("spark.app.id", "Console")   // To silence Metrics warning.
-  val sc = new SparkContext(conf)
-  val sqlContext = new SQLContext(sc)
+  import org.apache.spark.sql.SparkSession
+  import org.apache.spark.SparkContext
+  val spark = SparkSession.builder.
+    master("local[*]").
+    appName("Console").
+    config("spark.app.id", "Console").   // To silence Metrics warning.
+    getOrCreate()
+  val sc = spark.sparkContext
+  val sqlContext = spark.sqlContext
   import sqlContext.implicits._
   import org.apache.spark.sql.functions._    // for min, max, etc.
   """
 
 cleanupCommands += """
-  println("Closing the SparkContext:")
-  sc.stop()
+  println("Closing the SparkSession:")
+  spark.stop()
   """
 
-addCommandAlias("ex2",  "run-main WordCount2")
-addCommandAlias("ex3",  "run-main WordCount3")
-addCommandAlias("ex4",  "run-main Matrix4")
-addCommandAlias("ex5a", "run-main Crawl5a")
-addCommandAlias("ex5b", "run-main InvertedIndex5b")
-addCommandAlias("ex6",  "run-main NGrams6")
-addCommandAlias("ex7",  "run-main Joins7")
-addCommandAlias("ex8",  "run-main SparkSQL8")
+addCommandAlias("ex2",  "runMain WordCount2")
+addCommandAlias("ex3",  "runMain WordCount3")
+addCommandAlias("ex4",  "runMain Matrix4")
+addCommandAlias("ex5a", "runMain Crawl5a")
+addCommandAlias("ex5b", "runMain InvertedIndex5b")
+addCommandAlias("ex6",  "runMain NGrams6")
+addCommandAlias("ex7",  "runMain Joins7")
+addCommandAlias("ex8",  "runMain SparkSQL8")
 
 // Note the differences in the next two definitions:
-addCommandAlias("ex11directory",  "run-main SparkStreaming11Main")
-addCommandAlias("ex11socket",     "run-main SparkStreaming11Main --socket localhost:9900")
-
-// Command aliases for the Hadoop drivers.
-// Note: there is no Hadoop version for WordCount2.
-addCommandAlias("hex3",  "run-main hadoop.HWordCount3")
-addCommandAlias("hex4",  "run-main hadoop.HMatrix4")
-addCommandAlias("hex5a", "run-main hadoop.HCrawl5aHDFS")
-addCommandAlias("hex5b", "run-main hadoop.HInvertedIndex5b")
-addCommandAlias("hex6",  "run-main hadoop.HNGrams6")
-addCommandAlias("hex7",  "run-main hadoop.HJoins7")
-addCommandAlias("hex8",  "run-main hadoop.HSparkSQL8")
-addCommandAlias("hex11", "run-main hadoop.HSparkStreaming11")
-
-fork in run := true
-
+addCommandAlias("ex10directory",  "runMain SparkStreaming10Main")
+addCommandAlias("ex10socket",     "runMain SparkStreaming10Main --socket localhost:9900")

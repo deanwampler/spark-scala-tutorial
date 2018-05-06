@@ -2,8 +2,8 @@ import util.{CommandLineOptions, FileUtil}
 import java.io.{File, FilenameFilter}
 import scala.io.Source
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 /**
@@ -43,11 +43,12 @@ object Crawl5aLocal {
     }
 
     val name = "CrawlLocal (5a)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name)   // To silence Metrics warning.
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.
+      master(master).
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
 
     try {
       val files_rdds = ingestFiles(in, sc)
@@ -62,7 +63,7 @@ object Crawl5aLocal {
       sc.makeRDD(names_contents).saveAsTextFile(out)
 
     } finally {
-      sc.stop()
+      spark.stop()
     }
   }
 

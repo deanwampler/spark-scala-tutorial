@@ -1,7 +1,8 @@
 import util.{CommandLineOptions, FileUtil}
 import util.CommandLineOptions.Opt
 import util.Matrix
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /**
  * Use an explicitly-parallel algorithm to sum perform statistics on
@@ -46,7 +47,13 @@ object Matrix4StdDev {
         sys.exit(1)
     }
 
-    val sc = new SparkContext(argz("master"), "Matrix (4)", new SparkConf())
+    val name = "Matrix - Standard Deviation (4)"
+    val spark = SparkSession.builder.
+      master(master).
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
 
     try {
       // Set up a mxn matrix of numbers.
@@ -76,7 +83,7 @@ object Matrix4StdDev {
       output.saveAsTextFile(out)
 
     } finally {
-      sc.stop()
+      spark.stop()
     }
 
     // Exercise: Try different values of m, n.

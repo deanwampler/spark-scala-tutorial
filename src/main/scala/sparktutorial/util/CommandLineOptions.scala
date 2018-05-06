@@ -124,7 +124,8 @@ object CommandLineOptions {
     })
 
   /**
-   * Use "--terminate N" to terminate a process after N seconds. Otherwise, it runs forever (or until ^C).
+   * Use "--terminate N" to terminate a Spark Streaming process after N seconds.
+   * Otherwise, it runs forever (or until ^C).
    */
   def terminate(seconds: Int): Opt = Opt(
     name   = "terminate",

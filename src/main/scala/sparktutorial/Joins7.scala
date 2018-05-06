@@ -1,10 +1,12 @@
 import util.{CommandLineOptions, FileUtil}
 import util.CommandLineOptions.Opt
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /**
  * Joins7 - Perform joins of datasets.
+ *
+ * @deprecated - Use the SparkSQL join implementations instead. They are far more performant!
  */
 object Joins7 {
   def main(args: Array[String]): Unit = {
@@ -37,11 +39,12 @@ object Joins7 {
     }
 
     val name = "Joins (7)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name)   // To silence Metrics warning.
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.
+      master(master).
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
 
     try {
       // Load one of the religious texts, don't convert each line to lower case
@@ -60,7 +63,7 @@ object Joins7 {
       // on the first space (in the unlikely case there are embedded tabs
       // in the names!)
       val abbrevs = sc.textFile(argz("abbreviations"))
-        .map{ line =>
+        .map { line =>
           val ary = line.split("\\s+", 2)
           (ary(0), ary(1).trim)  // I've noticed trailing whitespace...
         }
@@ -89,7 +92,7 @@ object Joins7 {
       if (!quiet) println(s"Writing output to: $out")
       verses2.saveAsTextFile(out)
     } finally {
-      sc.stop()
+      spark.stop()
     }
 
     // Exercise: Try different sacred text files.

@@ -2,14 +2,22 @@
 // Script files can't be compiled in the same way as normal code files, so
 // the SBT build is configured to ignore this file.
 
-// If you're using the Spark Shell, the following two import statements and
-// and construction of the SparkContext variable "sc" are done automatically
-// by the shell. In this tutorial, we don't download a full Spark distribution
-// with the $SPARK_HOME/bin/spark-shell. Instead, we'll use SBT's "console"
-// task, but we'll configure it to use the same commands that spark-shell use.
-// import org.apache.spark.SparkContext
-// import org.apache.spark.SparkContext._
-// val sc = new SparkContext("local[*]", "Intro (1)")
+// If you're using the Spark Shell, $SPARK_HOME/bin/spark-shell, the following
+// commented-out code are done automatically by the shell as it starts up.
+// In this tutorial, we don't download and use a full Spark distribution.
+// Instead, we'll use SBT's "console" task, but we'll configure it to use the
+// same commands that spark-shell uses (more or less...).
+//   import org.apache.spark.sql.SparkSession
+//   import org.apache.spark.SparkContext
+//   val spark = SparkSession.builder.
+//     master("local[*]").
+//     appName("Console").
+//     config("spark.app.id", "Console").   // to silence Metrics warning
+//     getOrCreate()
+//   val sc = spark.sparkContext
+//   val sqlContext = spark.sqlContext
+//   import sqlContext.implicits._
+//   import org.apache.spark.sql.functions._    // for min, max, etc.
 
 // Load the King James Version of the Bible, then convert
 // each line to lower case, creating an RDD.
@@ -24,8 +32,8 @@ val sins = input.filter(line => line.contains("sin"))
 // The () are optional in Scala for no-argument methods
 val sinCount = sins.count()      // How many sins?
 val array = sins.collect()       // Convert the RDD into a collection (array)
-array.take(20) foreach println   // Take the first 20, and print them 1/line.
-sins.take(20) foreach println    // ... but we don't have to "collect" first;
+array.take(20).foreach(println)  // Take the first 20, loop through them, and print them 1 per line.
+sins.take(20).foreach(println)   // ... but we don't have to "collect" first;
                                  // we can just use foreach on the RDD.
 
 // Create a separate filter function instead and pass it as an argument to the
@@ -37,7 +45,7 @@ val filterFunc: String => Boolean =
 //  s => s.contains("god") || s.contains("christ")
 
 // Filter the sins for the verses that mention God or Christ (lowercase)
-val sinsPlusGodOrChrist  = sins filter filterFunc
+val sinsPlusGodOrChrist  = sins filter filterFunc // same as: sins.filter(filterFunc)
 // Count how many we found. (Note we dropped the parentheses after "count")
 val countPlusGodOrChrist = sinsPlusGodOrChrist.count
 

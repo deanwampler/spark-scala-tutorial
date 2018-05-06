@@ -1,7 +1,8 @@
 import util.{CommandLineOptions, FileUtil}
 import util.CommandLineOptions.Opt
 import util.Matrix
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /**
  * Use an explicitly-parallel algorithm to sum perform statistics on
@@ -47,11 +48,12 @@ object Matrix4 {
     }
 
     val name = "Matrix (4)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name)   // To silence Metrics warning.
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.
+      master(master).
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
 
     try {
       // Set up a mxn matrix of numbers.
@@ -80,11 +82,10 @@ object Matrix4 {
       output.saveAsTextFile(out)
 
     } finally {
-      sc.stop()
+      spark.stop()
     }
 
     // Exercise: Try different values of m, n.
-    // Exercise: Try other statistics, like standard deviation.
     // Exercise: Try other statistics, like standard deviation. Are the average
     //   and standard deviation very meaningful here?
   }

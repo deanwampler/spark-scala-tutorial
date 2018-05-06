@@ -1,7 +1,7 @@
 import util.{CommandLineOptions, FileUtil, TextUtil}
 import util.CommandLineOptions.Opt
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
 
 /** NGrams6 - Find the ngrams in a corpus */
 object NGrams6 {
@@ -51,11 +51,12 @@ object NGrams6 {
     }
 
     val name = "NGrams (6)"
-    val conf = new SparkConf().
-      setMaster(master).
-      setAppName(name).
-      set("spark.app.id", name)   // To silence Metrics warning.
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.
+      master(master).
+      appName(name).
+      config("spark.app.id", name).   // To silence Metrics warning.
+      getOrCreate()
+    val sc = spark.sparkContext
 
     val ngramsStr = argz("ngrams").toLowerCase
     // Note that the replacement strings use Scala's triple quotes; necessary
@@ -105,7 +106,7 @@ object NGrams6 {
       output.saveAsTextFile(out)
 
     } finally {
-      sc.stop()
+      spark.stop()
     }
 
     // Exercise: Try different ngrams and input texts. Note that you can specify
