@@ -37,6 +37,10 @@ import org.apache.spark.streaming.scheduler.{
  * Note that the "-c" option used with "nc" above will cause it to terminate
  * automatically if the streaming process dies.
  * Nicer clean up, e.g., when a socket connection dies, is TBD.
+ *
+ * NOTE: This is obsolete, it uses the RDD-based Spark Streaming API, but converts
+ * to a DataFrame on each iteration. It would be better to use the newer Structured
+ * Streaming API instead.
  */
 object SparkStreaming10SQL {
 

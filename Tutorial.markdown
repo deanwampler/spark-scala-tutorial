@@ -1286,17 +1286,17 @@ See the script for more details. Run it the same way we ran `SparkSQL8-script.sc
 
 [SparkStreaming10.scala](https://github.com/deanwampler/spark-scala-tutorial/blob/master/src/main/scala/sparktutorial/SparkStreaming10.scala)
 
-This example shows the _Spark streaming_ capability that is based on the `RDD` API. We construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
+This example shows the original implementation of streaming in Spark, the _Spark streaming_ capability that is based on the `RDD` API. We construct a simple "word count" server. The example has two running configurations, reflecting the basic input sources supported by Spark Streaming.
 
-> **Note:** The newer streaming module is called _Structured Streaming_. It is based on the `Dataset` API, for better performance and convenience. It has supports much lower-latency processing. Examples of this API are TBD here, but see the [Structured Streaming Programming Guide](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) for more information.
+The newer streaming module is called _Structured Streaming_. It is based on the `Dataset` API, for better performance and convenience. It has supports much lower-latency processing. Examples of this API are TBD here, but see the [Apache Spark Structured Streaming Programming Guide](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) for more information.
 
 In the first configuration, which is also the default behavior for this example, new data is read from files that appear in a directory. This approach supports a workflow where new files are written to a landing directory and Spark Streaming is used to detect them, ingest them, and process the data.
 
-Note that Spark Streaming does not use the `_SUCCESS` marker file we mentioned earlier, in part because that mechanism can only be used once *all* files are written to the directory. Hence, only use this ingestion mechanism with files that "appear instantly" in the directory, i.e., through renaming from another location in the file system.
+Note that Spark Streaming does not use the `_SUCCESS` marker file we mentioned in an earlier notebook for batch processing, in part because that mechanism can only be used once *all* files are written to the directory. Hence, Spark can't know when writing the file has actually completed. This means you should only use this ingestion mechanism with files that "appear instantly" in the directory, i.e., through renaming from another location in the file system.
 
 The second basic configuration reads data from a socket. Spark Streaming also comes with connectors for other data sources, such as [Apache Kafka](http://kafka.apache.org/) and Twitter streams. We don't explore those here.
 
-`SparkStreaming10` uses directory watching by default. A temporary directory is created and a second process writes the user-specified data file(s) (default: Enron emails) to a temporary directory every second. Hence, the data will eventually repeat. `SparkStreaming10` does *Word Count* on the data. By default, it also stops after 200 iterations (the number of email files).
+`SparkStreaming10` uses directory watching by default. A temporary directory is created and a second process writes the user-specified data file(s) (default: Enron emails) to a temporary directory every second. `SparkStreaming10` does *Word Count* on the data. Hence, the data would eventually repeat, but for convenience, we also stop after 200 iterations (the number of email files).
 
 The socket option works similarly, but this time, the data are written to a socket.
 

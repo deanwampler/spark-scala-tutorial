@@ -19,6 +19,8 @@ This tutorial demonstrates how to write and run [Apache Spark](http://spark.apac
 
 This tutorial is mostly about learning Spark, but I teach you a little Scala as we go. If you are more interested in learning just enough Scala for Spark programming, see my new tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/spark-scala-tutorial).
 
+> **Note:** While the notebook approach is the easiest way to use this tutotial to learn Spark, the IDE and SBT options show details for creating Spark _applications_, i.e., writing executable programs you build and run, as well as examples that use the interactive Spark Shell.
+
 For more advanced Spark training and for information about Lightbend's _Fast Data Platform_, please visit [lightbend.com/fast-data-platform](http://www.lightbend.com/platform/fast-data-platform).
 
 ## Acknowledgments
@@ -51,7 +53,7 @@ Now Pick the way you want to work through the tutorial:
 <a name="use-jupyter-notebooks"></a>
 ## Using Jupyter Notebooks
 
-The easiest way to work with this tutorial is to use a [Docker](https://docker.com) image that combines the popular [Jupyter](http://jupyter.org/) notebook environment with all the tools you need to run Spark, including the Scala language. It's called the [All Spark Notebook](https://hub.docker.com/r/jupyter/all-spark-notebook/).  It bundles [Apache Toree](https://toree.apache.org/) to provide Spark and Scala access.
+The easiest way to work with this tutorial is to use a [Docker](https://docker.com) image that combines the popular [Jupyter](http://jupyter.org/) notebook environment with all the tools you need to run Spark, including the Scala language. It's called the [all-spark-notebook](https://hub.docker.com/r/jupyter/all-spark-notebook/).  It bundles [Apache Toree](https://toree.apache.org/) to provide Spark and Scala access.
 The [webpage](https://hub.docker.com/r/jupyter/all-spark-notebook/) for this Docker image discusses useful information like using Python as well as Scala, user authentication topics, running your Spark jobs on clusters, rather than local mode, etc.
 
 There are other notebook options you might investigate for your needs:

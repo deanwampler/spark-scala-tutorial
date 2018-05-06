@@ -27,3 +27,4 @@ project/play-fork-run.sbt
 project/sbt-ui.sbt
 .ensime
 .ensime_cache
+notebooks/.ipynb_checkpoints/
