@@ -31,3 +31,4 @@ notebooks/.ipynb_checkpoints/
 notebooks/output/
 notebooks/streaming-output/
 notebooks/tmp/
+notebooks/spark-warehouse/
