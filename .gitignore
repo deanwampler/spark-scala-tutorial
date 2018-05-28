@@ -28,3 +28,6 @@ project/sbt-ui.sbt
 .ensime
 .ensime_cache
 notebooks/.ipynb_checkpoints/
+notebooks/output/
+notebooks/streaming-output/
+notebooks/tmp/
