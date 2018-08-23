@@ -57,14 +57,14 @@ object Matrix4 {
 
     try {
       // Set up a mxn matrix of numbers.
-      val matrix = Matrix(dimensions.m, dimensions.n)
+      val matrix = Matrix(dimensions.n, dimensions.m)
 
       // Average rows of the matrix in parallel:
-      val sums_avgs = sc.parallelize(1 to dimensions.m).map { i =>
+      val sums_avgs = sc.parallelize(1 to dimensions.n).map { i =>
         // Matrix indices count from 0.
         // "_ + _" is the same as "(count1, count2) => count1 + count2".
         val sum = matrix(i-1) reduce (_ + _)
-        (sum, sum/dimensions.n)
+        (sum, sum/dimensions.m)
       }.collect    // convert to an array
 
       // Make a new sequence of strings with the formatted output, then we'll
@@ -72,7 +72,7 @@ object Matrix4 {
       // (Use fully-qualified path to Vector to avoid confusion with Spark's
       // Vector class in MLlib.)
       val outputLines = scala.collection.immutable.Vector(
-        s"${dimensions.m}x${dimensions.n} Matrix:") ++
+        s"${dimensions.n}x${dimensions.m} Matrix:") ++
         sums_avgs.zipWithIndex.map {
           case ((sum, avg), index) =>
             f"Row #${index}%2d: Sum = ${sum}%4d, Avg = ${avg}%3d"
