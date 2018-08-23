@@ -10,7 +10,7 @@ import org.apache.spark.SparkContext
  */
 object Matrix4 {
 
-  case class Dimensions(m: Int, n: Int)
+  case class Dimensions(n: Int, m: Int)
 
   def main(args: Array[String]): Unit = {
 
@@ -41,7 +41,7 @@ object Matrix4 {
 
     val dimsRE = """(\d+)\s*x\s*(\d+)""".r
     val dimensions = argz("dims") match {
-      case dimsRE(m, n) => Dimensions(m.toInt, n.toInt)
+      case dimsRE(n, m) => Dimensions(n.toInt, m.toInt)
       case s =>
         println(s"""Expected matrix dimensions 'NxM', but got this: $s""")
         sys.exit(1)
