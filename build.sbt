@@ -1,6 +1,6 @@
 name          := "spark-scala-tutorial"
 organization  := "com.lightbend"
-description   := "Spark Spark Tutorial"
+description   := "Spark Scala Tutorial"
 version       := "6.0.0"
 scalaVersion  := "2.11.8"
 scalacOptions := Seq("-deprecation", "-unchecked", "-encoding", "utf8", "-Xlint")
