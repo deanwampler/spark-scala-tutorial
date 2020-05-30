@@ -4,18 +4,18 @@
 
 ![](http://spark.apache.org/docs/latest/img/spark-logo-hd.png)
 
-Dean Wampler, Ph.D.<br/>
-[Lightbend](http://lightbend.com)<br/>
-[dean.wampler@lightbend.com](mailto:dean.wampler@lightbend.com)<br/>
+Dean Wampler<br/>
+[Anyscale](http://anyscale.com)<br/>
+[dean@anyscale.com](mailto:dean@anyscale.com)<br/>
 [@deanwampler](https://twitter.com/deanwampler)
 
 This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. I also teach a little Scala as we go, but if you already know Spark and you are more interested in learning just enough Scala for Spark programming, see my other tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/JustEnoughScalaForSpark).
 
 This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. You can run the examples and exercises several ways:
 
-1. [Jupyter notebooks](http://jupyter.org/) - The easiest way, especially for data scientists accustomed to _notebooks_
-2. In an IDE, like [IntelliJ](https://www.jetbrains.com/idea/) - Familiar for developers
-3. At the terminal prompt using the build tool [SBT](https://www.scala-sbt.org/)
+1. Notebooks, like [Jupyter](http://jupyter.org/) - The easiest way, especially for data scientists accustomed to _notebooks_.
+2. In an IDE, like [IntelliJ](https://www.jetbrains.com/idea/) - Familiar for developers.
+3. At the terminal prompt using the build tool [SBT](https://www.scala-sbt.org/).
 
 This tutorial is mostly about learning Spark, but I teach you a little Scala as we go. If you are more interested in learning just enough Scala for Spark programming, see my new tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/spark-scala-tutorial).
 
@@ -46,12 +46,12 @@ Begin by cloning or downloading the tutorial GitHub project [github.com/deanwamp
 
 Now Pick the way you want to work through the tutorial:
 
-1. Jupyter notebooks - Go [here](#use-jupyter-notebooks)
+1. Notebooks - Go [here](#use-notebooks)
 2. In an IDE, like IntelliJ - Go [here](#use-ide)
 3. At the terminal prompt using SBT - Go [here](#use-sbt)
 
-<a name="use-jupyter-notebooks"></a>
-## Using Jupyter Notebooks
+<a name="use-notebooks"></a>
+## Using Notebooks
 
 The easiest way to work with this tutorial is to use a [Docker](https://docker.com) image that combines the popular [Jupyter](http://jupyter.org/) notebook environment with all the tools you need to run Spark, including the Scala language. It's called the [all-spark-notebook](https://hub.docker.com/r/jupyter/all-spark-notebook/).  It bundles [Apache Toree](https://toree.apache.org/) to provide Spark and Scala access.
 The [webpage](https://hub.docker.com/r/jupyter/all-spark-notebook/) for this Docker image discusses useful information like using Python as well as Scala, user authentication topics, running your Spark jobs on clusters, rather than local mode, etc.
@@ -60,13 +60,12 @@ There are other notebook options you might investigate for your needs:
 
 **Open source:**
 
-* [Jupyter](https://ipython.org/) + [BeakerX](http://beakerx.com/) - a powerful set of extensions for Jupyter
+* [Polynote](https://polynote.org/) - A cross-language notebook environment with built-in Scala support. Developed by Netflix.
+* [Jupyter](https://ipython.org/) + [BeakerX](http://beakerx.com/) - a powerful set of extensions for Jupyter.
 * [Zeppelin](http://zeppelin-project.org/) - a popular tool in big data environments
-* [Spark Notebook](http://spark-notebook.io) - a powerful tool, but not as polished or well maintained
 
 **Commercial:**
 
-* [IBM Data Science Experience](http://datascience.ibm.com/) - IBM's full-featured environment for data science
 * [Databricks](https://databricks.com/) - a feature-rich, commercial, cloud-based service
 
 ## Installing Docker and the Jupyter Image
