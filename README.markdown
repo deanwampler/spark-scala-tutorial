@@ -5,13 +5,12 @@
 ![](http://spark.apache.org/docs/latest/img/spark-logo-hd.png)
 
 Dean Wampler<br/>
-[Anyscale](http://anyscale.com)<br/>
-[dean@anyscale.com](mailto:dean@anyscale.com)<br/>
+[deanwampler@gmail.com](mailto:deanwampler@gmail.com)<br/>
 [@deanwampler](https://twitter.com/deanwampler)
 
 This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. I also teach a little Scala as we go, but if you already know Spark and you are more interested in learning just enough Scala for Spark programming, see my other tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/JustEnoughScalaForSpark).
 
-This tutorial demonstrates how to write and run [Apache Spark](http://spark.apache.org) applications using Scala with some SQL. You can run the examples and exercises several ways:
+You can run the examples and exercises several ways:
 
 1. Notebooks, like [Jupyter](http://jupyter.org/) - The easiest way, especially for data scientists accustomed to _notebooks_.
 2. In an IDE, like [IntelliJ](https://www.jetbrains.com/idea/) - Familiar for developers.
@@ -19,9 +18,10 @@ This tutorial demonstrates how to write and run [Apache Spark](http://spark.apac
 
 This tutorial is mostly about learning Spark, but I teach you a little Scala as we go. If you are more interested in learning just enough Scala for Spark programming, see my new tutorial [Just Enough Scala for Spark](https://github.com/deanwampler/spark-scala-tutorial).
 
-> **Note:** While the notebook approach is the easiest way to use this tutorial to learn Spark, the IDE and SBT options show details for creating Spark _applications_, i.e., writing executable programs you build and run, as well as examples that use the interactive Spark Shell.
-
-For more advanced Spark training and for information about Lightbend's _Fast Data Platform_, please visit [lightbend.com/fast-data-platform](http://www.lightbend.com/platform/fast-data-platform).
+> **Notes:** 
+>
+> 1. The current version of Spark used is 2.3.X, which is a bit old. (TODO!)
+> 2. While the notebook approach is the easiest way to use this tutorial to learn Spark, the IDE and SBT options show details for creating Spark _applications_, i.e., writing executable programs you build and run, as well as examples that use the interactive Spark Shell.
 
 ## Acknowledgments
 
@@ -34,7 +34,7 @@ I'm grateful that several people have provided feedback, issue reports, and pull
 
 ## Getting Help
 
-Before describing the different ways to work with the tutorial, if you're having problems, use the [Gitter chat room](https://gitter.im/deanwampler/spark-scala-tutorial) to ask for help. If you're reasonably certain you've found a bug, post an issue to the [GitHub repo](https://github.com/deanwampler/spark-scala-tutorial/issues). Pull requests are welcome!!
+Before describing the different ways to work with the tutorial, if you're having problems, use the [Gitter chat room](https://gitter.im/deanwampler/spark-scala-tutorial) to ask for help. You can also use the new [Discussions feature](https://github.com/deanwampler/spark-scala-tutorial/discussions) for the GitHub repo. If you're reasonably certain you've found a bug, post an issue to the [GitHub repo](https://github.com/deanwampler/spark-scala-tutorial/issues). Pull requests are welcome, too!!
 
 ## Setup Instructions
 
