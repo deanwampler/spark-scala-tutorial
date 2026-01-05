@@ -1,7 +1,7 @@
 # Apache Spark Scala Tutorial - README
-
+<!--
 [![Join the chat at https://gitter.im/deanwampler/spark-scala-tutorial](https://badges.gitter.im/deanwampler/spark-scala-tutorial.svg)](https://gitter.im/deanwampler/spark-scala-tutorial?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+-->
 ![](http://spark.apache.org/docs/latest/img/spark-logo-hd.png)
 
 Dean Wampler<br/>
@@ -34,7 +34,7 @@ I'm grateful that several people have provided feedback, issue reports, and pull
 
 ## Getting Help
 
-Before describing the different ways to work with the tutorial, if you're having problems, use the [Gitter chat room](https://gitter.im/deanwampler/spark-scala-tutorial) to ask for help. You can also use the new [Discussions feature](https://github.com/deanwampler/spark-scala-tutorial/discussions) for the GitHub repo. If you're reasonably certain you've found a bug, post an issue to the [GitHub repo](https://github.com/deanwampler/spark-scala-tutorial/issues). Pull requests are welcome, too!!
+Before describing the different ways to work with the tutorial, if you are having problems, use the [Discussions forum](https://github.com/deanwampler/spark-scala-tutorial/discussions) for this repo. If you are reasonably certain you have found a bug, [post an issue](https://github.com/deanwampler/spark-scala-tutorial/issues) instead. Pull requests are welcome, too, of course!!
 
 ## Setup Instructions
 
